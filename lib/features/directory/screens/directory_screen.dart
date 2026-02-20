@@ -279,6 +279,13 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
 
   // جلب الأبناء
   List<DirectoryPerson> _getChildren(String personId) {
+    final person = _allPeople.firstWhere(
+      (p) => p.id == personId,
+      orElse: () => _allPeople.first,
+    );
+    if (person.gender == 'female') {
+      return _allPeople.where((p) => p.motherId == personId).toList();
+    }
     return _allPeople.where((p) => p.fatherId == personId).toList();
   }
 
