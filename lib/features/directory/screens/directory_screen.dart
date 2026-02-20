@@ -133,7 +133,16 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             residence_city,
             education,
             job,
-            is_vip
+            is_vip,
+            contact_info(
+              mobile_phone,
+              email,
+              photo_url,
+              instagram,
+              twitter,
+              snapchat,
+              facebook
+            )
           ''')
           .order('generation')
           .order('name')
@@ -180,7 +189,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           ...personJson,
           'father_name': father?['name'],
           'grandfather_name': grandfather?['name'],
-          'mother_name': mother?['name'],
+          'mother_name': mother?['name'] ?? personJson['mother_external_name'],
           'great_grandfather_name': greatGrandfather?['name'],
           'great_great_grandfather_name': greatGreatGrandfather?['name'],
           'mother_external_name': personJson['mother_external_name'],
@@ -579,7 +588,13 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       }
     }
     final spouse = _getSpouse(person.spouseId);
-    final contactInfo = await _getContactInfo(person.id);
+    // استخراج contactInfo من person مباشرة (تم جلبه في _loadPeople)
+    final contactInfo = {
+      'instagram': person.instagram,
+      'twitter': person.twitter,
+      'snapchat': person.snapchat,
+      'facebook': person.facebook,
+    };
     if (!mounted) return;
     Navigator.push(
       context,

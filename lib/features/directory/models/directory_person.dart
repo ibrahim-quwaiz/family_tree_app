@@ -29,6 +29,7 @@ class DirectoryPerson {
   final String? instagram;
   final String? twitter;
   final String? snapchat;
+  final String? facebook;
 
   DirectoryPerson({
     required this.id,
@@ -61,6 +62,7 @@ class DirectoryPerson {
     this.instagram,
     this.twitter,
     this.snapchat,
+    this.facebook,
   });
 
   factory DirectoryPerson.fromJson(Map<String, dynamic> json) {
@@ -111,6 +113,7 @@ class DirectoryPerson {
       instagram: contactMap?['instagram'] as String?,
       twitter: contactMap?['twitter'] as String?,
       snapchat: contactMap?['snapchat'] as String?,
+      facebook: contactMap?['facebook'] as String?,
     );
   }
 
