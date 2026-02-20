@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/directory_person.dart';
 import '../utils/arabic_search.dart';
 import '../widgets/ancestral_browser.dart';
+import 'person_profile_screen.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -110,7 +111,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     try {
       print('📡 جلب بيانات الدليل من Supabase...');
 
-      // جلب البيانات من people مع contact_info
+      // جلب البيانات من people
       final response = await SupabaseConfig.client
           .from('people')
           .select('''
@@ -118,18 +119,21 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             legacy_user_id,
             name,
             gender,
-            generation,
             is_alive,
-            residence_city,
-            job,
+            generation,
             father_id,
             mother_id,
             spouse_id,
             spouse_external_name,
-            contact_info (
-              mobile_phone, email, photo_url,
-              instagram, twitter, snapchat
-            )
+            mother_external_name,
+            birth_date,
+            death_date,
+            birth_city,
+            birth_country,
+            residence_city,
+            education,
+            job,
+            is_vip
           ''')
           .order('generation')
           .order('name')
@@ -169,12 +173,23 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
         final greatGreatGrandfatherId = greatGrandfather?['father_id'] as String?;
         final greatGreatGrandfather = greatGreatGrandfatherId != null ? peopleMap[greatGreatGrandfatherId] : null;
         
+        final motherId = personJson['mother_id'] as String?;
+        final mother = motherId != null ? peopleMap[motherId] : null;
+        
         final enriched = {
           ...personJson,
           'father_name': father?['name'],
           'grandfather_name': grandfather?['name'],
+          'mother_name': mother?['name'],
           'great_grandfather_name': greatGrandfather?['name'],
           'great_great_grandfather_name': greatGreatGrandfather?['name'],
+          'mother_external_name': personJson['mother_external_name'],
+          'birth_date': personJson['birth_date'],
+          'death_date': personJson['death_date'],
+          'birth_city': personJson['birth_city'],
+          'birth_country': personJson['birth_country'],
+          'education': personJson['education'],
+          'is_vip': personJson['is_vip'],
         };
         
         // Log للأشخاص الذين لديهم 4 أجيال (للاختبار)
@@ -224,13 +239,16 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     }
   }
 
-  // جلب الزوجات (للرجال)
+  // جلب الزوجات (للرجال) — نطلب wife_external_name صراحةً
   Future<List<Map<String, dynamic>>> _getWives(String personId) async {
     try {
       final marriages = await SupabaseConfig.client
           .from('marriages')
           .select('''
-            *,
+            husband_id,
+            wife_id,
+            wife_external_name,
+            marriage_order,
             wife:people!marriages_wife_id_fkey(
               id,
               name,
@@ -240,9 +258,12 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           .eq('husband_id', personId)
           .order('marriage_order');
       
-      return List<Map<String, dynamic>>.from(marriages);
-    } catch (e) {
+      final result = List<Map<String, dynamic>>.from(marriages);
+      
+      return result;
+    } catch (e, stackTrace) {
       print('❌ خطأ في جلب الزوجات: $e');
+      print('📋 Stack trace: $stackTrace');
       return [];
     }
   }
@@ -267,6 +288,27 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<Map<String, String?>> _getContactInfo(String personId) async {
+    try {
+      final response = await SupabaseConfig.client
+          .from('contact_info')
+          .select('instagram, twitter, snapchat, facebook')
+          .eq('person_id', personId)
+          .maybeSingle();
+      if (response != null) {
+        return {
+          'instagram': response['instagram'] as String?,
+          'twitter': response['twitter'] as String?,
+          'snapchat': response['snapchat'] as String?,
+          'facebook': response['facebook'] as String?,
+        };
+      }
+    } catch (e) {
+      print('خطأ في جلب معلومات التواصل: $e');
+    }
+    return {};
   }
 
   Color _getPersonColor(DirectoryPerson person) {
@@ -517,39 +559,44 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   }
 
   void _showPersonDetails(DirectoryPerson person) async {
-    // جلب الزوجات (إذا رجل)
+    final children = _getChildren(person.id);
+
     List<Map<String, dynamic>> wives = [];
     if (person.gender == 'male') {
       wives = await _getWives(person.id);
+      
+      // إذا لم نجد زوجات في marriages ووجدنا spouse_external_name في الشخص نفسه، أضفه كزوجة خارجية
+      if (wives.isEmpty && person.spouseExternalName != null && person.spouseExternalName!.isNotEmpty) {
+        wives = [
+          {
+            'husband_id': person.id,
+            'wife_id': null,
+            'wife_external_name': person.spouseExternalName,
+            'marriage_order': 1,
+            'wife': null,
+          }
+        ];
+      }
     }
-    
-    // جلب الأبناء
-    final children = _getChildren(person.id);
-    
-    // جلب معلومات الزوج (إذا امرأة)
     final spouse = _getSpouse(person.spouseId);
-    
+    final contactInfo = await _getContactInfo(person.id);
     if (!mounted) return;
-    
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return PersonDetailSheet(
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PersonProfileScreen(
           person: person,
           wives: wives,
           children: children,
           spouse: spouse,
+          contactInfo: contactInfo,
           allPeople: _allPeople,
           onPersonTap: (selectedPerson) {
             Navigator.pop(context);
             _showPersonDetails(selectedPerson);
           },
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -994,11 +1041,16 @@ class PersonDetailSheet extends StatelessWidget {
                 if (person.fatherName != null)
                   _buildFatherSection(),
                 
-                const Divider(height: 32),
+                // الأم
+                if (person.motherName != null)
+                  _buildMotherSection(),
                 
-                // للرجل: الزوجات + أبناء كل زوجة
-                if (person.gender == 'male' && wives.isNotEmpty)
+                // للرجل: الزوجات + أبناء كل زوجة أو الأبناء فقط
+                if (person.gender == 'male' && children.isNotEmpty && wives.isNotEmpty)
                   _buildWivesSection(),
+
+                if (person.gender == 'male' && children.isNotEmpty && wives.isEmpty)
+                  _buildChildrenWithExternalWifeSection(),
                 
                 // للمرأة: الزوج + الأبناء
                 if (person.gender == 'female')
@@ -1092,6 +1144,59 @@ class PersonDetailSheet extends StatelessWidget {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildMotherSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 32),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            '👩 الأم',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.person, color: Color(0xFFE91E8C)),
+            title: Text(
+              person.motherName!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              textDirection: TextDirection.rtl,
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              final mother = allPeople.firstWhere(
+                (p) => p.id == person.motherId,
+                orElse: () => person,
+              );
+              if (mother.id != person.id) {
+                onPersonTap(mother);
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChildrenWithExternalWifeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 32),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            '👨‍👩‍👦 الأبناء (${children.length})',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        ...children.map((child) => _buildChildTile(child)),
       ],
     );
   }

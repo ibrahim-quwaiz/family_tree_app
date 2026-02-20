@@ -10,9 +10,17 @@ class DirectoryPerson {
   final String? fatherId;
   final String? fatherName;
   final String? motherId;
+  final String? motherName;
+  final String? motherExternalName;
   final String? spouseId;
   final String? spouseExternalName;
   final String? grandfatherName;
+  final DateTime? birthDate;
+  final DateTime? deathDate;
+  final String? birthCity;
+  final String? birthCountry;
+  final String? education;
+  final bool isVip;
   final String? greatGrandfatherName;
   final String? greatGreatGrandfatherName;
   final String? mobilePhone;
@@ -34,9 +42,17 @@ class DirectoryPerson {
     this.fatherId,
     this.fatherName,
     this.motherId,
+    this.motherName,
+    this.motherExternalName,
     this.spouseId,
     this.spouseExternalName,
     this.grandfatherName,
+    this.birthDate,
+    this.deathDate,
+    this.birthCity,
+    this.birthCountry,
+    this.education,
+    this.isVip = false,
     this.greatGrandfatherName,
     this.greatGreatGrandfatherName,
     this.mobilePhone,
@@ -76,11 +92,19 @@ class DirectoryPerson {
       fatherId: json['father_id'] as String?,
       fatherName: json['father_name'] as String?,
       motherId: json['mother_id'] as String?,
+      motherName: json['mother_name'] as String?,
+      motherExternalName: json['mother_external_name'] as String?,
       spouseId: json['spouse_id'] as String?,
       spouseExternalName: json['spouse_external_name'] as String?,
       grandfatherName: json['grandfather_name'] as String?,
       greatGrandfatherName: json['great_grandfather_name'] as String?,
       greatGreatGrandfatherName: json['great_great_grandfather_name'] as String?,
+      birthDate: json['birth_date'] != null ? DateTime.tryParse(json['birth_date']) : null,
+      deathDate: json['death_date'] != null ? DateTime.tryParse(json['death_date']) : null,
+      birthCity: json['birth_city'] as String?,
+      birthCountry: json['birth_country'] as String?,
+      education: json['education'] as String?,
+      isVip: json['is_vip'] as bool? ?? false,
       mobilePhone: contactMap?['mobile_phone'] as String?,
       email: contactMap?['email'] as String?,
       photoUrl: contactMap?['photo_url'] as String?,
