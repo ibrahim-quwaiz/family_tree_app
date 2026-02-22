@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../features/tree/screens/tree_screen.dart';
 import '../../features/news/screens/news_screen.dart';
 import '../../features/directory/screens/directory_screen.dart';
+import '../../features/about/screens/about_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -17,6 +18,7 @@ class _MainNavigationState extends State<MainNavigation> {
     const TreeScreen(),
     const NewsScreen(),
     const DirectoryScreen(),
+    const AboutScreen(),
   ];
 
   @override
@@ -44,6 +46,10 @@ class _MainNavigationState extends State<MainNavigation> {
             BottomNavigationBarItem(
               icon: Icon(Icons.contacts),
               label: 'الدليل',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.info_outline),
+              label: 'عن العائلة',
             ),
           ],
           selectedItemColor: Colors.green[700],
