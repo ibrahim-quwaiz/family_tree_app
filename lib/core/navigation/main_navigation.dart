@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/tree/screens/tree_screen.dart';
+import '../../features/news/screens/news_screen.dart';
 import '../../features/directory/screens/directory_screen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -14,6 +15,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _screens = [
     const TreeScreen(),
+    const NewsScreen(),
     const DirectoryScreen(),
   ];
 
@@ -34,6 +36,10 @@ class _MainNavigationState extends State<MainNavigation> {
             BottomNavigationBarItem(
               icon: Icon(Icons.account_tree),
               label: 'الشجرة',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.newspaper),
+              label: 'الأخبار',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.contacts),

@@ -347,12 +347,14 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     final suffix = person.isAlive ? '' : ' رحمه الله';
     final parts = [person.name];
     if (person.fatherName != null && person.fatherName!.isNotEmpty) {
+      parts.add(connector);
       parts.add(person.fatherName!);
     }
     if (person.grandfatherName != null && person.grandfatherName!.isNotEmpty) {
+      parts.add('بن');
       parts.add(person.grandfatherName!);
     }
-    return parts.join(' $connector ') + suffix;
+    return parts.join(' ') + suffix;
   }
 
   Widget _buildAdvancedSearchTab() {
