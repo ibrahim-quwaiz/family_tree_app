@@ -200,6 +200,8 @@ class _NewsScreenState extends State<NewsScreen> {
     final preview = lines.take(2).join('\n').trim();
     final previewText =
         preview.length > 120 ? '${preview.substring(0, 120)}...' : preview;
+    final hasImage =
+        news.imageUrl != null && news.imageUrl!.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -208,113 +210,174 @@ class _NewsScreenState extends State<NewsScreen> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _showNewsDetail(news),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (news.imageUrl != null && news.imageUrl!.isNotEmpty)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  news.imageUrl!,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: news.typeColor.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(news.typeIcon,
-                            color: news.typeColor, size: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: hasImage
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        news.imageUrl!,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const SizedBox(width: 100, height: 100),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: news.typeColor.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            news.typeLabel,
-                            style: TextStyle(
-                              color: news.typeColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: news.typeColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              news.typeLabel,
+                              style: TextStyle(
+                                color: news.typeColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    news.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      if (news.authorName != null &&
-                          news.authorName!.isNotEmpty)
-                        Text(
-                          news.authorName!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
+                          const SizedBox(height: 8),
+                          Text(
+                            news.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
-                        ),
-                      if (news.authorName != null &&
-                          news.authorName!.isNotEmpty &&
-                          news.createdAt != null)
-                        Text(
-                          ' • ',
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                      if (news.createdAt != null)
-                        Text(
-                          _formatDate(news.createdAt!),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              if (news.authorName != null &&
+                                  news.authorName!.isNotEmpty)
+                                Text(
+                                  news.authorName!,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              if (news.authorName != null &&
+                                  news.authorName!.isNotEmpty &&
+                                  news.createdAt != null)
+                                Text(
+                                  ' • ',
+                                  style: TextStyle(
+                                      color: AppColors.textSecondary),
+                                ),
+                              if (news.createdAt != null)
+                                Text(
+                                  _formatDate(news.createdAt!),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                    ],
-                  ),
-                  if (previewText.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      previewText,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                        height: 1.5,
+                          if (previewText.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              previewText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                                height: 1.5,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ],
-              ),
-            ),
-          ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: news.typeColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        news.typeLabel,
+                        style: TextStyle(
+                          color: news.typeColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      news.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        if (news.authorName != null &&
+                            news.authorName!.isNotEmpty)
+                          Text(
+                            news.authorName!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        if (news.authorName != null &&
+                            news.authorName!.isNotEmpty &&
+                            news.createdAt != null)
+                          Text(
+                            ' • ',
+                            style: TextStyle(
+                                color: AppColors.textSecondary),
+                          ),
+                        if (news.createdAt != null)
+                          Text(
+                            _formatDate(news.createdAt!),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (previewText.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        previewText,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
         ),
       ),
     );
