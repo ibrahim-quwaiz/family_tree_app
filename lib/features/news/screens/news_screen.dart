@@ -132,10 +132,10 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
         title: const Text('الأخبار'),
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
@@ -166,7 +166,7 @@ class _NewsScreenState extends State<NewsScreen> {
 
   Widget _buildFilterTabs() {
     return Container(
-      color: AppColors.surface,
+      color: AppColors.bgCard,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -409,7 +409,7 @@ class _NewsScreenState extends State<NewsScreen> {
         maxChildSize: 1,
         builder: (context, scrollController) => Container(
           decoration: const BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.bgCard,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -521,13 +521,13 @@ class _NewsScreenState extends State<NewsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.newspaper_outlined, size: 80, color: Colors.grey[400]),
+          Icon(Icons.newspaper_outlined, size: 80, color: AppColors.textSecondary),
           const SizedBox(height: 16),
           Text(
             'لا توجد أخبار حالياً',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -546,7 +546,7 @@ class _NewsScreenState extends State<NewsScreen> {
             const SizedBox(height: 16),
             Text(
               'حدث خطأ في تحميل الأخبار',
-              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 18, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
             FilledButton(

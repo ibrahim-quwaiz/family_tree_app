@@ -47,7 +47,7 @@ class SearchAndFiltersBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.white,
+      color: AppColors.bgCard,
       child: Row(
         children: [
           // شريط البحث
@@ -59,7 +59,7 @@ class SearchAndFiltersBar extends StatelessWidget {
                 hintStyle: const TextStyle(color: AppColors.textSecondary),
                 prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: AppColors.bgCard,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -84,7 +84,7 @@ class SearchAndFiltersBar extends StatelessWidget {
             decoration: BoxDecoration(
               color: _hasActiveFilters() 
                   ? AppColors.primaryGreen 
-                  : AppColors.background,
+                  : AppColors.bgCard,
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -138,7 +138,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.bgCard,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -151,7 +151,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -165,6 +165,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
           
@@ -176,6 +177,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
             ),
           ),
           
@@ -230,6 +232,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
             ),
           ),
           

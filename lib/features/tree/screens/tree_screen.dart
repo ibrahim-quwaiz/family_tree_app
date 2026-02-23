@@ -139,8 +139,9 @@ class _TreeScreenState extends State<TreeScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
+          backgroundColor: AppColors.bgDeep,
           title: const Text('شجرة العائلة'),
           actions: [
             IconButton(
@@ -179,7 +180,7 @@ class _TreeScreenState extends State<TreeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
-                        color: AppColors.primaryGreen,
+                        color: AppColors.gold,
                       ),
                       SizedBox(height: 16),
                       Text(
@@ -222,7 +223,7 @@ class _TreeScreenState extends State<TreeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
+                            color: AppColors.accentGreen,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -349,24 +350,24 @@ class _TreeScreenState extends State<TreeScreen> {
       children: [
         FloatingActionButton(
           mini: true,
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.add, color: AppColors.primaryGreen),
+          backgroundColor: AppColors.bgCard,
+          child: const Icon(Icons.add, color: AppColors.gold),
           onPressed: _zoomIn,
           heroTag: 'zoom_in',
         ),
         const SizedBox(height: 8),
         FloatingActionButton(
           mini: true,
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.remove, color: AppColors.primaryGreen),
+          backgroundColor: AppColors.bgCard,
+          child: const Icon(Icons.remove, color: AppColors.gold),
           onPressed: _zoomOut,
           heroTag: 'zoom_out',
         ),
         const SizedBox(height: 8),
         FloatingActionButton(
           mini: true,
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.center_focus_strong, color: AppColors.primaryGreen),
+          backgroundColor: AppColors.bgCard,
+          child: const Icon(Icons.center_focus_strong, color: AppColors.gold),
           onPressed: _resetZoom,
           heroTag: 'zoom_reset',
         ),
@@ -378,13 +379,13 @@ class _TreeScreenState extends State<TreeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: AppColors.bgCard,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         '${(_currentZoom * 100).toInt()}%',
         style: const TextStyle(
-          color: Colors.white,
+          color: AppColors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -398,12 +399,12 @@ class _TreeScreenState extends State<TreeScreen> {
       height: 120,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.bgCard,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -412,14 +413,14 @@ class _TreeScreenState extends State<TreeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.people, color: AppColors.primaryGreen, size: 40),
+          const Icon(Icons.people, color: AppColors.gold, size: 40),
           const SizedBox(height: 8),
           Text(
             '${filteredPeople.length}',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryGreen,
+              color: AppColors.gold,
             ),
           ),
           const Text(
@@ -450,7 +451,7 @@ class _TreeScreenState extends State<TreeScreen> {
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.bgCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -460,22 +461,32 @@ class _TreeScreenState extends State<TreeScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               person.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('الجيل ${person.generation}'),
+                Text(
+                  'الجيل ${person.generation}',
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
                 const SizedBox(width: 16),
-                Text(person.isAlive ? '🟢 حي' : '⚪ متوفى'),
+                Text(
+                  person.isAlive ? '🟢 حي' : '⚪ متوفى',
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
               ],
             ),
             if (person.legacyUserId != null) ...[
@@ -491,13 +502,13 @@ class _TreeScreenState extends State<TreeScreen> {
             const SizedBox(height: 24),
             Text(
               'عدد الأبناء: ${person.childrenCount}',
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
             ),
             if (person.mobilePhone != null) ...[
               const SizedBox(height: 12),
               Text(
                 'الجوال: ${person.mobilePhone}',
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
             ],
             const SizedBox(height: 24),

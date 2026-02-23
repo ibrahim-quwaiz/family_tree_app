@@ -63,7 +63,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
   }
 
   Color _getPersonColor(DirectoryPerson person) {
-    if (!person.isAlive) return Colors.grey;
+    if (!person.isAlive) return AppColors.neutralGray;
     if (person.gender == 'female') return const Color(0xFFE91E8C);
     return AppColors.primaryGreen;
   }
@@ -99,7 +99,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                           )
                         : null,
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.bgCard,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppColors.borderLight),

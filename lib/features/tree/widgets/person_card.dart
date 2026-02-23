@@ -23,7 +23,7 @@ class PersonCard extends StatelessWidget {
         height: 180,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.bgCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _getBorderColor(),
@@ -31,7 +31,7 @@ class PersonCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: isCurrentUser ? AppColors.secondaryGold.withOpacity(0.3) : Colors.black.withOpacity(0.08),
+              color: isCurrentUser ? AppColors.gold.withOpacity(0.3) : Colors.black.withOpacity(0.2),
               blurRadius: isCurrentUser ? 12 : 8,
               offset: const Offset(0, 2),
             ),
@@ -44,7 +44,7 @@ class PersonCard extends StatelessWidget {
             const SizedBox(height: 8),
             Container(height: 1, color: AppColors.borderLight),
             const SizedBox(height: 8),
-            Text(person.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center, maxLines: 2),
+            Text(person.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, maxLines: 2),
             const SizedBox(height: 4),
             Text('الجيل ${person.generation}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
             const SizedBox(height: 4),
@@ -83,7 +83,7 @@ class PersonCard extends StatelessWidget {
   }
 
   Color _getBorderColor() {
-    if (isCurrentUser) return AppColors.secondaryGold;
+    if (isCurrentUser) return AppColors.gold;
     return person.isAlive ? AppColors.successGreen : AppColors.neutralGray;
   }
 }

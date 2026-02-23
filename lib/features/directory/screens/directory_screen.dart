@@ -337,7 +337,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   }
 
   Color _getPersonColor(DirectoryPerson person) {
-    if (!person.isAlive) return Colors.grey;
+    if (!person.isAlive) return AppColors.neutralGray;
     if (person.gender == 'female') return const Color(0xFFE91E8C);
     return AppColors.primaryGreen;
   }
@@ -387,7 +387,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
         ),
         Expanded(
           child: _filteredPeople.isEmpty
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.search_off, size: 64, color: Colors.grey), const SizedBox(height: 16), const Text('لا توجد نتائج', style: TextStyle(fontSize: 18))]))
+              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.search_off, size: 64, color: AppColors.textSecondary), const SizedBox(height: 16), const Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary))]))
               : ListView.builder(itemCount: _filteredPeople.length, itemBuilder: (context, index) => _buildPersonCard(_filteredPeople[index])),
         ),
       ],
@@ -403,7 +403,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
         subtitle: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text('الجيل ${person.generation}', style: const TextStyle(fontSize: 12), textDirection: TextDirection.rtl),
           if (person.residenceCity != null) Text(person.residenceCity!, style: const TextStyle(fontSize: 12)),
-          if (person.legacyUserId != null) Text(person.legacyUserId!, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          if (person.legacyUserId != null) Text(person.legacyUserId!, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         ]),
         trailing: person.mobilePhone != null
             ? Row(mainAxisSize: MainAxisSize.min, children: [
@@ -485,13 +485,15 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
               if (!_isLoading) Text('${_allPeople.length} شخص', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.normal)),
             ]),
             actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _loadPeople, tooltip: 'تحديث البيانات')],
-            bottom: const TabBar(
-              tabs: [Tab(icon: Icon(Icons.search), text: 'بحث'), Tab(icon: Icon(Icons.account_tree), text: 'تصفح')],
-              labelColor: Colors.white, unselectedLabelColor: Colors.white70, indicatorColor: Colors.white,
+            bottom: TabBar(
+              tabs: const [Tab(icon: Icon(Icons.search), text: 'بحث'), Tab(icon: Icon(Icons.account_tree), text: 'تصفح')],
+              labelColor: AppColors.gold,
+              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: AppColors.gold,
             ),
           ),
           body: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
               : TabBarView(children: [_buildAdvancedSearchTab(), AncestralBrowser(allPeople: _allPeople, onPersonSelected: _showPersonDetails)]),
         ),
       ),

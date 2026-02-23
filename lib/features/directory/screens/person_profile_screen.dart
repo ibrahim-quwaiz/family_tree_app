@@ -30,7 +30,7 @@ class PersonProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('الملف الشخصي'),
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.bgDeep,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -87,7 +87,7 @@ class PersonProfileScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Text(_buildPersonFullName(), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold), textAlign: TextAlign.center, textDirection: TextDirection.rtl),
+        Text(_buildPersonFullName(), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, textDirection: TextDirection.rtl),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -95,15 +95,15 @@ class PersonProfileScreen extends StatelessWidget {
             if (person.legacyUserId != null) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
                 child: Text(person.legacyUserId!, style: const TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(width: 8),
             ],
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12)),
-              child: Text('الجيل ${person.generation}', style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              decoration: BoxDecoration(color: AppColors.bgCard, borderRadius: BorderRadius.circular(12)),
+              child: Text('الجيل ${person.generation}', style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -219,13 +219,13 @@ class PersonProfileScreen extends StatelessWidget {
         onTap: isInternal ? () { try { final wife = allPeople.firstWhere((p) => p.id == wifeId); onPersonTap(wife); } catch (e) {} } : null,
         child: Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: const Color(0xFFE91E8C).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(color: const Color(0xFFE91E8C).withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
           child: Row(children: [
             CircleAvatar(backgroundColor: const Color(0xFFE91E8C), child: Text(wifeName.isNotEmpty ? wifeName[0] : '؟', style: const TextStyle(color: Colors.white))),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Text(wifeName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
-              Text(isInternal ? 'من العائلة' : 'من خارج العائلة', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              Text(isInternal ? 'من العائلة' : 'من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ])),
             if (isInternal) const Icon(Icons.arrow_forward_ios, size: 16),
           ]),
@@ -233,7 +233,7 @@ class PersonProfileScreen extends StatelessWidget {
       ),
       if (childrenFromWife.isNotEmpty) ...[
         const SizedBox(height: 12),
-        Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${childrenFromWife.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]))),
+        Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${childrenFromWife.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
         const SizedBox(height: 8),
         ...childrenFromWife.map((child) => _buildChildTile(child)),
       ],
@@ -257,12 +257,12 @@ class PersonProfileScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text(motherName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
-            Text('من خارج العائلة', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text('من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           ])),
         ]),
       ),
       const SizedBox(height: 12),
-      Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]))),
+      Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
       const SizedBox(height: 8),
       ...kids.map((child) => _buildChildTile(child)),
       const SizedBox(height: 16),
@@ -311,13 +311,13 @@ class PersonProfileScreen extends StatelessWidget {
                     onTap: isInternal && father != null ? () => onPersonTap(father) : null,
                     child: Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
                       child: Row(children: [
                         CircleAvatar(backgroundColor: AppColors.primaryGreen, child: Text(fatherName.isNotEmpty ? fatherName[0] : '؟', style: const TextStyle(color: Colors.white))),
                         const SizedBox(width: 12),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                           Text(fatherName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
-                          Text(isInternal ? 'الزوج - من العائلة' : 'الزوج', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                          Text(isInternal ? 'الزوج - من العائلة' : 'الزوج', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ])),
                         if (isInternal) const Icon(Icons.arrow_forward_ios, size: 16),
                       ]),
@@ -325,7 +325,7 @@ class PersonProfileScreen extends StatelessWidget {
                   ),
                   // الأبناء
                   const SizedBox(height: 8),
-                  Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]))),
+                  Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
                   const SizedBox(height: 8),
                   ...kids.map((child) => _buildChildTile(child)),
                   const SizedBox(height: 16),
@@ -347,13 +347,13 @@ class PersonProfileScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
-                        Text('الزوج - من خارج العائلة', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text('الزوج - من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       ])),
                     ]),
                   ),
                   // الأبناء
                   const SizedBox(height: 8),
-                  Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${entry.value.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]))),
+                  Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${entry.value.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
                   const SizedBox(height: 8),
                   ...entry.value.map((child) => Card(
                     margin: const EdgeInsets.symmetric(vertical: 4),
@@ -476,7 +476,7 @@ class PersonProfileScreen extends StatelessWidget {
         Icon(icon, color: AppColors.primaryGreen, size: 20),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          Text(label, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 2),
           Text(value, style: const TextStyle(fontSize: 15), textDirection: TextDirection.rtl),
         ])),
@@ -489,12 +489,12 @@ class PersonProfileScreen extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
         child: Row(children: [
           CircleAvatar(backgroundColor: color, child: Icon(icon, color: Colors.white, size: 20)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text(relation, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text(relation, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
           ])),
           if (onTap != null) const Icon(Icons.arrow_forward_ios, size: 16),
@@ -516,7 +516,7 @@ class PersonProfileScreen extends StatelessWidget {
   }
 
   Color _getPersonColor() {
-    if (!person.isAlive) return Colors.grey;
+    if (!person.isAlive) return AppColors.neutralGray;
     if (person.gender == 'female') return const Color(0xFFE91E8C);
     return AppColors.primaryGreen;
   }

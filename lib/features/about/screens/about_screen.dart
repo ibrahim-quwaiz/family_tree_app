@@ -121,7 +121,7 @@ class _AboutScreenState extends State<AboutScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('عن العائلة'),
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
@@ -175,7 +175,7 @@ class _AboutScreenState extends State<AboutScreen> {
               spacing: 12,
               runSpacing: 12,
               children: [
-                _buildStatBox('الإجمالي', '$_totalCount', AppColors.primaryGreen),
+                _buildStatBox('الإجمالي', '$_totalCount', AppColors.gold),
                 _buildStatBox('الرجال', '$_maleCount', Colors.blue.shade700),
                 _buildStatBox('النساء', '$_femaleCount', Colors.pink.shade600),
                 _buildStatBox('الأحياء', '$_aliveCount', AppColors.successGreen),
@@ -228,7 +228,7 @@ class _AboutScreenState extends State<AboutScreen> {
           children: [
             Icon(
               Icons.account_tree,
-              color: AppColors.primaryGreen,
+              color: AppColors.gold,
               size: 28,
             ),
             const SizedBox(width: 8),
@@ -237,7 +237,7 @@ class _AboutScreenState extends State<AboutScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryGreen,
+                color: AppColors.gold,
               ),
             ),
           ],
@@ -247,11 +247,11 @@ class _AboutScreenState extends State<AboutScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.bgCard,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -280,7 +280,7 @@ class _AboutScreenState extends State<AboutScreen> {
           children: [
             Icon(
               Icons.info_outline,
-              color: AppColors.primaryGreen,
+              color: AppColors.gold,
               size: 28,
             ),
             const SizedBox(width: 8),
@@ -289,7 +289,7 @@ class _AboutScreenState extends State<AboutScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryGreen,
+                color: AppColors.gold,
               ),
             ),
           ],
@@ -299,11 +299,11 @@ class _AboutScreenState extends State<AboutScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.bgCard,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -332,7 +332,7 @@ class _AboutScreenState extends State<AboutScreen> {
           children: [
             Icon(
               Icons.contact_phone,
-              color: AppColors.primaryGreen,
+              color: AppColors.gold,
               size: 28,
             ),
             const SizedBox(width: 8),
@@ -341,7 +341,7 @@ class _AboutScreenState extends State<AboutScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryGreen,
+                color: AppColors.gold,
               ),
             ),
           ],
@@ -428,11 +428,11 @@ class _AboutScreenState extends State<AboutScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+            Icon(Icons.error_outline, size: 64, color: AppColors.accentRed),
             const SizedBox(height: 16),
             Text(
               'حدث خطأ في تحميل البيانات',
-              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 18, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
             FilledButton(

@@ -43,7 +43,7 @@ class _AncestralBrowserState extends State<AncestralBrowser> {
   }
 
   Color _getPersonColor(DirectoryPerson person) {
-    if (!person.isAlive) return Colors.grey;
+    if (!person.isAlive) return AppColors.neutralGray;
     if (person.gender == 'female') return const Color(0xFFE91E8C);
     return AppColors.primaryGreen;
   }
