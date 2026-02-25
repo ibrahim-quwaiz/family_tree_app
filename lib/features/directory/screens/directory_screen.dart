@@ -223,23 +223,29 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
 
   Future<List<Map<String, dynamic>>> _getWives(String personId) async {
     try {
-      final marriages = await SupabaseConfig.client
+      // تجنب الاعتماد على اسم FK في PostgREST (قد يسبب 400 إذا اختلف الاسم)
+      final response = await SupabaseConfig.client
           .from('marriages')
-          .select('''
-            husband_id,
-            wife_id,
-            wife_external_name,
-            marriage_order,
-            wife:people!marriages_wife_id_fkey(
-              id,
-              name,
-              legacy_user_id
-            )
-          ''')
+          .select('id, husband_id, wife_id, wife_external_name, marriage_order, marriage_date, is_current')
           .eq('husband_id', personId)
           .order('marriage_order');
-      
-      return List<Map<String, dynamic>>.from(marriages);
+
+      final wives = <Map<String, dynamic>>[];
+      for (final m in response) {
+        final marriage = Map<String, dynamic>.from(m);
+        final wifeId = marriage['wife_id'] as String?;
+        if (wifeId != null) {
+          final wife = await SupabaseConfig.client
+              .from('people')
+              .select('id, name, legacy_user_id')
+              .eq('id', wifeId)
+              .maybeSingle();
+          marriage['wife'] = wife;
+        }
+        wives.add(marriage);
+      }
+
+      return wives;
     } catch (e) {
       print('❌ خطأ في جلب الزوجات: $e');
       return [];

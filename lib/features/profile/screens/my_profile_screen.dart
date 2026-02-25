@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
@@ -1484,7 +1488,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   void _showEditPhotoDialog() {
-    final urlCtrl = TextEditingController(text: _contactData?['photo_url'] ?? '');
+    Uint8List? selectedImageBytes;
+    String? selectedImageName;
+    String? currentPhotoUrl = _contactData?['photo_url'] as String?;
 
     showModalBottomSheet(
       context: context,
@@ -1493,40 +1499,184 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 24, right: 24, left: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-              const SizedBox(height: 20),
-              const Text('تعديل الصورة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 20),
-              _buildTextField(urlCtrl, 'رابط الصورة', Icons.link_rounded),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () async {
-                    await _updateContactData({
-                      'photo_url': urlCtrl.text.trim().isEmpty ? null : urlCtrl.text.trim(),
-                    });
-                    if (mounted) Navigator.pop(context);
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.gold,
-                    foregroundColor: AppColors.bgDeep,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 24, right: 24, left: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                  child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                const Center(
+                  child: Text(
+                    'تعديل الصورة',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // اختيار صورة بدل رابط
+                Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withOpacity(0.06)),
+                        image: selectedImageBytes != null
+                            ? DecorationImage(
+                                image: MemoryImage(selectedImageBytes!),
+                                fit: BoxFit.cover,
+                              )
+                            : (currentPhotoUrl != null && currentPhotoUrl!.isNotEmpty)
+                                ? DecorationImage(
+                                    image: NetworkImage(currentPhotoUrl!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                      ),
+                      child: (selectedImageBytes == null &&
+                              (currentPhotoUrl == null || currentPhotoUrl!.isEmpty))
+                          ? const Icon(Icons.person_rounded, color: AppColors.textSecondary, size: 28)
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final picker = ImagePicker();
+                              final picked = await picker.pickImage(
+                                source: ImageSource.gallery,
+                                maxWidth: 400,
+                                maxHeight: 400,
+                                imageQuality: 70,
+                              );
+                              if (picked != null) {
+                                final bytes = await picked.readAsBytes();
+                                if (bytes.length > 500 * 1024) {
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('الصورة كبيرة جداً. الحد الأقصى 500 كيلوبايت'),
+                                      backgroundColor: AppColors.accentRed,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                setModalState(() {
+                                  selectedImageBytes = bytes;
+                                  selectedImageName = picked.name;
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppColors.gold.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.upload_rounded, color: AppColors.gold, size: 18),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    selectedImageBytes != null ? 'تم اختيار صورة ✓' : 'اختر صورة',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.gold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'الحد الأقصى: 400×400 بكسل، 500 كيلوبايت',
+                            style: TextStyle(fontSize: 10, color: AppColors.textSecondary.withOpacity(0.6)),
+                          ),
+                          if ((selectedImageName ?? '').isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              selectedImageName!,
+                              style: TextStyle(fontSize: 10, color: AppColors.textSecondary.withOpacity(0.6)),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      String? photoUrl = currentPhotoUrl;
+
+                      if (selectedImageBytes != null) {
+                        try {
+                          final personId = _personData!['id'] as String;
+                          final fileName = 'profile_$personId.jpg';
+                          final storagePath = 'profiles/$fileName';
+
+                          await SupabaseConfig.client.storage
+                              .from('photos')
+                              .uploadBinary(
+                                storagePath,
+                                selectedImageBytes!,
+                                fileOptions: const FileOptions(
+                                  contentType: 'image/jpeg',
+                                  upsert: true,
+                                ),
+                              );
+
+                          photoUrl = SupabaseConfig.client.storage
+                              .from('photos')
+                              .getPublicUrl(storagePath);
+                        } catch (e) {
+                          print('خطأ في رفع الصورة: $e');
+                        }
+                      }
+
+                      await _updateContactData({'photo_url': photoUrl});
+                      if (mounted) Navigator.pop(context);
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.bgDeep,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
