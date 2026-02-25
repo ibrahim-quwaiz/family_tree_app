@@ -12,8 +12,6 @@ class DirectoryPerson {
   final String? motherId;
   final String? motherName;
   final String? motherExternalName;
-  final String? spouseId;
-  final String? spouseExternalName;
   final String? grandfatherName;
   final DateTime? birthDate;
   final DateTime? deathDate;
@@ -45,8 +43,6 @@ class DirectoryPerson {
     this.motherId,
     this.motherName,
     this.motherExternalName,
-    this.spouseId,
-    this.spouseExternalName,
     this.grandfatherName,
     this.birthDate,
     this.deathDate,
@@ -96,8 +92,6 @@ class DirectoryPerson {
       motherId: json['mother_id'] as String?,
       motherName: json['mother_name'] as String?,
       motherExternalName: json['mother_external_name'] as String?,
-      spouseId: json['spouse_id'] as String?,
-      spouseExternalName: json['spouse_external_name'] as String?,
       grandfatherName: json['grandfather_name'] as String?,
       greatGrandfatherName: json['great_grandfather_name'] as String?,
       greatGreatGrandfatherName: json['great_great_grandfather_name'] as String?,

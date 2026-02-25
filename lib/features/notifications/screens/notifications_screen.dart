@@ -56,12 +56,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
-          leading: Navigator.canPop(context)
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  onPressed: () => Navigator.pop(context),
-                )
-              : null,
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator(color: AppColors.gold))

@@ -106,18 +106,8 @@ class _TreeScreenState extends State<TreeScreen> {
         });
       }
 
-      // حساب إجمالي الذرية للشخص الحالي
-      int totalDesc = childrenResponse.length;
-      try {
-        final totalDescResponse = await SupabaseConfig.client
-            .from('people_with_children')
-            .select('children_count')
-            .eq('id', personId)
-            .maybeSingle();
-        if (totalDescResponse != null && totalDescResponse['children_count'] != null) {
-          totalDesc = totalDescResponse['children_count'] as int;
-        }
-      } catch (_) {}
+      // حساب إجمالي الذرية للشخص الحالي (عدد الأبناء المباشرين فقط)
+      final int totalDesc = childrenResponse.length;
 
       setState(() {
         _currentPerson = {
@@ -257,21 +247,6 @@ class _TreeScreenState extends State<TreeScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
       child: Row(
         children: [
-          if (Navigator.canPop(context))
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 36,
-                height: 36,
-                margin: const EdgeInsets.only(left: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.bgCard,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.06)),
-                ),
-                child: const Icon(Icons.arrow_forward_rounded, color: AppColors.gold, size: 18),
-              ),
-            ),
           const Text(
             'شجرة العائلة',
             style: TextStyle(

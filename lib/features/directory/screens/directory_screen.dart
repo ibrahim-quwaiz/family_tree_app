@@ -116,8 +116,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             generation,
             father_id,
             mother_id,
-            spouse_id,
-            spouse_external_name,
             mother_external_name,
             birth_date,
             death_date,
@@ -435,9 +433,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     List<Map<String, dynamic>> wives = [];
     if (person.gender == 'male') {
       wives = await _getWives(person.id);
-      if (wives.isEmpty && person.spouseExternalName != null && person.spouseExternalName!.isNotEmpty) {
-        wives = [{'husband_id': person.id, 'wife_id': null, 'wife_external_name': person.spouseExternalName, 'marriage_order': 1, 'wife': null}];
-      }
     }
 
     final contactInfo = {'instagram': person.instagram, 'twitter': person.twitter, 'snapchat': person.snapchat, 'facebook': person.facebook};
