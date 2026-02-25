@@ -7,6 +7,7 @@ import '../features/notifications/screens/notifications_screen.dart';
 import '../features/about/screens/about_screen.dart';
 import '../features/stats/screens/stats_screen.dart';
 import '../features/profile/screens/my_profile_screen.dart';
+import '../features/admin/screens/admin_screen.dart';
 import '../features/auth/services/auth_service.dart';
 import '../features/auth/screens/login_screen.dart';
 
@@ -114,17 +115,26 @@ class _HomePage extends StatefulWidget {
 
 class _HomePageState extends State<_HomePage> {
   String? _userName;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
+    _loadAdminFlag();
   }
 
   Future<void> _loadUserName() async {
     final name = await AuthService.getCurrentName();
     if (mounted) {
       setState(() => _userName = name);
+    }
+  }
+
+  Future<void> _loadAdminFlag() async {
+    final isAdmin = await AuthService.isAdmin();
+    if (mounted) {
+      setState(() => _isAdmin = isAdmin);
     }
   }
 
@@ -240,6 +250,8 @@ class _HomePageState extends State<_HomePage> {
       _GridItem(icon: Icons.bar_chart_rounded, title: 'الإحصائيات', color: AppColors.accentAmber, route: '/stats'),
       _GridItem(icon: Icons.info_rounded, title: 'عن العائلة', color: AppColors.accentTeal, route: '/about'),
       _GridItem(icon: Icons.notifications_rounded, title: 'الإشعارات', color: AppColors.accentRed, route: '/notifications'),
+      if (_isAdmin)
+        _GridItem(icon: Icons.admin_panel_settings_rounded, title: 'لوحة التحكم', color: AppColors.gold, route: '/admin'),
     ];
 
     return GridView.builder(
@@ -278,6 +290,9 @@ class _HomePageState extends State<_HomePage> {
             switch (item.route) {
               case '/directory':
                 screen = const DirectoryScreen();
+                break;
+              case '/admin':
+                screen = const AdminScreen();
                 break;
               case '/news':
                 screen = const NewsScreen();
