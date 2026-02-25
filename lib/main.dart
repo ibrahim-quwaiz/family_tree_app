@@ -17,8 +17,18 @@ void main() async {
     print('❌ فشل تهيئة Supabase في main(): $e');
   }
 
-  // التحقق من حالة الدخول
-  final isLoggedIn = await AuthService.isLoggedIn();
+  // محاولة استعادة الجلسة من Supabase
+  bool isLoggedIn = false;
+  try {
+    final session = SupabaseConfig.client.auth.currentSession;
+    if (session != null) {
+      isLoggedIn = true;
+    } else {
+      isLoggedIn = await AuthService.isLoggedIn();
+    }
+  } catch (e) {
+    isLoggedIn = await AuthService.isLoggedIn();
+  }
 
   runApp(FamilyTreeApp(isLoggedIn: isLoggedIn));
 }

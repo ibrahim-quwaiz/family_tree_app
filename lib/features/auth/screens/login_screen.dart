@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../screens/home_screen.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   Future<void> _login() async {
-    // التحقق من المدخلات
     final qfId = _qfController.text.trim().toUpperCase();
     final pin = _pinController.text.trim();
 
@@ -62,7 +61,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       return;
     }
 
-    // حد المحاولات
     if (_failedAttempts >= 5) {
       setState(() => _errorMessage = 'تم تجاوز الحد الأقصى للمحاولات. حاول لاحقاً.');
       return;
@@ -74,55 +72,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     });
 
     try {
-      // البحث عن المستخدم
-      final response = await SupabaseConfig.client
-          .from('people')
-          .select('id, name, legacy_user_id, pin_code, is_admin, generation, gender')
-          .eq('legacy_user_id', qfId)
-          .maybeSingle();
-
-      if (response == null) {
-        setState(() {
-          _failedAttempts++;
-          _errorMessage = 'رقم العضوية غير موجود';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final storedPin = response['pin_code'] as String?;
-
-      if (storedPin == null || storedPin.isEmpty) {
-        setState(() {
-          _errorMessage = 'لم يتم تعيين رقم سري لهذا الحساب. تواصل مع إدارة التطبيق.';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      if (storedPin != pin) {
-        setState(() {
-          _failedAttempts++;
-          _errorMessage = 'الرقم السري غير صحيح (${5 - _failedAttempts} محاولات متبقية)';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      // نجاح! حفظ الجلسة
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('logged_in_user_id', response['id'] as String);
-      await prefs.setString('logged_in_qf_id', qfId);
-      await prefs.setString('logged_in_name', response['name'] as String? ?? '');
-      await prefs.setBool('logged_in_is_admin', response['is_admin'] as bool? ?? false);
-      await prefs.setBool('is_logged_in', true);
+      await AuthService.login(qfId, pin);
 
       if (!mounted) return;
 
-      // الانتقال للصفحة الرئيسية
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
+    } on AuthException catch (e) {
+      setState(() {
+        _failedAttempts++;
+        if (e.message == 'الرقم السري غير صحيح') {
+          _errorMessage = '${e.message} (${5 - _failedAttempts} محاولات متبقية)';
+        } else {
+          _errorMessage = e.message;
+        }
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() {
         _errorMessage = 'حدث خطأ في الاتصال. حاول مرة أخرى.';
