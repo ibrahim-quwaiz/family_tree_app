@@ -7,28 +7,15 @@ import '../features/directory/screens/directory_screen.dart';
 import '../features/news/screens/news_screen.dart';
 import '../features/about/screens/about_screen.dart';
 import '../features/profile/screens/my_profile_screen.dart';
+import '../features/stats/screens/stats_screen.dart';
+import '../features/notifications/screens/notifications_screen.dart';
+import '../features/auth/services/auth_service.dart';
+import '../features/auth/screens/login_screen.dart';
+import '../core/theme/app_theme.dart';
 
 // ============================================================
 // الصفحة الرئيسية - عائلة القويز
 // ============================================================
-
-// --- ثيم الألوان ---
-class AppColors {
-  static const gold = Color(0xFFC8A45C);
-  static const goldLight = Color(0xFFE8D5A3);
-  static const goldDark = Color(0xFF9A7B3A);
-  static const bgDeep = Color(0xFF0A1628);
-  static const bgCard = Color(0xFF111E36);
-  static const bgCardHover = Color(0xFF162747);
-  static const textPrimary = Color(0xFFF0EDE6);
-  static const textSecondary = Color(0xFF8A9BB5);
-  static const accentGreen = Color(0xFF4CAF7D);
-  static const accentBlue = Color(0xFF4A8FD4);
-  static const accentRed = Color(0xFFD4654A);
-  static const accentPurple = Color(0xFF8B6AC2);
-  static const accentTeal = Color(0xFF4ABDD4);
-  static const accentAmber = Color(0xFFD4A44A);
-}
 
 // --- نموذج بيانات القسم ---
 class GridSection {
@@ -254,6 +241,55 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: AlertDialog(
+                        backgroundColor: AppColors.bgCard,
+                        title: const Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary)),
+                        content: const Text('هل تريد تسجيل الخروج؟', style: TextStyle(color: AppColors.textSecondary)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            style: FilledButton.styleFrom(backgroundColor: AppColors.accentRed),
+                            child: const Text('خروج'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                  if (confirm == true) {
+                    await AuthService.logout();
+                    if (mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        (route) => false,
+                      );
+                    }
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgCard.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.logout_rounded, color: AppColors.textSecondary, size: 20),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           _buildFamilyCrest(),
           const SizedBox(height: 16),
           const Text(
@@ -404,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             screen = const NewsScreen();
             break;
           case '/genealogy':
-            screen = const AboutScreen();
+            screen = const StatsScreen();
             break;
           case '/contact':
             screen = const AboutScreen();
@@ -631,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   screen = const DirectoryScreen();
                   break;
                 case 2: // التنبيهات
-                  screen = const NewsScreen();
+                  screen = const NotificationsScreen();
                   break;
                 case 3: // حسابي
                   screen = const MyProfileScreen();

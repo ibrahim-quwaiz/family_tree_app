@@ -90,6 +90,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
+          leading: Navigator.canPop(context)
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  onPressed: () => Navigator.pop(context),
+                )
+              : null,
           title: const Text('حسابي'),
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,

@@ -134,6 +134,12 @@ class _NewsScreenState extends State<NewsScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_forward_rounded),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: const Text('الأخبار'),
         backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,

@@ -120,6 +120,12 @@ class _AboutScreenState extends State<AboutScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_forward_rounded),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: const Text('عن العائلة'),
         backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,

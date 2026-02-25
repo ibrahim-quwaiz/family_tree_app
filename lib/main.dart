@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/supabase_config.dart';
-import 'core/navigation/main_navigation.dart';
+import 'features/auth/screens/login_screen.dart';
+import 'features/auth/services/auth_service.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     print('🚀 بدء تهيئة التطبيق...');
     await SupabaseConfig.initialize();
@@ -15,12 +16,17 @@ void main() async {
   } catch (e) {
     print('❌ فشل تهيئة Supabase في main(): $e');
   }
-  
-  runApp(const FamilyTreeApp());
+
+  // التحقق من حالة الدخول
+  final isLoggedIn = await AuthService.isLoggedIn();
+
+  runApp(FamilyTreeApp(isLoggedIn: isLoggedIn));
 }
 
 class FamilyTreeApp extends StatelessWidget {
-  const FamilyTreeApp({super.key});
+  final bool isLoggedIn;
+
+  const FamilyTreeApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +36,7 @@ class FamilyTreeApp extends StatelessWidget {
       theme: AppTheme.darkTheme.copyWith(
         textTheme: GoogleFonts.tajawalTextTheme(AppTheme.darkTheme.textTheme),
       ),
-      home: const HomeScreen(),
+      home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
     );
   }
 }
