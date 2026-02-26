@@ -145,6 +145,17 @@ class AuthService {
 
   /// هل المستخدم مدير؟
   static Future<bool> isAdmin() async {
+    final user = SupabaseConfig.client.auth.currentUser;
+    if (user != null) {
+      try {
+        final response = await SupabaseConfig.client
+            .from('people')
+            .select('is_admin')
+            .eq('auth_user_id', user.id)
+            .maybeSingle();
+        if (response != null && response['is_admin'] == true) return true;
+      } catch (_) {}
+    }
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('logged_in_is_admin') ?? false;
   }

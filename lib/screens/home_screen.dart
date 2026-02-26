@@ -9,6 +9,7 @@ import '../features/stats/screens/stats_screen.dart';
 import '../features/profile/screens/my_profile_screen.dart';
 import '../features/auth/services/auth_service.dart';
 import '../features/auth/screens/login_screen.dart';
+import '../features/admin/screens/admin_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -114,11 +115,15 @@ class _HomePage extends StatefulWidget {
 
 class _HomePageState extends State<_HomePage> {
   String? _userName;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
+    AuthService.isAdmin().then((value) {
+      if (mounted) setState(() => _isAdmin = value);
+    });
   }
 
   Future<void> _loadUserName() async {
@@ -234,6 +239,13 @@ class _HomePageState extends State<_HomePage> {
 
   Widget _buildGrid() {
     final items = [
+      if (_isAdmin)
+        _GridItem(
+          icon: Icons.admin_panel_settings_rounded,
+          title: 'لوحة التحكم',
+          color: const Color(0xFFE91E8C),
+          route: '/admin',
+        ),
       _GridItem(icon: Icons.account_tree_rounded, title: 'شجرة العائلة', color: AppColors.accentGreen, route: '/tree'),
       _GridItem(icon: Icons.people_rounded, title: 'دليل الأعضاء', color: AppColors.accentBlue, route: '/directory'),
       _GridItem(icon: Icons.newspaper_rounded, title: 'الأخبار', color: AppColors.accentPurple, route: '/news'),
@@ -271,6 +283,17 @@ class _HomePageState extends State<_HomePage> {
             break;
           case '/notifications':
             homeState?.setState(() => homeState._currentIndex = 2);
+            break;
+          case '/admin':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: AdminScreen(),
+                ),
+              ),
+            );
             break;
           default:
             // الصفحات الفرعية تنفتح فوق (بدون بار)
