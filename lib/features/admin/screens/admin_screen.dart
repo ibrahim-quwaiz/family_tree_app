@@ -21,7 +21,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   bool _isLoadingPeople = true;
 
   List<Map<String, dynamic>> _allMarriages = [];
+  List<Map<String, dynamic>> _filteredMarriages = [];
   bool _isLoadingMarriages = true;
+  final _marriagesSearchController = TextEditingController();
 
   List<Map<String, dynamic>> _allGirlsChildren = [];
   List<Map<String, dynamic>> _filteredGirlsChildren = [];
@@ -50,6 +52,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _marriagesSearchController.dispose();
     _girlsChildrenSearchController.dispose();
     super.dispose();
   }
@@ -89,7 +92,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     try {
       final response = await SupabaseConfig.client
           .from('marriages')
-          .select('id, husband_id, wife_id, wife_external_name, marriage_order, marriage_date, is_current')
+          .select('id, husband_id, wife_id, wife_external_name, marriage_order, is_current')
           .order('marriage_order');
 
       final marriagesWithNames = <Map<String, dynamic>>[];
@@ -101,8 +104,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           try {
             final husband = _allPeople.firstWhere((p) => p['id'] == husbandId);
             marriage['husband_name'] = husband['name'];
+            marriage['husband_qf'] = husband['legacy_user_id'] as String? ?? '';
           } catch (_) {
             marriage['husband_name'] = 'غير معروف';
+            marriage['husband_qf'] = '';
           }
         }
 
@@ -111,13 +116,16 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           try {
             final wife = _allPeople.firstWhere((p) => p['id'] == wifeId);
             marriage['wife_name'] = wife['name'];
+            marriage['wife_qf'] = wife['legacy_user_id'] as String? ?? '';
             marriage['is_external'] = false;
           } catch (_) {
             marriage['wife_name'] = 'غير معروفة';
+            marriage['wife_qf'] = '';
             marriage['is_external'] = false;
           }
         } else {
           marriage['wife_name'] = marriage['wife_external_name'] ?? 'غير معروفة';
+          marriage['wife_qf'] = '';
           marriage['is_external'] = true;
         }
 
@@ -126,12 +134,30 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
       setState(() {
         _allMarriages = marriagesWithNames;
+        _filteredMarriages = List.from(_allMarriages);
         _isLoadingMarriages = false;
       });
     } catch (e) {
       setState(() => _isLoadingMarriages = false);
       _showError('خطأ في تحميل الزواجات: $e');
     }
+  }
+
+  void _filterMarriages(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredMarriages = List.from(_allMarriages);
+      } else {
+        _filteredMarriages = _allMarriages.where((m) {
+          final husbandName = (m['husband_name'] as String? ?? '').toLowerCase();
+          final wifeName = (m['wife_name'] as String? ?? '').toLowerCase();
+          final husbandQf = (m['husband_qf'] as String? ?? '').toLowerCase();
+          final wifeQf = (m['wife_qf'] as String? ?? '').toLowerCase();
+          final q = query.toLowerCase();
+          return husbandName.contains(q) || wifeName.contains(q) || husbandQf.contains(q) || wifeQf.contains(q);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _loadGirlsChildren() async {
@@ -152,7 +178,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             orElse: () => <String, dynamic>{},
           );
           child['mother_name'] = mother.isNotEmpty ? mother['name'] : 'غير معروفة';
-          child['mother_qf'] = mother.isNotEmpty ? mother['legacy_user_id'] : '';
+          child['mother_qf'] = mother.isNotEmpty ? (mother['legacy_user_id'] as String? ?? '') : '';
         } else {
           child['mother_name'] = 'غير معروفة';
           child['mother_qf'] = '';
@@ -176,14 +202,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   void _filterGirlsChildren(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredGirlsChildren = _allGirlsChildren;
+        _filteredGirlsChildren = List.from(_allGirlsChildren);
       } else {
-        final q = query.toLowerCase();
         _filteredGirlsChildren = _allGirlsChildren.where((c) {
           final childName = (c['child_name'] as String? ?? '').toLowerCase();
           final motherName = (c['mother_name'] as String? ?? '').toLowerCase();
           final fatherName = (c['father_name'] as String? ?? '').toLowerCase();
-          return childName.contains(q) || motherName.contains(q) || fatherName.contains(q);
+          final motherQf = (c['mother_qf'] as String? ?? '').toLowerCase();
+          final q = query.toLowerCase();
+          return childName.contains(q) || motherName.contains(q) || fatherName.contains(q) || motherQf.contains(q);
         }).toList();
       }
     });
@@ -196,6 +223,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     Map<String, dynamic>? selectedMother;
     String childGender = 'male';
     DateTime? childBirthdate;
+    List<String> allFatherNames = [];
+    List<String> filteredFatherNames = [];
+    bool showFatherSuggestions = false;
 
     showModalBottomSheet(
       context: context,
@@ -242,7 +272,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       Expanded(child: _buildTextField(motherQfController, 'مثال: QF05012')),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           final qf = motherQfController.text.trim().toUpperCase();
                           if (qf.isEmpty) return;
                           final found = _allPeople.firstWhere(
@@ -251,6 +281,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           );
                           if (found.isNotEmpty) {
                             setModalState(() => selectedMother = found);
+                            // جلب أسماء الآباء الفريدة من girls_children
+                            final fathersResponse = await SupabaseConfig.client
+                                .from('girls_children')
+                                .select('father_name')
+                                .eq('mother_id', selectedMother!['id']);
+                            final fatherSet = <String>{};
+                            for (final r in fathersResponse) {
+                              if (r['father_name'] != null && (r['father_name'] as String).isNotEmpty) {
+                                fatherSet.add(r['father_name'] as String);
+                              }
+                            }
+                            allFatherNames = fatherSet.toList();
+                            setModalState(() {});
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('لم يتم العثور على أنثى بـ $qf'), backgroundColor: AppColors.accentRed),
@@ -300,9 +343,108 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   _buildTextField(childNameController, 'الاسم الكامل'),
                   const SizedBox(height: 12),
 
-                  _buildLabel('اسم أبو الطفل (زوج البنت) *'),
-                  const SizedBox(height: 4),
-                  _buildTextField(fatherNameController, 'اسم الزوج'),
+                  _buildLabel('الأب'),
+                  const SizedBox(height: 6),
+                  if (selectedMother == null)
+                    Text('اختر الأم أولاً', style: TextStyle(fontSize: 12, color: AppColors.textSecondary))
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (allFatherNames.isNotEmpty) ...[
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.gold.withOpacity(0.15)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: [
+                                    ...allFatherNames.map((name) {
+                                      final isSelected = fatherNameController.text == name;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          fatherNameController.text = name;
+                                          showFatherSuggestions = false;
+                                          setModalState(() {});
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? AppColors.accentGreen.withOpacity(0.15)
+                                                : AppColors.bgDeep,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? AppColors.accentGreen.withOpacity(0.4)
+                                                  : Colors.white.withOpacity(0.08),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                isSelected ? Icons.check_circle_rounded : Icons.person_outline_rounded,
+                                                size: 14,
+                                                color: isSelected ? AppColors.accentGreen : AppColors.textSecondary,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                name,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: isSelected ? AppColors.accentGreen : AppColors.textPrimary,
+                                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                    GestureDetector(
+                                      onTap: () {
+                                        fatherNameController.clear();
+                                        showFatherSuggestions = false;
+                                        setModalState(() {});
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.gold.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.add_rounded, size: 14, color: AppColors.gold),
+                                            SizedBox(width: 4),
+                                            Text('أب جديد', style: TextStyle(fontSize: 12, color: AppColors.gold, fontWeight: FontWeight.w600)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                        if (allFatherNames.isEmpty || fatherNameController.text.isEmpty || !allFatherNames.contains(fatherNameController.text))
+                          _buildTextField(fatherNameController, 'اكتب اسم الأب'),
+                      ],
+                    ),
                   const SizedBox(height: 12),
 
                   _buildLabel('الجنس'),
@@ -396,6 +538,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     if (child['child_birthdate'] != null) {
       try { childBirthdate = DateTime.parse(child['child_birthdate'] as String); } catch (_) {}
     }
+    List<String> allFatherNames = [];
+    bool editFatherNamesLoaded = false;
 
     showModalBottomSheet(
       context: context,
@@ -443,9 +587,125 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   _buildTextField(childNameController, 'الاسم'),
                   const SizedBox(height: 12),
 
-                  _buildLabel('اسم الأب'),
-                  const SizedBox(height: 4),
-                  _buildTextField(fatherNameController, 'اسم أبو الطفل'),
+                  _buildLabel('الأب'),
+                  const SizedBox(height: 6),
+                  Builder(
+                    builder: (context) {
+                      final motherId = child['mother_id'] as String?;
+                      if (motherId != null && !editFatherNamesLoaded) {
+                        editFatherNamesLoaded = true;
+                        Future.microtask(() async {
+                          final fathersResponse = await SupabaseConfig.client
+                              .from('girls_children')
+                              .select('father_name')
+                              .eq('mother_id', motherId);
+                          final fatherSet = <String>{};
+                          for (final r in fathersResponse) {
+                            if (r['father_name'] != null && (r['father_name'] as String).isNotEmpty) {
+                              fatherSet.add(r['father_name'] as String);
+                            }
+                          }
+                          allFatherNames = fatherSet.toList();
+                          if (context.mounted) setModalState(() {});
+                        });
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (allFatherNames.isNotEmpty) ...[
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.gold.withOpacity(0.06),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.gold.withOpacity(0.15)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: [
+                                      ...allFatherNames.map((name) {
+                                        final isSelected = fatherNameController.text == name;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            fatherNameController.text = name;
+                                            setModalState(() {});
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? AppColors.accentGreen.withOpacity(0.15)
+                                                  : AppColors.bgDeep,
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? AppColors.accentGreen.withOpacity(0.4)
+                                                    : Colors.white.withOpacity(0.08),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  isSelected ? Icons.check_circle_rounded : Icons.person_outline_rounded,
+                                                  size: 14,
+                                                  color: isSelected ? AppColors.accentGreen : AppColors.textSecondary,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  name,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: isSelected ? AppColors.accentGreen : AppColors.textPrimary,
+                                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                      GestureDetector(
+                                        onTap: () {
+                                          fatherNameController.clear();
+                                          setModalState(() {});
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.gold.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.add_rounded, size: 14, color: AppColors.gold),
+                                              SizedBox(width: 4),
+                                              Text('أب جديد', style: TextStyle(fontSize: 12, color: AppColors.gold, fontWeight: FontWeight.w600)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                          if (allFatherNames.isEmpty || fatherNameController.text.isEmpty || !allFatherNames.contains(fatherNameController.text))
+                            _buildTextField(fatherNameController, 'اكتب اسم الأب'),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 12),
 
                   _buildLabel('الجنس'),
@@ -602,6 +862,93 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   }
 
   Future<void> _deletePerson(Map<String, dynamic> person) async {
+    final personId = person['id'] as String;
+    final personName = person['name'] as String? ?? '—';
+    final personQf = person['legacy_user_id'] as String? ?? '';
+
+    // التحقق من الارتباطات
+    final children = _allPeople.where((p) => p['father_id'] == personId || p['mother_id'] == personId).toList();
+    final marriages = _allMarriages.where((m) => m['husband_id'] == personId || m['wife_id'] == personId).toList();
+    
+    // التحقق من أبناء البنات
+    int girlsChildrenCount = 0;
+    if (person['gender'] == 'female') {
+      try {
+        final gc = await SupabaseConfig.client
+            .from('girls_children')
+            .select('id')
+            .eq('mother_id', personId);
+        girlsChildrenCount = (gc as List).length;
+      } catch (_) {}
+    }
+
+    final hasRelations = children.isNotEmpty || marriages.isNotEmpty || girlsChildrenCount > 0;
+
+    if (hasRelations) {
+      // لا يسمح بالحذف — يعرض تفاصيل الارتباطات
+      String details = '';
+      if (children.isNotEmpty) {
+        details += '👨‍👩‍👦 ${children.length} ابن/بنت\n';
+      }
+      if (marriages.isNotEmpty) {
+        details += '💍 ${marriages.length} زواج\n';
+      }
+      if (girlsChildrenCount > 0) {
+        details += '👶 $girlsChildrenCount من أبناء البنات\n';
+      }
+
+      showDialog(
+        context: context,
+        builder: (ctx) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            backgroundColor: AppColors.bgCard,
+            title: Row(
+              children: [
+                const Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
+                const SizedBox(width: 8),
+                const Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '"$personName" ($personQf) مرتبط بالتالي:',
+                  style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentRed.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.accentRed.withOpacity(0.2)),
+                  ),
+                  child: Text(details, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.8)),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'لحذف هذا الشخص، يجب أولاً حذف أو نقل جميع الارتباطات المتعلقة به من التبويبات المخصصة (الأشخاص، الزواجات، أبناء البنات).',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('فهمت', style: TextStyle(color: AppColors.gold)),
+              ),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+
+    // لا يوجد ارتباطات — يسمح بالحذف
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
@@ -610,7 +957,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           backgroundColor: AppColors.bgCard,
           title: const Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
-            'هل أنت متأكد من حذف "${person['name']}"؟\nهذا الإجراء لا يمكن التراجع عنه.',
+            'هل أنت متأكد من حذف "$personName"؟\nهذا الإجراء لا يمكن التراجع عنه.',
             style: const TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
@@ -620,7 +967,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('حذف', style: TextStyle(color: AppColors.accentRed)),
+              child: const Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -630,142 +977,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     if (confirmed != true) return;
 
     try {
-      await SupabaseConfig.client.from('people').delete().eq('id', person['id']);
-      _showSuccess('تم حذف "${person['name']}" بنجاح');
+      // حذف بيانات التواصل أولاً
+      await SupabaseConfig.client.from('contact_info').delete().eq('person_id', personId);
+      // حذف الشخص
+      await SupabaseConfig.client.from('people').delete().eq('id', personId);
+      _showSuccess('تم حذف "$personName" بنجاح');
       _loadPeople();
     } catch (e) {
       _showError('خطأ في الحذف: $e');
     }
-  }
-
-  void _showAddGirlChildDialog(
-    String motherId,
-    String fatherName,
-    StateSetter parentSetState,
-    List<Map<String, dynamic>> girlChildren,
-  ) {
-    final childNameController = TextEditingController();
-    final fatherNameController = TextEditingController(text: fatherName);
-    String childGender = 'male';
-    DateTime? childBirthdate;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: AppColors.bgCard,
-            title: const Text('إضافة ابن/بنت',
-                style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700)),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLabel('اسم الطفل *'),
-                  const SizedBox(height: 4),
-                  _buildTextField(childNameController, 'الاسم'),
-                  const SizedBox(height: 12),
-                  _buildLabel('اسم الأب'),
-                  const SizedBox(height: 4),
-                  _buildTextField(fatherNameController, 'اسم أب الطفل'),
-                  const SizedBox(height: 12),
-                  _buildLabel('الجنس'),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      _buildGenderOption('ذكر', 'male', childGender,
-                          (val) => setDialogState(() => childGender = val)),
-                      const SizedBox(width: 8),
-                      _buildGenderOption('أنثى', 'female', childGender,
-                          (val) => setDialogState(() => childGender = val)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _buildLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 4),
-                  GestureDetector(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: ctx,
-                        initialDate: DateTime(2010),
-                        firstDate: DateTime(1970),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) setDialogState(() => childBirthdate = picked);
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.bgDeep.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withOpacity(0.06)),
-                      ),
-                      child: Text(
-                        childBirthdate != null
-                            ? '${childBirthdate!.year}/${childBirthdate!.month}/${childBirthdate!.day}'
-                            : 'اختر',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: childBirthdate != null
-                                ? AppColors.textPrimary
-                                : AppColors.textSecondary),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('إلغاء',
-                    style: TextStyle(color: AppColors.textSecondary)),
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (childNameController.text.trim().isEmpty) {
-                    _showError('اسم الطفل مطلوب');
-                    return;
-                  }
-                  Navigator.pop(ctx);
-                  try {
-                    final insertData = <String, dynamic>{
-                      'mother_id': motherId,
-                      'father_name': fatherNameController.text.trim(),
-                      'child_name': childNameController.text.trim(),
-                      'child_gender': childGender,
-                    };
-                    if (childBirthdate != null) {
-                      insertData['child_birthdate'] =
-                          childBirthdate!.toIso8601String().split('T')[0];
-                    }
-                    final result = await SupabaseConfig.client
-                        .from('girls_children')
-                        .insert(insertData)
-                        .select()
-                        .single();
-                    girlChildren.add(result);
-                    parentSetState(() {});
-                    _showSuccess('تم إضافة ${childNameController.text.trim()}');
-                  } catch (e) {
-                    _showError('خطأ: $e');
-                  }
-                },
-                child: const Text('إضافة',
-                    style: TextStyle(
-                        color: AppColors.gold, fontWeight: FontWeight.w600)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildLabel(String text) {
@@ -839,8 +1059,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     final twitterController = TextEditingController();
     final snapchatController = TextEditingController();
     final facebookController = TextEditingController();
-    final husbandNameController = TextEditingController();
-    final husbandQfSearchController = TextEditingController();
     String selectedGender = person['gender'] as String? ?? 'male';
     bool isAlive = person['is_alive'] as bool? ?? true;
     final int generation = person['generation'] as int? ?? 1;
@@ -852,11 +1070,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     Map<String, dynamic>? selectedMotherMarriage;
     bool _contactLoaded = false;
     bool _wivesLoadedForEdit = false;
-    bool isMarried = false;
-    bool isHusbandExternal = true;
-    Map<String, dynamic>? selectedHusbandPerson;
-    Map<String, dynamic>? existingGirlMarriage;
-    List<Map<String, dynamic>> girlChildren = [];
 
     if (person['father_id'] != null) {
       try {
@@ -925,44 +1138,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               }
                               setModalState(() {});
                             });
-                        if (person['gender'] == 'female') {
-                          SupabaseConfig.client
-                              .from('marriages')
-                              .select('id, husband_id, wife_external_name, marriage_order, is_current')
-                              .eq('wife_id', person['id'])
-                              .maybeSingle()
-                              .then((marriage) {
-                                if (marriage != null) {
-                                  isMarried = true;
-                                  existingGirlMarriage = marriage;
-                                  final husbandId = marriage['husband_id'] as String?;
-                                  if (husbandId != null) {
-                                    isHusbandExternal = false;
-                                    try {
-                                      final husband = _allPeople.firstWhere(
-                                        (p) => p['id'] == husbandId,
-                                        orElse: () => <String, dynamic>{},
-                                      );
-                                      if (husband.isNotEmpty) {
-                                        selectedHusbandPerson = husband;
-                                        husbandQfSearchController.text =
-                                            husband['legacy_user_id'] as String? ?? '';
-                                      }
-                                    } catch (_) {}
-                                  }
-                                }
-                                setModalState(() {});
-                              });
-                          SupabaseConfig.client
-                              .from('girls_children')
-                              .select()
-                              .eq('mother_id', person['id'])
-                              .order('child_birthdate')
-                              .then((children) {
-                                girlChildren = List<Map<String, dynamic>>.from(children);
-                                setModalState(() {});
-                              });
-                        }
                         return const SizedBox.shrink();
                       },
                     ),
@@ -1540,307 +1715,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       )                      ),
                     ],
                   ),
-                  if (person['gender'] == 'female') ...[
-                    const SizedBox(height: 20),
-                    Container(height: 1, color: Colors.white.withOpacity(0.06)),
-                    const SizedBox(height: 16),
-                    const Text('الزواج والأبناء',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFFE91E8C))),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        _buildLabel('الحالة:'),
-                        const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () => setModalState(() => isMarried = true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isMarried
-                                  ? const Color(0xFFE91E8C).withOpacity(0.15)
-                                  : AppColors.bgDeep.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: isMarried
-                                      ? const Color(0xFFE91E8C)
-                                      : Colors.white.withOpacity(0.06)),
-                            ),
-                            child: Text(
-                              'متزوجة',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: isMarried
-                                      ? const Color(0xFFE91E8C)
-                                      : AppColors.textSecondary),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () => setModalState(() => isMarried = false),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: !isMarried
-                                  ? AppColors.textSecondary.withOpacity(0.15)
-                                  : AppColors.bgDeep.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: !isMarried
-                                      ? AppColors.textSecondary
-                                      : Colors.white.withOpacity(0.06)),
-                            ),
-                            child: Text(
-                              'غير متزوجة',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: !isMarried
-                                      ? AppColors.textSecondary
-                                      : AppColors.textSecondary.withOpacity(0.5)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (isMarried) ...[
-                      const SizedBox(height: 12),
-                      _buildLabel('الزوج'),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => setModalState(() => isHusbandExternal = false),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: !isHusbandExternal
-                                      ? AppColors.gold.withOpacity(0.15)
-                                      : AppColors.bgDeep.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                      color: !isHusbandExternal
-                                          ? AppColors.gold
-                                          : Colors.white.withOpacity(0.06)),
-                                ),
-                                child: Center(
-                                    child: Text(
-                                        'من العائلة',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: !isHusbandExternal
-                                                ? AppColors.gold
-                                                : AppColors.textSecondary))),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => setModalState(() => isHusbandExternal = true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isHusbandExternal
-                                      ? AppColors.gold.withOpacity(0.15)
-                                      : AppColors.bgDeep.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                      color: isHusbandExternal
-                                          ? AppColors.gold
-                                          : Colors.white.withOpacity(0.06)),
-                                ),
-                                child: Center(
-                                    child: Text(
-                                        'من خارج العائلة',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: isHusbandExternal
-                                                ? AppColors.gold
-                                                : AppColors.textSecondary))),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (!isHusbandExternal) ...[
-                        Row(
-                          children: [
-                            Expanded(
-                                child: _buildTextField(
-                                    husbandQfSearchController, 'رقم QF للزوج')),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: () {
-                                final qf =
-                                    husbandQfSearchController.text.trim().toUpperCase();
-                                if (qf.isEmpty) {
-                                  setModalState(() => selectedHusbandPerson = null);
-                                  return;
-                                }
-                                try {
-                                  final found = _allPeople.firstWhere(
-                                    (p) =>
-                                        (p['legacy_user_id'] as String? ?? '')
-                                                .toUpperCase() ==
-                                            qf &&
-                                        p['gender'] == 'male',
-                                    orElse: () => <String, dynamic>{},
-                                  );
-                                  if (found.isNotEmpty) {
-                                    setModalState(() => selectedHusbandPerson = found);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text('لم يتم العثور على ذكر بـ $qf'),
-                                          backgroundColor: AppColors.accentRed),
-                                    );
-                                  }
-                                } catch (_) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('لم يتم العثور على ذكر بـ $qf'),
-                                        backgroundColor: AppColors.accentRed),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                width: 46,
-                                height: 46,
-                                decoration: BoxDecoration(
-                                    color: AppColors.gold,
-                                    borderRadius: BorderRadius.circular(12)),
-                                child: const Icon(Icons.search_rounded,
-                                    color: AppColors.bgDeep, size: 22),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (selectedHusbandPerson != null) ...[
-                          const SizedBox(height: 6),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.accentGreen.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(10),
-                              border:
-                                  Border.all(color: AppColors.accentGreen.withOpacity(0.2)),
-                            ),
-                            child: Text(
-                              '${selectedHusbandPerson!['name']} (${selectedHusbandPerson!['legacy_user_id']})',
-                              style: const TextStyle(
-                                  fontSize: 13, color: AppColors.accentGreen),
-                            ),
-                          ),
-                        ],
-                      ] else ...[
-                        _buildTextField(husbandNameController, 'اسم الزوج'),
-                      ],
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildLabel('أبناء البنت'),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () => _showAddGirlChildDialog(
-                                person['id'] as String,
-                                isHusbandExternal
-                                    ? husbandNameController.text.trim()
-                                    : (selectedHusbandPerson?['name'] as String? ?? ''),
-                                setModalState,
-                                girlChildren),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.gold.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color: AppColors.gold.withOpacity(0.3)),
-                              ),
-                              child: const Text('+ إضافة ابن/بنت',
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.gold)),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (girlChildren.isEmpty)
-                        Text(
-                            'لا يوجد أبناء مسجلين',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary.withOpacity(0.7)))
-                      else
-                        ...girlChildren.map((child) {
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 6),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.bgDeep.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  (child['child_gender'] as String? ?? 'male') ==
-                                          'male'
-                                      ? Icons.male_rounded
-                                      : Icons.female_rounded,
-                                  color:
-                                      (child['child_gender'] as String? ?? 'male') ==
-                                              'male'
-                                          ? Colors.blue
-                                          : Colors.pink,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    child['child_name'] as String? ?? '—',
-                                    style: const TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textPrimary),
-                                  ),
-                                ),
-                                if (child['child_birthdate'] != null)
-                                  Text(
-                                    child['child_birthdate'] as String? ?? '',
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textSecondary
-                                            .withOpacity(0.7)),
-                                  ),
-                                const SizedBox(width: 8),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await SupabaseConfig.client
-                                        .from('girls_children')
-                                        .delete()
-                                        .eq('id', child['id']);
-                                    girlChildren
-                                        .removeWhere((c) => c['id'] == child['id']);
-                                    setModalState(() {});
-                                  },
-                                  child: const Icon(Icons.close_rounded,
-                                      color: AppColors.accentRed, size: 16),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                    ],
-                  ],
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
@@ -1937,34 +1811,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           await SupabaseConfig.client
                               .from('contact_info')
                               .upsert(contactData, onConflict: 'person_id');
-
-                          if (person['gender'] == 'female') {
-                            if (isMarried) {
-                              final marriageData = <String, dynamic>{
-                                'wife_id': person['id'],
-                                'marriage_order': 1,
-                                'is_current': true,
-                              };
-                              if (!isHusbandExternal && selectedHusbandPerson != null) {
-                                marriageData['husband_id'] = selectedHusbandPerson!['id'];
-                              } else {
-                                marriageData['husband_id'] = null;
-                              }
-                              if (existingGirlMarriage != null) {
-                                await SupabaseConfig.client
-                                    .from('marriages')
-                                    .update(marriageData)
-                                    .eq('id', existingGirlMarriage!['id']);
-                              } else {
-                                await SupabaseConfig.client.from('marriages').insert(marriageData);
-                              }
-                            } else if (existingGirlMarriage != null) {
-                              await SupabaseConfig.client
-                                  .from('marriages')
-                                  .delete()
-                                  .eq('id', existingGirlMarriage!['id']);
-                            }
-                          }
 
                           _showSuccess('تم تعديل "${nameController.text.trim()}" بنجاح');
                           _loadPeople();
@@ -2462,12 +2308,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
   void _showAddMarriageDialog() {
     final husbandQfController = TextEditingController();
+    final wifeQfController = TextEditingController();
     Map<String, dynamic>? selectedHusband;
-    String? selectedWifeId;
+    Map<String, dynamic>? selectedWife;
     bool isExternalWife = false;
     final externalNameController = TextEditingController();
-
-    final females = _allPeople.where((p) => p['gender'] == 'female').toList();
+    int marriageOrder = 1;
 
     showModalBottomSheet(
       context: context,
@@ -2518,7 +2364,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         onTap: () {
                           final qf = husbandQfController.text.trim().toUpperCase();
                           if (qf.isEmpty) {
-                            setModalState(() => selectedHusband = null);
+                            setModalState(() {
+                              selectedHusband = null;
+                              marriageOrder = 1;
+                            });
                             return;
                           }
                           try {
@@ -2527,7 +2376,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               orElse: () => <String, dynamic>{},
                             );
                             if (found.isNotEmpty) {
-                              setModalState(() => selectedHusband = found);
+                              setModalState(() {
+                                selectedHusband = found;
+                                // حساب رقم الزواج تلقائياً
+                                final existingMarriages = _allMarriages
+                                    .where((m) => m['husband_id'] == found['id'])
+                                    .length;
+                                marriageOrder = existingMarriages + 1;
+                              });
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -2645,35 +2501,92 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ],
                   ),
                   const SizedBox(height: 8),
-                  if (!isExternalWife)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: AppColors.bgDeep.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withOpacity(0.06)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String?>(
-                          value: selectedWifeId,
-                          hint: const Text('اختر الزوجة',
-                              style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-                          isExpanded: true,
-                          dropdownColor: AppColors.bgCard,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                          items: females
-                              .map((f) => DropdownMenuItem<String?>(
-                                    value: f['id'] as String,
-                                    child: Text(f['name'] as String),
-                                  ))
-                              .toList(),
-                          onChanged: (val) => setModalState(() => selectedWifeId = val),
+                  if (!isExternalWife) ...[
+                    Row(
+                      children: [
+                        Expanded(child: _buildTextField(wifeQfController, 'أدخل رقم QF للزوجة')),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            final qf = wifeQfController.text.trim().toUpperCase();
+                            if (qf.isEmpty) {
+                              setModalState(() => selectedWife = null);
+                              return;
+                            }
+                            try {
+                              final found = _allPeople.firstWhere(
+                                (p) => (p['legacy_user_id'] as String? ?? '').toUpperCase() == qf && p['gender'] == 'female',
+                                orElse: () => <String, dynamic>{},
+                              );
+                              if (found.isNotEmpty) {
+                                setModalState(() => selectedWife = found);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('لم يتم العثور على أنثى بـ $qf'), backgroundColor: AppColors.accentRed),
+                                );
+                              }
+                            } catch (_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('لم يتم العثور على $qf'), backgroundColor: AppColors.accentRed),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: 46, height: 46,
+                            decoration: BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(12)),
+                            child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (selectedWife != null) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentGreen.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.accentGreen.withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${selectedWife!['name']} (${selectedWife!['legacy_user_id']}) — ج${selectedWife!['generation']}',
+                                style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => setModalState(() {
+                                selectedWife = null;
+                                wifeQfController.clear();
+                              }),
+                              child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                            ),
+                          ],
                         ),
                       ),
-                    )
-                  else
+                    ],
+                  ] else
                     _buildTextField(externalNameController, 'اسم الزوجة'),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.bgDeep.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        _buildLabel('رقم الزواج:'),
+                        const SizedBox(width: 8),
+                        Text('$marriageOrder', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.gold)),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
@@ -2684,7 +2597,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           _showError('ابحث عن الزوج برقم QF واختره');
                           return;
                         }
-                        if (!isExternalWife && selectedWifeId == null) {
+                        if (!isExternalWife && selectedWife == null) {
                           _showError('اختر الزوجة');
                           return;
                         }
@@ -2695,15 +2608,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         Navigator.pop(context);
                         try {
                           final husbandId = selectedHusband!['id'] as String;
-                          final existingMarriages =
-                              _allMarriages.where((m) => m['husband_id'] == husbandId).length;
                           final insertData = <String, dynamic>{
                             'husband_id': husbandId,
-                            'marriage_order': existingMarriages + 1,
+                            'marriage_order': marriageOrder,
                             'is_current': true,
                           };
                           if (!isExternalWife) {
-                            insertData['wife_id'] = selectedWifeId;
+                            insertData['wife_id'] = selectedWife!['id'];
                           } else {
                             insertData['wife_external_name'] = externalNameController.text.trim();
                           }
@@ -2732,35 +2643,117 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   }
 
   Future<void> _deleteMarriage(Map<String, dynamic> marriage) async {
+    final marriageId = marriage['id'] as String;
+    final husbandName = marriage['husband_name'] as String? ?? '—';
+    final wifeName = marriage['wife_name'] as String? ?? '—';
+    final isExternal = marriage['is_external'] as bool? ?? false;
+    final wifeId = marriage['wife_id'] as String?;
+    final husbandId = marriage['husband_id'] as String?;
+    final wifeExternalName = marriage['wife_external_name'] as String?;
+
+    // التحقق من وجود أبناء مرتبطين بهذا الزواج
+    int childrenCount = 0;
+
+    if (husbandId != null) {
+      final allChildren = _allPeople.where((p) => p['father_id'] == husbandId).toList();
+      for (final child in allChildren) {
+        if (!isExternal && wifeId != null && child['mother_id'] == wifeId) {
+          childrenCount++;
+        } else if (isExternal && wifeExternalName != null && child['mother_external_name'] == wifeExternalName) {
+          childrenCount++;
+        }
+      }
+    }
+
+    if (childrenCount > 0) {
+      showDialog(
+        context: context,
+        builder: (ctx) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            backgroundColor: AppColors.bgCard,
+            title: Row(
+              children: [
+                const Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
+                const SizedBox(width: 8),
+                const Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'زواج "$husbandName" و "$wifeName" مرتبط بـ:',
+                  style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentRed.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.accentRed.withOpacity(0.2)),
+                  ),
+                  child: Text(
+                    '👨‍👩‍👦 $childrenCount ابن/بنت',
+                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'لحذف هذا الزواج، يجب أولاً حذف أو نقل الأبناء المرتبطين من تبويب الأشخاص.',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('فهمت', style: TextStyle(color: AppColors.gold)),
+              ),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+
+    // لا يوجد أبناء — يسمح بالحذف
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: const Text('تأكيد حذف الزواج', style: TextStyle(color: AppColors.textPrimary)),
+          title: const Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
-            'حذف زواج ${marriage['husband_name']} و ${marriage['wife_name']}؟',
+            'هل أنت متأكد من حذف زواج "$husbandName" و "$wifeName"؟',
             style: const TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+            ),
             TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('حذف', style: TextStyle(color: AppColors.accentRed))),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
+            ),
           ],
         ),
       ),
     );
+
     if (confirmed != true) return;
+
     try {
-      await SupabaseConfig.client.from('marriages').delete().eq('id', marriage['id']);
-      _showSuccess('تم حذف الزواج');
+      await SupabaseConfig.client.from('marriages').delete().eq('id', marriageId);
+      _showSuccess('تم حذف الزواج بنجاح');
       _loadMarriages();
     } catch (e) {
-      _showError('خطأ: $e');
+      _showError('خطأ في الحذف: $e');
     }
   }
 
@@ -3292,44 +3285,70 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(
-                '${_allMarriages.length} زواج',
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.bgCard,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: _marriagesSearchController,
+                    onChanged: _filterMarriages,
+                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: 'بحث باسم أو رقم QF للزوج أو الزوجة...',
+                      hintStyle: TextStyle(color: AppColors.textSecondary),
+                      prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   if (_allPeople.isEmpty) _loadPeople();
                   _showAddMarriageDialog();
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  width: 46,
+                  height: 46,
                   decoration: BoxDecoration(
                     color: AppColors.gold,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 18),
-                      SizedBox(width: 4),
-                      Text('إضافة زواج',
-                          style: TextStyle(
-                              color: AppColors.bgDeep, fontSize: 12, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
+                  child: const Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
                 ),
               ),
             ],
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Text(
+                '${_filteredMarriages.length} زواج',
+                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _loadMarriages,
+                child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
         Expanded(
           child: _isLoadingMarriages
               ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _allMarriages.length,
+                  itemCount: _filteredMarriages.length,
                   itemBuilder: (context, index) {
-                    final m = _allMarriages[index];
+                    final m = _filteredMarriages[index];
                     final isExternal = m['is_external'] as bool? ?? false;
                     final isCurrent = m['is_current'] as bool? ?? true;
 
@@ -3399,6 +3418,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             ),
                           ),
                           IconButton(
+                            onPressed: () => _showEditMarriageDialog(m),
+                            icon: const Icon(Icons.edit_rounded, size: 18),
+                            color: AppColors.gold,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                          ),
+                          IconButton(
                             onPressed: () => _deleteMarriage(m),
                             icon: const Icon(Icons.delete_outline_rounded, size: 18),
                             color: AppColors.accentRed,
@@ -3412,6 +3438,103 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ),
         ),
       ],
+    );
+  }
+
+  void _showEditMarriageDialog(Map<String, dynamic> marriage) {
+    final isExternal = marriage['is_external'] as bool? ?? false;
+    final marriageOrderController = TextEditingController(text: '${marriage['marriage_order'] ?? 1}');
+    bool isCurrent = marriage['is_current'] as bool? ?? true;
+    bool isExternalWife = isExternal;
+    final externalNameController = TextEditingController(text: marriage['wife_external_name'] as String? ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            left: 16, right: 16, top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(width: 40, height: 4,
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+              ),
+              const SizedBox(height: 16),
+              const Text('تعديل الزواج', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const SizedBox(height: 16),
+              Text('الزوج: ${marriage['husband_name'] ?? '—'}', style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+              const SizedBox(height: 4),
+              Text('الزوجة: ${marriage['wife_name'] ?? '—'}', style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+              const SizedBox(height: 16),
+              _buildLabel('رقم الزواج'),
+              _buildTextField(marriageOrderController, 'رقم الزواج (1، 2، 3...)'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildLabel('حالة الزواج'),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => setModalState(() => isCurrent = !isCurrent),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isCurrent ? AppColors.accentGreen.withOpacity(0.1) : AppColors.accentRed.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: isCurrent ? AppColors.accentGreen.withOpacity(0.3) : AppColors.accentRed.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        isCurrent ? '💍 حالية' : '📝 سابقة',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isCurrent ? AppColors.accentGreen : AppColors.accentRed),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (isExternalWife) ...[
+                const SizedBox(height: 12),
+                _buildLabel('اسم الزوجة الخارجية'),
+                _buildTextField(externalNameController, 'اسم الزوجة'),
+              ],
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton(
+                  onPressed: () async {
+                    try {
+                      final updateData = <String, dynamic>{
+                        'marriage_order': int.tryParse(marriageOrderController.text.trim()) ?? 1,
+                        'is_current': isCurrent,
+                      };
+                      if (isExternalWife && externalNameController.text.trim().isNotEmpty) {
+                        updateData['wife_external_name'] = externalNameController.text.trim();
+                      }
+                      await SupabaseConfig.client.from('marriages').update(updateData).eq('id', marriage['id']);
+                      Navigator.pop(context);
+                      _showSuccess('تم تعديل الزواج بنجاح');
+                      _loadMarriages();
+                    } catch (e) {
+                      _showError('خطأ: $e');
+                    }
+                  },
+                  style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep),
+                  child: const Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -3430,7 +3553,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     onChanged: _filterGirlsChildren,
                     style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
                     decoration: const InputDecoration(
-                      hintText: 'بحث باسم الطفل أو الأم أو الأب...',
+                      hintText: 'بحث باسم الطفل أو الأم أو الأب أو رقم QF...',
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
                       border: InputBorder.none,

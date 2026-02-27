@@ -212,7 +212,15 @@ class PersonProfileScreen extends StatelessWidget {
     }
     final wifeName = getWifeName();
     final wifeId = isInternal ? wifeData['wife_id'] : null;
-    final childrenFromWife = children.where((child) { if (isInternal) { return child.motherId == wifeId; } else { return child.motherId == null; } }).toList();
+    final childrenFromWife = children.where((child) {
+      if (isInternal) {
+        return child.motherId == wifeId;
+      } else {
+        // مطابقة بالاسم النصي للزوجة الخارجية
+        final childMotherName = child.motherExternalName ?? '';
+        return childMotherName == wifeName;
+      }
+    }).toList();
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       InkWell(
