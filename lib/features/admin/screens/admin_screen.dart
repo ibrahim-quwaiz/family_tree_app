@@ -38,10 +38,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   List<Map<String, dynamic>> _allNotifications = [];
   bool _isLoadingNotifications = true;
 
+  List<Map<String, dynamic>> _allRequests = [];
+  bool _isLoadingRequests = true;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         _loadTabData(_tabController.index);
@@ -67,6 +70,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       case 2: if (_allGirlsChildren.isEmpty) { if (_allPeople.isEmpty) _loadPeople(); _loadGirlsChildren(); } break;
       case 3: if (_allNews.isEmpty) _loadNews(); _loadNotifications(); break;
       case 4: if (_allPeople.isEmpty) _loadPeople(); break;
+      case 5: _loadSupportRequests(); break;
     }
   }
 
@@ -3167,6 +3171,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               Tab(text: 'أبناء البنات', icon: Icon(Icons.child_care_rounded, size: 18)),
               Tab(text: 'الأخبار', icon: Icon(Icons.newspaper_rounded, size: 18)),
               Tab(text: 'الصلاحيات', icon: Icon(Icons.admin_panel_settings_rounded, size: 18)),
+              Tab(text: 'الطلبات'),
             ],
           ),
         ),
@@ -3178,6 +3183,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             _buildGirlsChildrenTab(),
             _buildNewsTab(),
             _buildUsersTab(),
+            _buildSupportRequestsTab(),
           ],
         ),
       ),
@@ -4080,6 +4086,168 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ),
         ),
       ],
+    );
+  }
+
+  Future<void> _loadSupportRequests() async {
+    setState(() => _isLoadingRequests = true);
+    try {
+      final response = await SupabaseConfig.client
+          .from('support_requests')
+          .select()
+          .order('created_at', ascending: false);
+      setState(() {
+        _allRequests = List<Map<String, dynamic>>.from(response);
+        _isLoadingRequests = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingRequests = false);
+      _showError('خطأ في تحميل الطلبات: $e');
+    }
+  }
+
+  Widget _buildSupportRequestsTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Text('${_allRequests.length} طلب', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              const Spacer(),
+              GestureDetector(onTap: _loadSupportRequests, child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20)),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _isLoadingRequests
+              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              : _allRequests.isEmpty
+                  ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.inbox_rounded, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
+                      const SizedBox(height: 12),
+                      Text('لا توجد طلبات', style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7))),
+                    ]))
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _allRequests.length,
+                      itemBuilder: (context, index) {
+                        final req = _allRequests[index];
+                        final status = req['status'] as String? ?? 'جديد';
+                        final statusColor = status == 'جديد' ? AppColors.accentAmber
+                            : status == 'قيد المراجعة' ? AppColors.accentBlue
+                            : status == 'تم الرد' ? AppColors.accentGreen
+                            : AppColors.textSecondary;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(color: AppColors.bgCard, borderRadius: BorderRadius.circular(12), border: Border.all(color: statusColor.withOpacity(0.15))),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [
+                              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                                child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor))),
+                              const SizedBox(width: 8),
+                              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(6)),
+                                child: Text(req['request_type'] as String? ?? '', style: const TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600))),
+                              const Spacer(),
+                              Text(req['sender_name'] as String? ?? 'مجهول', style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.7))),
+                            ]),
+                            const SizedBox(height: 8),
+                            Text(req['subject'] as String? ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                            const SizedBox(height: 4),
+                            Text(req['message'] as String? ?? '', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7)), maxLines: 3, overflow: TextOverflow.ellipsis),
+                            if (req['admin_reply'] != null && (req['admin_reply'] as String).isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Container(width: double.infinity, padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.accentGreen.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
+                                child: Text('الرد: ${req['admin_reply']}', style: TextStyle(fontSize: 12, color: AppColors.accentGreen.withOpacity(0.8)))),
+                            ],
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              Expanded(child: GestureDetector(onTap: () => _showReplyDialog(req),
+                                child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                                  child: const Center(child: Text('رد', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w600, fontSize: 12)))))),
+                              const SizedBox(width: 8),
+                              Expanded(child: GestureDetector(onTap: () => _changeRequestStatus(req),
+                                child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: AppColors.accentBlue.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                                  child: const Center(child: Text('تغيير الحالة', style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600, fontSize: 12)))))),
+                            ]),
+                          ]),
+                        );
+                      },
+                    ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showReplyDialog(Map<String, dynamic> req) async {
+    final id = req['id'] as String?;
+    if (id == null) return;
+    final replyController = TextEditingController(text: req['admin_reply'] as String? ?? '');
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.bgCard,
+        title: Text('رد على الطلب', style: const TextStyle(color: AppColors.textPrimary)),
+        content: TextField(
+          controller: replyController,
+          maxLines: 4,
+          style: const TextStyle(color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'اكتب ردك...',
+            hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.6)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep),
+            onPressed: () async {
+              final reply = replyController.text.trim();
+              Navigator.pop(context);
+              try {
+                await SupabaseConfig.client.from('support_requests').update({'admin_reply': reply, 'status': 'تم الرد'}).eq('id', id);
+                _loadSupportRequests();
+              } catch (e) {
+                _showError('خطأ في حفظ الرد: $e');
+              }
+            },
+            child: const Text('إرسال'),
+          ),
+        ],
+      ),
+    );
+    replyController.dispose();
+  }
+
+  void _changeRequestStatus(Map<String, dynamic> request) {
+    final statuses = ['جديد', 'قيد المراجعة', 'تم الرد', 'مغلق'];
+    showModalBottomSheet(
+      context: context, backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+          const SizedBox(height: 16),
+          const Text('تغيير الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          const SizedBox(height: 16),
+          ...statuses.map((s) => ListTile(
+            title: Text(s, style: TextStyle(color: s == request['status'] ? AppColors.gold : AppColors.textPrimary)),
+            leading: Icon(Icons.circle, size: 12, color: s == request['status'] ? AppColors.gold : AppColors.textSecondary.withOpacity(0.3)),
+            onTap: () async {
+              try {
+                await SupabaseConfig.client.from('support_requests').update({'status': s, 'updated_at': DateTime.now().toIso8601String()}).eq('id', request['id']);
+                Navigator.pop(context);
+                _showSuccess('تم تغيير الحالة');
+                _loadSupportRequests();
+              } catch (e) { _showError('خطأ: $e'); }
+            },
+          )),
+        ]),
+      ),
     );
   }
 }
