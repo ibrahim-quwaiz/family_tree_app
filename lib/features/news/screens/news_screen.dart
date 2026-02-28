@@ -1,6 +1,10 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/services/auth_service.dart';
+import '../../../core/constants/current_user.dart';
 
 /// أنواع الأخبار
 const Map<String, _NewsTypeInfo> _newsTypeInfo = {
@@ -74,6 +78,8 @@ class _NewsScreenState extends State<NewsScreen> {
   bool _isLoading = true;
   String? _error;
   String _selectedFilter = 'all';
+  String? _currentUserName;
+  String? _currentUserId;
 
   static const List<_FilterTab> _filters = [
     _FilterTab('all', 'الكل'),
@@ -87,6 +93,7 @@ class _NewsScreenState extends State<NewsScreen> {
   void initState() {
     super.initState();
     _loadNews();
+    _loadCurrentUser();
   }
 
   Future<void> _loadNews() async {
@@ -118,6 +125,228 @@ class _NewsScreenState extends State<NewsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final name = await AuthService.getCurrentName();
+    final id = await AuthService.getCurrentUserId();
+    if (mounted) {
+      setState(() {
+        _currentUserName = name;
+        _currentUserId = id;
+      });
+    }
+  }
+
+  void _showAddNewsDialog() {
+    final titleController = TextEditingController();
+    final contentController = TextEditingController();
+    String selectedType = 'general';
+    Uint8List? imageBytes;
+    String? imageName;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 16),
+              const Text('إضافة خبر جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const SizedBox(height: 4),
+              Text('سيتم مراجعة الخبر من الإدارة قبل النشر', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7))),
+              const SizedBox(height: 16),
+
+              const Text('نوع الخبر', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: _newsTypeInfo.entries.map((e) {
+                  final isSelected = selectedType == e.key;
+                  return GestureDetector(
+                    onTap: () => setModalState(() => selectedType = e.key),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? e.value.color.withOpacity(0.15) : AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isSelected ? e.value.color.withOpacity(0.4) : Colors.white.withOpacity(0.06)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(e.value.icon, size: 16, color: isSelected ? e.value.color : AppColors.textSecondary),
+                          const SizedBox(width: 6),
+                          Text(e.value.label, style: TextStyle(fontSize: 12, color: isSelected ? e.value.color : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal)),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+
+              const Text('العنوان', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: titleController,
+                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'عنوان الخبر...',
+                  hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
+                  filled: true, fillColor: AppColors.bgDeep.withOpacity(0.5),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              const Text('المحتوى', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: contentController,
+                maxLines: 4,
+                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'اكتب تفاصيل الخبر...',
+                  hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
+                  filled: true, fillColor: AppColors.bgDeep.withOpacity(0.5),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('صورة (اختياري)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 1200, imageQuality: 80);
+                  if (picked != null) {
+                    final bytes = await picked.readAsBytes();
+                    setModalState(() {
+                      imageBytes = bytes;
+                      imageName = picked.name;
+                    });
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppColors.bgDeep.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: imageBytes != null ? AppColors.gold.withOpacity(0.3) : Colors.white.withOpacity(0.06)),
+                  ),
+                  child: imageBytes != null
+                      ? Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(imageBytes!, width: double.infinity, height: 120, fit: BoxFit.cover),
+                            ),
+                            Positioned(
+                              top: 4, left: 4,
+                              child: GestureDetector(
+                                onTap: () => setModalState(() { imageBytes = null; imageName = null; }),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(color: AppColors.accentRed, borderRadius: BorderRadius.circular(8)),
+                                  child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_photo_alternate_rounded, size: 32, color: AppColors.textSecondary.withOpacity(0.4)),
+                            const SizedBox(height: 6),
+                            Text('اضغط لإضافة صورة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.5))),
+                          ],
+                        ),
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton(
+                  onPressed: () async {
+                    if (titleController.text.trim().isEmpty || contentController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: const Text('الرجاء تعبئة العنوان والمحتوى'), backgroundColor: AppColors.bgCard, behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      );
+                      return;
+                    }
+                    try {
+                      String? imageUrl;
+                      if (imageBytes != null && imageName != null) {
+                        final fileName = 'news/${DateTime.now().millisecondsSinceEpoch}_$imageName';
+                        await SupabaseConfig.client.storage.from('images').uploadBinary(
+                          fileName,
+                          imageBytes!,
+                          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+                        );
+                        imageUrl = SupabaseConfig.client.storage.from('images').getPublicUrl(fileName);
+                      }
+                      await SupabaseConfig.client.from('news').insert({
+                        'news_type': selectedType,
+                        'title': titleController.text.trim(),
+                        'content': contentController.text.trim(),
+                        'image_url': imageUrl,
+                        'author_name': _currentUserName ?? '',
+                        'author_id': _currentUserId ?? '',
+                        'is_approved': false,
+                      });
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Row(children: [
+                            Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 20),
+                            SizedBox(width: 8),
+                            Text('تم إرسال الخبر للمراجعة'),
+                          ]),
+                          backgroundColor: AppColors.bgCard, behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.bgCard, behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      );
+                    }
+                  },
+                  style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.send_rounded, size: 18),
+                      SizedBox(width: 8),
+                      Text('إرسال للمراجعة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _applyFilter() {
@@ -166,6 +395,13 @@ class _NewsScreenState extends State<NewsScreen> {
                           ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddNewsDialog,
+        backgroundColor: AppColors.gold,
+        foregroundColor: AppColors.bgDeep,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('أضف خبر', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }

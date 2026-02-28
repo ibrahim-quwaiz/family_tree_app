@@ -2983,6 +2983,128 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     }
   }
 
+  void _showEditNewsDialog(Map<String, dynamic> news) {
+    final titleController = TextEditingController(text: news['title'] as String? ?? '');
+    final contentController = TextEditingController(text: news['content'] as String? ?? '');
+    String selectedType = news['news_type'] as String? ?? 'general';
+    bool isApproved = news['is_approved'] as bool? ?? false;
+
+    final newsTypes = {
+      'general': 'أخبار عامة',
+      'events': 'مناسبات',
+      'births': 'ولادات',
+      'deaths': 'وفيات',
+    };
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                const Text('تعديل الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                const SizedBox(height: 16),
+
+                _buildLabel('نوع الخبر'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(color: AppColors.bgDeep.withOpacity(0.5), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white.withOpacity(0.06))),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedType,
+                      isExpanded: true,
+                      dropdownColor: AppColors.bgCard,
+                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                      items: newsTypes.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                      onChanged: (v) => setModalState(() => selectedType = v ?? 'general'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                _buildLabel('العنوان'),
+                _buildTextField(titleController, 'عنوان الخبر'),
+                const SizedBox(height: 12),
+
+                _buildLabel('المحتوى'),
+                TextField(
+                  controller: contentController,
+                  maxLines: 5,
+                  style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'محتوى الخبر...',
+                    hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
+                    filled: true, fillColor: AppColors.bgDeep.withOpacity(0.5),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    _buildLabel('حالة النشر'),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => setModalState(() => isApproved = !isApproved),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isApproved ? AppColors.accentGreen.withOpacity(0.1) : AppColors.accentAmber.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: isApproved ? AppColors.accentGreen.withOpacity(0.3) : AppColors.accentAmber.withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          isApproved ? '✅ منشور' : '⏳ معلق',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isApproved ? AppColors.accentGreen : AppColors.accentAmber),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: () async {
+                      try {
+                        await SupabaseConfig.client.from('news').update({
+                          'news_type': selectedType,
+                          'title': titleController.text.trim(),
+                          'content': contentController.text.trim(),
+                          'is_approved': isApproved,
+                        }).eq('id', news['id']);
+                        Navigator.pop(context);
+                        _showSuccess('تم تعديل الخبر');
+                        _loadNews();
+                      } catch (e) {
+                        _showError('خطأ: $e');
+                      }
+                    },
+                    style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep),
+                    child: const Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showSendNotificationDialog() {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
@@ -3813,18 +3935,55 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.textPrimary),
                                             ),
-                                            const SizedBox(height: 2),
+                                            if (!(news['is_approved'] as bool? ?? false))
+                                              Container(
+                                                margin: const EdgeInsets.only(top: 4),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.accentAmber.withOpacity(0.12),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: const Text('⏳ بانتظار الموافقة', style: TextStyle(fontSize: 10, color: AppColors.accentAmber, fontWeight: FontWeight.w600)),
+                                              ),
+                                            const SizedBox(height: 4),
                                             Text(
-                                              news['body'] as String? ?? '',
+                                              news['content'] as String? ?? '',
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: AppColors.textSecondary.withOpacity(0.7)),
+                                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7)),
                                             ),
+                                            if (news['author_name'] != null && (news['author_name'] as String).isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 4),
+                                                child: Text('بواسطة: ${news['author_name']}', style: TextStyle(fontSize: 10, color: AppColors.textSecondary.withOpacity(0.5))),
+                                              ),
                                           ],
                                         ),
                                       ),
+                                      IconButton(
+                                        onPressed: () => _showEditNewsDialog(news),
+                                        icon: const Icon(Icons.edit_rounded, size: 18),
+                                        color: AppColors.gold,
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                      ),
+                                      if (!(news['is_approved'] as bool? ?? false))
+                                        IconButton(
+                                          onPressed: () async {
+                                            try {
+                                              await SupabaseConfig.client.from('news').update({'is_approved': true}).eq('id', news['id']);
+                                              _showSuccess('تم نشر الخبر');
+                                              _loadNews();
+                                            } catch (e) {
+                                              _showError('خطأ: $e');
+                                            }
+                                          },
+                                          icon: const Icon(Icons.check_circle_rounded, size: 18),
+                                          color: AppColors.accentGreen,
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                          tooltip: 'موافقة ونشر',
+                                        ),
                                       IconButton(
                                         onPressed: () => _deleteNews(news),
                                         icon: const Icon(Icons.delete_outline_rounded, size: 18),
