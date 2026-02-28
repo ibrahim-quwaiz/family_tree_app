@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../screens/home_screen.dart';
+import '../../../core/constants/current_user.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -73,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
     try {
       await AuthService.login(qfId, pin);
+      await CurrentUser.loadFromSession();
 
       if (!mounted) return;
 

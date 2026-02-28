@@ -23,11 +23,16 @@ class _StatsScreenState extends State<StatsScreen> {
   // توزيع الأجيال
   Map<int, int> _generationDistribution = {};
 
-  // أكبر الفروع
-  List<Map<String, dynamic>> _topBranches = [];
-
   // توزيع المدن
   Map<String, int> _cityDistribution = {};
+
+  // توزيع الحالة الاجتماعية
+  int _marriedCount = 0;
+  int _singleCount = 0;
+  int _unknownMaritalCount = 0;
+
+  // المواليد حسب السنة
+  Map<int, int> _birthsByYear = {};
 
   @override
   void initState() {
@@ -45,8 +50,9 @@ class _StatsScreenState extends State<StatsScreen> {
       await Future.wait([
         _loadGeneralStats(),
         _loadGenerationDistribution(),
-        _loadTopBranches(),
         _loadCityDistribution(),
+        _loadMaritalStatus(),
+        _loadBirthsByYear(),
       ]);
       setState(() => _isLoading = false);
     } catch (e) {
@@ -95,45 +101,6 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
-  Future<void> _loadTopBranches() async {
-    // جلب أبناء الجيل 1 (الفروع الرئيسية) مع عدد ذريتهم
-    final gen1Response = await SupabaseConfig.client
-        .from('people')
-        .select('id, name')
-        .eq('generation', 1)
-        .order('name');
-
-    _topBranches = [];
-
-    for (final person in gen1Response) {
-      final personId = person['id'] as String;
-      final personName = person['name'] as String;
-
-      int count = 0;
-      try {
-        final countResponse = await SupabaseConfig.client
-            .from('people_with_children')
-            .select('children_count')
-            .eq('id', personId)
-            .maybeSingle();
-        count = countResponse?['children_count'] as int? ?? 0;
-      } catch (e) {
-        final directChildren = await SupabaseConfig.client
-            .from('people')
-            .select('id')
-            .eq('father_id', personId);
-        count = (directChildren as List).length;
-      }
-
-      _topBranches.add({
-        'name': personName,
-        'count': count,
-      });
-    }
-
-    _topBranches.sort((a, b) => (b['count'] as int).compareTo(a['count'] as int));
-  }
-
   Future<void> _loadCityDistribution() async {
     final response = await SupabaseConfig.client
         .from('people')
@@ -147,6 +114,45 @@ class _StatsScreenState extends State<StatsScreen> {
       final city = (item as Map<String, dynamic>)['residence_city'] as String? ?? '';
       if (city.isNotEmpty) {
         _cityDistribution[city] = (_cityDistribution[city] ?? 0) + 1;
+      }
+    }
+  }
+
+  Future<void> _loadMaritalStatus() async {
+    final response = await SupabaseConfig.client
+        .from('people')
+        .select('marital_status');
+
+    final list = response as List;
+    _marriedCount = 0;
+    _singleCount = 0;
+
+    for (final item in list) {
+      final status = (item as Map<String, dynamic>)['marital_status'] as String?;
+      if (status == 'متزوج') {
+        _marriedCount++;
+      } else if (status == 'أعزب') {
+        _singleCount++;
+      }
+    }
+  }
+
+  Future<void> _loadBirthsByYear() async {
+    final response = await SupabaseConfig.client
+        .from('people')
+        .select('birth_date')
+        .not('birth_date', 'is', null);
+
+    final list = response as List;
+    _birthsByYear = {};
+
+    for (final item in list) {
+      final dateStr = (item as Map<String, dynamic>)['birth_date'] as String?;
+      if (dateStr != null && dateStr.isNotEmpty) {
+        final date = DateTime.tryParse(dateStr);
+        if (date != null && date.year > 1900) {
+          _birthsByYear[date.year] = (_birthsByYear[date.year] ?? 0) + 1;
+        }
       }
     }
   }
@@ -184,9 +190,11 @@ class _StatsScreenState extends State<StatsScreen> {
                         children: [
                           _buildGeneralStats(),
                           const SizedBox(height: 20),
+                          _buildMaritalStatusSection(),
+                          const SizedBox(height: 20),
                           _buildGenerationChart(),
                           const SizedBox(height: 20),
-                          _buildTopBranchesSection(),
+                          _buildBirthsByYearSection(),
                           const SizedBox(height: 20),
                           _buildCityDistributionSection(),
                           const SizedBox(height: 30),
@@ -264,17 +272,11 @@ class _StatsScreenState extends State<StatsScreen> {
                 children: [
                   Expanded(
                     flex: _maleCount > 0 ? _maleCount : 1,
-                    child: Container(
-                      height: 8,
-                      color: AppColors.accentBlue,
-                    ),
+                    child: Container(height: 8, color: AppColors.accentBlue),
                   ),
                   Expanded(
                     flex: _femaleCount > 0 ? _femaleCount : 1,
-                    child: Container(
-                      height: 8,
-                      color: const Color(0xFFE91E8C),
-                    ),
+                    child: Container(height: 8, color: const Color(0xFFE91E8C)),
                   ),
                 ],
               ),
@@ -324,6 +326,146 @@ class _StatsScreenState extends State<StatsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // توزيع الحالة الاجتماعية
+  // ═══════════════════════════════════════════
+  Widget _buildMaritalStatusSection() {
+    final total = _marriedCount + _singleCount;
+    if (total == 0) return const SizedBox.shrink();
+
+    final marriedPercent = (total > 0) ? (_marriedCount * 100 / total).toStringAsFixed(1) : '0';
+    final singlePercent = (total > 0) ? (_singleCount * 100 / total).toStringAsFixed(1) : '0';
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.bgCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.favorite_rounded, color: AppColors.gold, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'الحالة الاجتماعية',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // الدوائر
+          Row(
+            children: [
+              Expanded(
+                child: _buildCircularStat(
+                  'متزوج',
+                  _marriedCount,
+                  total,
+                  AppColors.accentGreen,
+                  Icons.people_rounded,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildCircularStat(
+                  'أعزب',
+                  _singleCount,
+                  total,
+                  AppColors.accentBlue,
+                  Icons.person_rounded,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // شريط النسبة
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: _marriedCount > 0 ? _marriedCount : 1,
+                  child: Container(height: 8, color: AppColors.accentGreen),
+                ),
+                Expanded(
+                  flex: _singleCount > 0 ? _singleCount : 1,
+                  child: Container(height: 8, color: AppColors.accentBlue),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'متزوج $marriedPercent%',
+                style: const TextStyle(fontSize: 11, color: AppColors.accentGreen),
+              ),
+              Text(
+                'أعزب $singlePercent%',
+                style: const TextStyle(fontSize: 11, color: AppColors.accentBlue),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCircularStat(String label, int count, int total, Color color, IconData icon) {
+    final percentage = total > 0 ? count / total : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.12)),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 70,
+            height: 70,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 70,
+                  height: 70,
+                  child: CircularProgressIndicator(
+                    value: percentage,
+                    strokeWidth: 6,
+                    backgroundColor: color.withOpacity(0.15),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    strokeCap: StrokeCap.round,
+                  ),
+                ),
+                Icon(icon, color: color, size: 24),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '$count',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color),
+          ),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: color.withOpacity(0.8)),
+          ),
+        ],
       ),
     );
   }
@@ -443,10 +585,35 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   // ═══════════════════════════════════════════
-  // أكبر الفروع
+  // المواليد حسب السنة
   // ═══════════════════════════════════════════
-  Widget _buildTopBranchesSection() {
-    if (_topBranches.isEmpty) return const SizedBox.shrink();
+  Widget _buildBirthsByYearSection() {
+    if (_birthsByYear.isEmpty) return const SizedBox.shrink();
+
+    final sortedYears = _birthsByYear.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    final maxCount = sortedYears.fold<int>(0, (max, e) => e.value > max ? e.value : max);
+    final totalBirths = sortedYears.fold<int>(0, (sum, e) => sum + e.value);
+
+    // تجميع حسب العقود لو البيانات كثيرة
+    final bool groupByDecade = sortedYears.length > 20;
+
+    List<MapEntry<String, int>> displayData;
+
+    if (groupByDecade) {
+      final decades = <String, int>{};
+      for (final entry in sortedYears) {
+        final decade = '${(entry.key ~/ 10) * 10}s';
+        final decadeLabel = '${(entry.key ~/ 10) * 10}';
+        decades[decadeLabel] = (decades[decadeLabel] ?? 0) + entry.value;
+      }
+      displayData = decades.entries.toList();
+    } else {
+      displayData = sortedYears.map((e) => MapEntry('${e.key}', e.value)).toList();
+    }
+
+    final displayMax = displayData.fold<int>(0, (max, e) => e.value > max ? e.value : max);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -460,90 +627,155 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_tree_rounded, color: AppColors.gold, size: 20),
+              const Icon(Icons.cake_rounded, color: AppColors.gold, size: 20),
               const SizedBox(width: 8),
               const Text(
-                'أكبر الفروع',
+                'المواليد حسب السنة',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+              ),
+              const Spacer(),
+              Text(
+                '$totalBirths مسجل',
+                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          if (groupByDecade)
+            Text(
+              'مجمّع حسب العقد',
+              style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.6)),
+            ),
           const SizedBox(height: 16),
 
-          ..._topBranches.asMap().entries.map((entry) {
-            final index = entry.key;
-            final branch = entry.value;
-            final name = branch['name'] as String;
-            final count = branch['count'] as int;
+          // رسم بياني عمودي
+          SizedBox(
+            height: 220,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: displayData.map((entry) {
+                final barHeight = displayMax > 0 ? (entry.value / displayMax) * 150 : 0.0;
+                final colorIndex = displayData.indexOf(entry);
+                final color = _getBirthYearColor(colorIndex, displayData.length);
 
-            Color medalColor;
-            String medal;
-            if (index == 0) {
-              medalColor = const Color(0xFFFFD700);
-              medal = '🥇';
-            } else if (index == 1) {
-              medalColor = const Color(0xFFC0C0C0);
-              medal = '🥈';
-            } else if (index == 2) {
-              medalColor = const Color(0xFFCD7F32);
-              medal = '🥉';
-            } else {
-              medalColor = AppColors.textSecondary;
-              medal = '${index + 1}';
-            }
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.bgDeep.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: index < 3
-                    ? Border.all(color: medalColor.withOpacity(0.2))
-                    : null,
-              ),
-              child: Row(
-                children: [
-                  Text(medal, style: TextStyle(fontSize: index < 3 ? 22 : 14)),
-                  const SizedBox(width: 12),
-                  Expanded(
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'فرع $name',
+                          '${entry.value}',
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: index < 3 ? medalColor : AppColors.textPrimary,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: color,
                           ),
                         ),
-                        Text(
-                          '$count فرد',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        const SizedBox(height: 4),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          height: barHeight,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [color, color.withOpacity(0.4)],
+                            ),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        RotatedBox(
+                          quarterTurns: -1,
+                          child: Text(
+                            entry.key,
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: AppColors.textSecondary.withOpacity(0.7),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.gold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$count',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.gold,
-                      ),
-                    ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          // أعلى وأقل سنة
+          if (sortedYears.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Divider(color: Colors.white.withOpacity(0.06)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildBirthHighlight(
+                    'أكثر سنة مواليد',
+                    '${sortedYears.reduce((a, b) => a.value > b.value ? a : b).key}',
+                    '${sortedYears.reduce((a, b) => a.value > b.value ? a : b).value} مولود',
+                    AppColors.accentGreen,
+                    Icons.trending_up_rounded,
                   ),
-                ],
-              ),
-            );
-          }),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildBirthHighlight(
+                    'أقدم مولود مسجل',
+                    '${sortedYears.first.key}',
+                    '',
+                    AppColors.accentAmber,
+                    Icons.history_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Color _getBirthYearColor(int index, int total) {
+    // تدرج من الذهبي إلى الأخضر
+    final t = total > 1 ? index / (total - 1) : 0.0;
+    return Color.lerp(AppColors.gold, AppColors.accentGreen, t) ?? AppColors.gold;
+  }
+
+  Widget _buildBirthHighlight(String title, String value, String subtitle, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.12)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 10, color: color.withOpacity(0.7)),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color),
+                ),
+                if (subtitle.isNotEmpty)
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 10, color: color.withOpacity(0.6)),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -633,10 +865,7 @@ class _StatsScreenState extends State<StatsScreen> {
                 final colorIndex = entry.key % cityColors.length;
                 return Expanded(
                   flex: entry.value.value,
-                  child: Container(
-                    height: 10,
-                    color: cityColors[colorIndex],
-                  ),
+                  child: Container(height: 10, color: cityColors[colorIndex]),
                 );
               }).toList(),
             ),

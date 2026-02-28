@@ -3,6 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/current_user.dart';
+import '../../auth/services/auth_service.dart';
+import '../../auth/screens/login_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -194,6 +196,57 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           _buildMarriagesSection(),
                           const SizedBox(height: 16),
                           _buildChildrenSection(),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: AlertDialog(
+                                      backgroundColor: AppColors.bgCard,
+                                      title: const Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
+                                      content: const Text('هل تريد تسجيل الخروج من التطبيق؟', style: TextStyle(color: AppColors.textSecondary)),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, false),
+                                          child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, true),
+                                          child: const Text('خروج', style: TextStyle(color: AppColors.accentRed)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                                if (confirm == true && mounted) {
+                                  await AuthService.logout();
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                                    (route) => false,
+                                  );
+                                }
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.accentRed,
+                                side: BorderSide(color: AppColors.accentRed.withOpacity(0.3)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.logout_rounded, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('تسجيل الخروج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 30),
                         ],
                       ),

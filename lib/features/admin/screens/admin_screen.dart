@@ -18,6 +18,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   List<Map<String, dynamic>> _allPeople = [];
   List<Map<String, dynamic>> _filteredPeople = [];
   final _searchController = TextEditingController();
+  List<Map<String, dynamic>> _filteredUsers = [];
+  final _usersSearchController = TextEditingController();
   bool _isLoadingPeople = true;
 
   List<Map<String, dynamic>> _allMarriages = [];
@@ -54,6 +56,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     _searchController.dispose();
     _marriagesSearchController.dispose();
     _girlsChildrenSearchController.dispose();
+    _usersSearchController.dispose();
     super.dispose();
   }
 
@@ -72,13 +75,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     try {
       final response = await SupabaseConfig.client
           .from('people')
-          .select('id, legacy_user_id, name, gender, generation, is_alive, father_id, mother_id, mother_external_name, birth_date, death_date, birth_city, birth_country, residence_city, job, education, is_admin, pin_code, sort_order')
+          .select('id, legacy_user_id, name, gender, generation, is_alive, father_id, mother_id, mother_external_name, birth_date, death_date, birth_city, birth_country, residence_city, job, education, marital_status, is_admin, pin_code, sort_order')
           .order('generation')
           .order('name');
 
       setState(() {
         _allPeople = List<Map<String, dynamic>>.from(response);
         _filteredPeople = _allPeople;
+        _filteredUsers = _allPeople;
         _isLoadingPeople = false;
       });
     } catch (e) {
@@ -861,6 +865,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     });
   }
 
+  void _filterUsers(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredUsers = _allPeople;
+      } else {
+        _filteredUsers = _allPeople.where((p) {
+          final name = (p['name'] as String? ?? '').toLowerCase();
+          final qf = (p['legacy_user_id'] as String? ?? '').toLowerCase();
+          final q = query.toLowerCase();
+          return name.contains(q) || qf.contains(q);
+        }).toList();
+      }
+    });
+  }
+
   Future<void> _deletePerson(Map<String, dynamic> person) async {
     final personId = person['id'] as String;
     final personName = person['name'] as String? ?? '—';
@@ -1049,6 +1068,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     final residenceCityController = TextEditingController(text: person['residence_city'] as String? ?? '');
     final jobController = TextEditingController(text: person['job'] as String? ?? '');
     final educationController = TextEditingController(text: person['education'] as String? ?? '');
+    String maritalStatus = person['marital_status'] as String? ?? '';
     final pinController = TextEditingController(text: person['pin_code'] as String? ?? '');
     final fatherQfController = TextEditingController();
     final mobileController = TextEditingController();
@@ -1573,6 +1593,34 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ],
                   ),
                   const SizedBox(height: 12),
+                  _buildLabel('الحالة الاجتماعية'),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.bgDeep.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withOpacity(0.06)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: maritalStatus.isEmpty ? null : maritalStatus,
+                        isExpanded: true,
+                        dropdownColor: AppColors.bgCard,
+                        hint: const Text('اختر الحالة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                        items: const [
+                          DropdownMenuItem(value: 'متزوج', child: Text('متزوج')),
+                          DropdownMenuItem(value: 'أعزب', child: Text('أعزب')),
+                          DropdownMenuItem(value: 'مطلق', child: Text('مطلق')),
+                          DropdownMenuItem(value: 'أرمل', child: Text('أرمل/أرملة')),
+                        ],
+                        onChanged: (value) {
+                          setModalState(() => maritalStatus = value ?? '');
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   _buildLabel('رمز PIN'),
                   const SizedBox(height: 4),
                   _buildTextField(pinController, 'رمز الدخول (4 أرقام)'),
@@ -1744,6 +1792,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             'job': jobController.text.trim().isEmpty ? null : jobController.text.trim(),
                             'education':
                                 educationController.text.trim().isEmpty ? null : educationController.text.trim(),
+                            'marital_status': maritalStatus.isEmpty ? null : maritalStatus,
                           };
                           // الأم — من زوجات الأب
                           if (selectedMotherMarriage != null) {
@@ -3891,14 +3940,35 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.bgCard,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TextField(
+              controller: _usersSearchController,
+              onChanged: _filterUsers,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+              decoration: const InputDecoration(
+                hintText: 'بحث باسم أو رقم QF...',
+                hintStyle: TextStyle(color: AppColors.textSecondary),
+                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ),
         Expanded(
           child: _isLoadingPeople
               ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _allPeople.length,
+                  itemCount: _filteredUsers.length,
                   itemBuilder: (context, index) {
-                    final person = _allPeople[index];
+                    final person = _filteredUsers[index];
                     final isAdmin = person['is_admin'] == true;
                     final hasPin = (person['pin_code'] as String? ?? '').isNotEmpty;
 
