@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../screens/home_screen.dart';
 import '../../../core/constants/current_user.dart';
@@ -391,6 +392,27 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          TextButton.icon(
+            onPressed: () async {
+              final url = Uri.parse(
+                  'https://wa.me/966555113730?text=${Uri.encodeComponent("السلام عليكم، أحتاج مساعدة في الدخول للتطبيق")}');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
+            },
+            icon: Icon(Icons.help_outline,
+                color: AppColors.textSecondary, size: 18),
+            label: Text(
+              'تواجه مشكلة؟ تواصل مع مدير التطبيق',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.textSecondary.withOpacity(0.5),
+              ),
             ),
           ),
         ],

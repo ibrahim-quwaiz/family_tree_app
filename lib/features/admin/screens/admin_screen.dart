@@ -3013,7 +3013,31 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 const SizedBox(height: 16),
                 const Text('تعديل الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                 const SizedBox(height: 16),
-
+                if (news['image_url'] != null && (news['image_url'] as String).toString().isNotEmpty) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      news['image_url'] as String,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          color: AppColors.bgCard,
+                          child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                        );
+                      },
+                      errorBuilder: (_, __, ___) => Container(
+                        height: 100,
+                        color: AppColors.bgCard,
+                        child: Center(child: Icon(Icons.broken_image, color: AppColors.textSecondary)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 _buildLabel('نوع الخبر'),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -3922,14 +3946,43 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                     color: AppColors.bgCard,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Row(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              news['title'] as String? ?? '—',
+                                      if (news['image_url'] != null && (news['image_url'] as String).toString().isNotEmpty) ...[
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.network(
+                                            news['image_url'] as String,
+                                            height: 200,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            loadingBuilder: (context, child, loadingProgress) {
+                                              if (loadingProgress == null) return child;
+                                              return Container(
+                                                height: 200,
+                                                color: AppColors.bgCard,
+                                                child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                                              );
+                                            },
+                                            errorBuilder: (_, __, ___) => Container(
+                                              height: 100,
+                                              color: AppColors.bgCard,
+                                              child: Center(child: Icon(Icons.broken_image, color: AppColors.textSecondary)),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                      ],
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  news['title'] as String? ?? '—',
                                               style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
@@ -3988,6 +4041,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                         onPressed: () => _deleteNews(news),
                                         icon: const Icon(Icons.delete_outline_rounded, size: 18),
                                         color: AppColors.accentRed,
+                                      ),
+                                        ],
                                       ),
                                     ],
                                   ),

@@ -3,7 +3,8 @@ import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 
 class TreeScreen extends StatefulWidget {
-  const TreeScreen({super.key});
+  final String? highlightPersonId;
+  const TreeScreen({super.key, this.highlightPersonId});
 
   @override
   State<TreeScreen> createState() => _TreeScreenState();
@@ -32,7 +33,11 @@ class _TreeScreenState extends State<TreeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadRoot();
+    if (widget.highlightPersonId != null) {
+      _loadPersonWithHistory(widget.highlightPersonId!);
+    } else {
+      _loadRoot();
+    }
   }
 
   @override
@@ -65,6 +70,48 @@ class _TreeScreenState extends State<TreeScreen> {
           _isLoading = false;
         });
       }
+    } catch (e) {
+      setState(() {
+        _error = 'خطأ في تحميل البيانات: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadPersonWithHistory(String personId) async {
+    setState(() => _isLoading = true);
+
+    try {
+      // بناء سلسلة الآباء من الشخص للجذر
+      final ancestors = <Map<String, dynamic>>[];
+      String? currentId = personId;
+
+      while (currentId != null) {
+        final person = await SupabaseConfig.client
+            .from('people')
+            .select('id, name, gender, generation, is_alive, father_id, legacy_user_id')
+            .eq('id', currentId)
+            .maybeSingle();
+
+        if (person == null) break;
+        ancestors.insert(0, person);
+        currentId = person['father_id'] as String?;
+      }
+
+      // أول عنصر هو الجذر، آخر عنصر هو الشخص المطلوب
+      // نضع كل الآباء (ما عدا الشخص المطلوب) في _history
+      _history.clear();
+      if (ancestors.length > 1) {
+        _history.addAll(ancestors.sublist(0, ancestors.length - 1));
+      }
+
+      // تحميل الجذر للرجوع إليه
+      if (ancestors.isNotEmpty) {
+        _rootPersonId = ancestors.first['id'] as String;
+      }
+
+      // تحميل الشخص المطلوب
+      await _loadPerson(personId);
     } catch (e) {
       setState(() {
         _error = 'خطأ في تحميل البيانات: $e';

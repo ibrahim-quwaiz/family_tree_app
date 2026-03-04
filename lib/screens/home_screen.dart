@@ -14,18 +14,27 @@ import '../features/admin/screens/admin_screen.dart';
 import '../features/contact/screens/contact_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.initialIndex = 0, this.highlightPersonId});
+
+  final int initialIndex;
+  final String? highlightPersonId;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
-  final List<Widget> _pages = [
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  List<Widget> get _pages => [
     const _HomePage(),
-    const TreeScreen(),
+    TreeScreen(highlightPersonId: widget.highlightPersonId),
     const DirectoryScreen(),
     const NotificationsScreen(),
     const MyProfileScreen(),

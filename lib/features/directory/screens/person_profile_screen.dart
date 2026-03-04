@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/directory_person.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../screens/home_screen.dart';
 
 class PersonProfileScreen extends StatelessWidget {
   final DirectoryPerson person;
@@ -467,7 +468,15 @@ class PersonProfileScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Column(children: [
       SizedBox(width: double.infinity, child: OutlinedButton.icon(
-        onPressed: () { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ميزة الشجرة قريباً'))); },
+        onPressed: () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(initialIndex: 1, highlightPersonId: person.id),
+          ),
+          (route) => false,
+        );
+      },
         icon: const Icon(Icons.account_tree), label: const Text('عرض في شجرة العائلة'),
         style: OutlinedButton.styleFrom(foregroundColor: AppColors.primaryGreen, padding: const EdgeInsets.symmetric(vertical: 12)),
       )),

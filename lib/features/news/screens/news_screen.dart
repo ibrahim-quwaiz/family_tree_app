@@ -153,10 +153,11 @@ class _NewsScreenState extends State<NewsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(
           padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 16),
               const Text('إضافة خبر جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
@@ -298,7 +299,6 @@ class _NewsScreenState extends State<NewsScreen> {
                         await SupabaseConfig.client.storage.from('images').uploadBinary(
                           fileName,
                           imageBytes!,
-                          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
                         );
                         imageUrl = SupabaseConfig.client.storage.from('images').getPublicUrl(fileName);
                       }
@@ -343,6 +343,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 ),
               ),
             ],
+            ),
           ),
         ),
       ),
@@ -452,174 +453,94 @@ class _NewsScreenState extends State<NewsScreen> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _showNewsDetail(news),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: hasImage
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        news.imageUrl!,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const SizedBox(width: 100, height: 100),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (hasImage)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.network(
+                  news.imageUrl!,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 180,
+                      color: AppColors.bgCard,
+                      child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: news.typeColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      news.typeLabel,
+                      style: TextStyle(
+                        color: news.typeColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: news.typeColor.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              news.typeLabel,
-                              style: TextStyle(
-                                color: news.typeColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            news.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              if (news.authorName != null &&
-                                  news.authorName!.isNotEmpty)
-                                Text(
-                                  news.authorName!,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              if (news.authorName != null &&
-                                  news.authorName!.isNotEmpty &&
-                                  news.createdAt != null)
-                                Text(
-                                  ' • ',
-                                  style: TextStyle(
-                                      color: AppColors.textSecondary),
-                                ),
-                              if (news.createdAt != null)
-                                Text(
-                                  _formatDate(news.createdAt!),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (previewText.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              previewText,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                                height: 1.5,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    news.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: news.typeColor.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        news.typeLabel,
-                        style: TextStyle(
-                          color: news.typeColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      if (news.authorName != null && news.authorName!.isNotEmpty)
+                        Text(
+                          news.authorName!,
+                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                         ),
-                      ),
-                    ),
+                      if (news.authorName != null &&
+                          news.authorName!.isNotEmpty &&
+                          news.createdAt != null)
+                        Text(' • ', style: TextStyle(color: AppColors.textSecondary)),
+                      if (news.createdAt != null)
+                        Text(
+                          _formatDate(news.createdAt!),
+                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        ),
+                    ],
+                  ),
+                  if (previewText.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
-                      news.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                      previewText,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        height: 1.5,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        if (news.authorName != null &&
-                            news.authorName!.isNotEmpty)
-                          Text(
-                            news.authorName!,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        if (news.authorName != null &&
-                            news.authorName!.isNotEmpty &&
-                            news.createdAt != null)
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                                color: AppColors.textSecondary),
-                          ),
-                        if (news.createdAt != null)
-                          Text(
-                            _formatDate(news.createdAt!),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (previewText.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        previewText,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                          height: 1.5,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
                   ],
-                ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

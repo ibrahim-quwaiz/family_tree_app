@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/current_user.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../../screens/home_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -265,6 +266,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final legacyId = _personData?['legacy_user_id'] ?? '';
     final generation = _personData?['generation'] ?? 0;
     final isAlive = _personData?['is_alive'] ?? true;
+    final currentPersonId = _personData?['id'] as String?;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -382,6 +384,30 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                if (currentPersonId == null) return;
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen(initialIndex: 1, highlightPersonId: currentPersonId),
+                  ),
+                  (route) => false,
+                );
+              },
+              icon: const Icon(Icons.account_tree_rounded, size: 18),
+              label: const Text('عرض في شجرة العائلة'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primaryGreen,
+                side: BorderSide(color: AppColors.primaryGreen.withOpacity(0.4)),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
           ),
         ],
       ),
