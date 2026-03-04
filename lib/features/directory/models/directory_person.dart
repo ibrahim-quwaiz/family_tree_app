@@ -28,6 +28,13 @@ class DirectoryPerson {
   final String? twitter;
   final String? snapchat;
   final String? facebook;
+  final bool isContactPublic;
+  final bool? showMobile;
+  final bool? showEmail;
+  final bool? showInstagram;
+  final bool? showTwitter;
+  final bool? showSnapchat;
+  final bool? showFacebook;
 
   DirectoryPerson({
     required this.id,
@@ -59,6 +66,13 @@ class DirectoryPerson {
     this.twitter,
     this.snapchat,
     this.facebook,
+    this.isContactPublic = true,
+    this.showMobile,
+    this.showEmail,
+    this.showInstagram,
+    this.showTwitter,
+    this.showSnapchat,
+    this.showFacebook,
   });
 
   factory DirectoryPerson.fromJson(Map<String, dynamic> json) {
@@ -108,6 +122,13 @@ class DirectoryPerson {
       twitter: contactMap?['twitter'] as String?,
       snapchat: contactMap?['snapchat'] as String?,
       facebook: contactMap?['facebook'] as String?,
+      isContactPublic: contactMap?['is_contact_public'] as bool? ?? true,
+      showMobile: contactMap?['show_mobile'] as bool?,
+      showEmail: contactMap?['show_email'] as bool?,
+      showInstagram: contactMap?['show_instagram'] as bool?,
+      showTwitter: contactMap?['show_twitter'] as bool?,
+      showSnapchat: contactMap?['show_snapchat'] as bool?,
+      showFacebook: contactMap?['show_facebook'] as bool?,
     );
   }
 

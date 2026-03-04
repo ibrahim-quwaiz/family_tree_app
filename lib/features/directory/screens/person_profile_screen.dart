@@ -13,6 +13,7 @@ class PersonProfileScreen extends StatelessWidget {
   final List<Map<String, dynamic>> girlsChildren;
   final List<DirectoryPerson> allPeople;
   final Function(DirectoryPerson) onPersonTap;
+  final Map<String, dynamic> privacySettings;
 
   const PersonProfileScreen({
     Key? key,
@@ -24,6 +25,7 @@ class PersonProfileScreen extends StatelessWidget {
     this.girlsChildren = const [],
     required this.allPeople,
     required this.onPersonTap,
+    this.privacySettings = const {},
   }) : super(key: key);
 
   @override
@@ -404,7 +406,9 @@ class PersonProfileScreen extends StatelessWidget {
   // التواصل
   // ═══════════════════════════════════════════
   Widget _buildContactSection() {
-    final hasContact = person.mobilePhone != null || person.email != null;
+    final showMobile = privacySettings['show_mobile'] ?? true;
+    final showEmail = privacySettings['show_email'] ?? true;
+    final hasContact = (person.mobilePhone != null && showMobile) || (person.email != null && showEmail);
     if (!hasContact) return const SizedBox.shrink();
 
     return Card(
@@ -416,13 +420,13 @@ class PersonProfileScreen extends StatelessWidget {
           Row(children: [const Icon(Icons.contact_phone, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
           const Divider(height: 24),
           Row(children: [
-            if (person.mobilePhone != null) ...[
+            if (person.mobilePhone != null && showMobile) ...[
               Expanded(child: ElevatedButton.icon(onPressed: () => _makePhoneCall(person.mobilePhone!), icon: const Icon(Icons.phone), label: const Text('اتصال'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen, padding: const EdgeInsets.symmetric(vertical: 12)))),
               const SizedBox(width: 8),
               Expanded(child: ElevatedButton.icon(onPressed: () => _openWhatsApp(person.mobilePhone!), icon: const Icon(Icons.chat), label: const Text('واتساب'), style: ElevatedButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.symmetric(vertical: 12)))),
             ],
           ]),
-          if (person.email != null) ...[
+          if (person.email != null && showEmail) ...[
             const SizedBox(height: 8),
             SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _sendEmail(person.email!), icon: const Icon(Icons.email), label: const Text('إيميل'), style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.symmetric(vertical: 12)))),
           ],
@@ -435,8 +439,15 @@ class PersonProfileScreen extends StatelessWidget {
   // وسائل التواصل الاجتماعي
   // ═══════════════════════════════════════════
   Widget _buildSocialMediaSection() {
-    final instagram = contactInfo['instagram']; final twitter = contactInfo['twitter']; final snapchat = contactInfo['snapchat']; final facebook = contactInfo['facebook'];
-    final hasSocial = instagram != null || twitter != null || snapchat != null || facebook != null;
+    final showInsta = privacySettings['show_instagram'] ?? true;
+    final showTwitter = privacySettings['show_twitter'] ?? true;
+    final showSnap = privacySettings['show_snapchat'] ?? true;
+    final showFb = privacySettings['show_facebook'] ?? true;
+    final instagram = contactInfo['instagram'];
+    final twitter = contactInfo['twitter'];
+    final snapchat = contactInfo['snapchat'];
+    final facebook = contactInfo['facebook'];
+    final hasSocial = (instagram != null && showInsta) || (twitter != null && showTwitter) || (snapchat != null && showSnap) || (facebook != null && showFb);
     if (!hasSocial) return const SizedBox.shrink();
 
     return Card(
@@ -448,10 +459,10 @@ class PersonProfileScreen extends StatelessWidget {
           Row(children: [const Icon(Icons.public, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('وسائل التواصل الاجتماعي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
           const Divider(height: 24),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            if (instagram != null) _buildSocialButton('Instagram', Icons.camera_alt, const Color(0xFFE1306C), () => _openUrl('https://instagram.com/$instagram')),
-            if (twitter != null) _buildSocialButton('Twitter', Icons.chat_bubble, const Color(0xFF1DA1F2), () => _openUrl('https://twitter.com/$twitter')),
-            if (snapchat != null) _buildSocialButton('Snapchat', Icons.camera, const Color(0xFFFFFC00), () => _openUrl('https://snapchat.com/add/$snapchat')),
-            if (facebook != null) _buildSocialButton('Facebook', Icons.facebook, const Color(0xFF1877F2), () => _openUrl('https://facebook.com/$facebook')),
+            if (instagram != null && showInsta) _buildSocialButton('Instagram', Icons.camera_alt, const Color(0xFFE1306C), () => _openUrl('https://instagram.com/$instagram')),
+            if (twitter != null && showTwitter) _buildSocialButton('Twitter', Icons.chat_bubble, const Color(0xFF1DA1F2), () => _openUrl('https://twitter.com/$twitter')),
+            if (snapchat != null && showSnap) _buildSocialButton('Snapchat', Icons.camera, const Color(0xFFFFFC00), () => _openUrl('https://snapchat.com/add/$snapchat')),
+            if (facebook != null && showFb) _buildSocialButton('Facebook', Icons.facebook, const Color(0xFF1877F2), () => _openUrl('https://facebook.com/$facebook')),
           ]),
         ]),
       ),

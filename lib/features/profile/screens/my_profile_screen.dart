@@ -476,6 +476,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ],
           ),
         ],
+        const SizedBox(height: 12),
+        Divider(color: Colors.white.withOpacity(0.06)),
+        const SizedBox(height: 8),
+        const Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+        const SizedBox(height: 4),
+        _buildPrivacyToggle('إظهار رقم الجوال', 'show_mobile', _contactData?['show_mobile'] ?? true),
+        _buildPrivacyToggle('إظهار الإيميل', 'show_email', _contactData?['show_email'] ?? true),
       ],
     );
   }
@@ -498,7 +505,35 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         _buildInfoRow(Icons.alternate_email_rounded, 'Twitter', twitter ?? '-'),
         _buildInfoRow(Icons.photo_camera_front_rounded, 'Snapchat', snapchat ?? '-'),
         _buildInfoRow(Icons.facebook_rounded, 'Facebook', facebook ?? '-'),
+        const SizedBox(height: 12),
+        Divider(color: Colors.white.withOpacity(0.06)),
+        const SizedBox(height: 8),
+        const Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+        const SizedBox(height: 4),
+        _buildPrivacyToggle('إظهار Instagram', 'show_instagram', _contactData?['show_instagram'] ?? true),
+        _buildPrivacyToggle('إظهار Twitter', 'show_twitter', _contactData?['show_twitter'] ?? true),
+        _buildPrivacyToggle('إظهار Snapchat', 'show_snapchat', _contactData?['show_snapchat'] ?? true),
+        _buildPrivacyToggle('إظهار Facebook', 'show_facebook', _contactData?['show_facebook'] ?? true),
       ],
+    );
+  }
+
+  Widget _buildPrivacyToggle(String label, String field, bool value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
+          Switch(
+            value: value,
+            activeTrackColor: AppColors.gold,
+            onChanged: (newValue) async {
+              await _updateContactData({field: newValue});
+            },
+          ),
+        ],
+      ),
     );
   }
 

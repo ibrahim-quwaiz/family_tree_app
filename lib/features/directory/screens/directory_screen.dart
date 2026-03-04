@@ -132,7 +132,14 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
               instagram,
               twitter,
               snapchat,
-              facebook
+              facebook,
+              is_contact_public,
+              show_mobile,
+              show_email,
+              show_instagram,
+              show_twitter,
+              show_snapchat,
+              show_facebook
             )
           ''')
           .order('generation')
@@ -460,6 +467,14 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           onPersonTap: (selectedPerson) {
             Navigator.pop(context);
             _showPersonDetails(selectedPerson);
+          },
+          privacySettings: {
+            'show_mobile': person.showMobile ?? true,
+            'show_email': person.showEmail ?? true,
+            'show_instagram': person.showInstagram ?? true,
+            'show_twitter': person.showTwitter ?? true,
+            'show_snapchat': person.showSnapchat ?? true,
+            'show_facebook': person.showFacebook ?? true,
           },
         ),
       ),
