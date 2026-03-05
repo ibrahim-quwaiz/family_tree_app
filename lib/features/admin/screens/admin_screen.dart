@@ -41,10 +41,16 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   List<Map<String, dynamic>> _allRequests = [];
   bool _isLoadingRequests = true;
 
+  List<Map<String, dynamic>> _familyInfo = [];
+  bool _isLoadingSettings = true;
+  final _whatsappSettingsController = TextEditingController();
+  final _emailSettingsController = TextEditingController();
+  final _smsSettingsController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         _loadTabData(_tabController.index);
@@ -60,6 +66,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     _marriagesSearchController.dispose();
     _girlsChildrenSearchController.dispose();
     _usersSearchController.dispose();
+    _whatsappSettingsController.dispose();
+    _emailSettingsController.dispose();
+    _smsSettingsController.dispose();
     super.dispose();
   }
 
@@ -71,6 +80,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       case 3: if (_allNews.isEmpty) _loadNews(); _loadNotifications(); break;
       case 4: if (_allPeople.isEmpty) _loadPeople(); break;
       case 5: _loadSupportRequests(); break;
+      case 6: _loadSettings(); break;
     }
   }
 
@@ -3318,6 +3328,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               Tab(text: 'الأخبار', icon: Icon(Icons.newspaper_rounded, size: 18)),
               Tab(text: 'الصلاحيات', icon: Icon(Icons.admin_panel_settings_rounded, size: 18)),
               Tab(text: 'الطلبات'),
+              Tab(text: 'الإعدادات'),
             ],
           ),
         ),
@@ -3330,6 +3341,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             _buildNewsTab(),
             _buildUsersTab(),
             _buildSupportRequestsTab(),
+            _buildSettingsTab(),
           ],
         ),
       ),
@@ -4320,6 +4332,37 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     }
   }
 
+  Future<void> _loadSettings() async {
+    setState(() => _isLoadingSettings = true);
+    try {
+      final response = await SupabaseConfig.client
+          .from('family_info')
+          .select()
+          .inFilter('type', ['whatsapp', 'email', 'sms']);
+      final list = List<Map<String, dynamic>>.from(response);
+      String whatsapp = '';
+      String email = '';
+      String sms = '';
+      for (final row in list) {
+        final type = row['type'] as String? ?? '';
+        final content = row['content'] as String? ?? '';
+        if (type == 'whatsapp') whatsapp = content;
+        if (type == 'email') email = content;
+        if (type == 'sms') sms = content;
+      }
+      _whatsappSettingsController.text = whatsapp;
+      _emailSettingsController.text = email;
+      _smsSettingsController.text = sms;
+      setState(() {
+        _familyInfo = list;
+        _isLoadingSettings = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingSettings = false);
+      _showError('خطأ في تحميل الإعدادات: $e');
+    }
+  }
+
   Widget _buildSupportRequestsTab() {
     return Column(
       children: [
@@ -4391,6 +4434,90 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSettingsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'إعدادات التطبيق',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: 20),
+          if (_isLoadingSettings)
+            const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator(color: AppColors.gold)))
+          else
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.bgCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.06)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLabel('رقم الواتساب'),
+                  const SizedBox(height: 8),
+                  _buildTextField(_whatsappSettingsController, 'مثال: 966555113730'),
+                  const SizedBox(height: 16),
+                  _buildLabel('الإيميل'),
+                  const SizedBox(height: 8),
+                  _buildTextField(_emailSettingsController, 'مثال: admin@example.com'),
+                  const SizedBox(height: 16),
+                  _buildLabel('رقم SMS'),
+                  const SizedBox(height: 8),
+                  _buildTextField(_smsSettingsController, 'رقم SMS للتنبيهات'),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: FilledButton(
+                      onPressed: () async {
+                        try {
+                          await SupabaseConfig.client
+                              .from('family_info')
+                              .update({'content': _whatsappSettingsController.text.trim()})
+                              .eq('type', 'whatsapp');
+                          await SupabaseConfig.client
+                              .from('family_info')
+                              .update({'content': _emailSettingsController.text.trim()})
+                              .eq('type', 'email');
+                          await SupabaseConfig.client
+                              .from('family_info')
+                              .update({'content': _smsSettingsController.text.trim()})
+                              .eq('type', 'sms');
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('✅ تم تحديث الإعدادات بنجاح'),
+                                backgroundColor: AppColors.bgCard,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          _showError('خطأ في حفظ الإعدادات: $e');
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.gold,
+                        foregroundColor: AppColors.bgDeep,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 

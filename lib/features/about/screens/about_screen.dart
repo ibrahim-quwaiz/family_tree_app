@@ -361,7 +361,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 label: 'واتساب',
                 icon: Icons.chat,
                 color: const Color(0xFF25D366),
-                onTap: () => _launchUrl('https://wa.me/$_whatsappNumber'),
+                onTap: () => _launchUrl('https://wa.me/${_normalizePhone(_whatsappNumber)}'),
               ),
               const SizedBox(height: 10),
               _buildContactButton(
@@ -382,6 +382,16 @@ class _AboutScreenState extends State<AboutScreen> {
         ),
       ],
     );
+  }
+
+  String _normalizePhone(String phone) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const englishDigits = '0123456789';
+    String result = phone;
+    for (int i = 0; i < arabicDigits.length; i++) {
+      result = result.replaceAll(arabicDigits[i], englishDigits[i]);
+    }
+    return result.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
   Future<void> _launchUrl(String url) async {

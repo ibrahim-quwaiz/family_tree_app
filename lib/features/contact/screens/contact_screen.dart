@@ -22,6 +22,10 @@ class _ContactScreenState extends State<ContactScreen> {
   String? _senderName;
   String? _senderId;
 
+  String _whatsapp = '';
+  String _email = '';
+  bool _isLoadingInfo = true;
+
   static const _requestTypes = [
     'تعديل بيانات',
     'إبلاغ عن خطأ',
@@ -30,13 +34,30 @@ class _ContactScreenState extends State<ContactScreen> {
     'أخرى',
   ];
 
-  static const _adminPhone = '966555113730';
-  static const _adminEmail = 'ibrahim.sec@gmail.com';
-
   @override
   void initState() {
     super.initState();
     _loadSenderInfo();
+    _loadContactInfo();
+  }
+
+  Future<void> _loadContactInfo() async {
+    try {
+      final response = await SupabaseConfig.client
+          .from('family_info')
+          .select()
+          .inFilter('type', ['whatsapp', 'email', 'sms']);
+
+      for (final item in response) {
+        final type = item['type'] as String? ?? '';
+        final content = (item['content'] as String? ?? '').toString();
+        if (type == 'whatsapp') _whatsapp = content;
+        if (type == 'email') _email = content;
+      }
+      setState(() => _isLoadingInfo = false);
+    } catch (e) {
+      setState(() => _isLoadingInfo = false);
+    }
   }
 
   Future<void> _loadSenderInfo() async {
@@ -601,9 +622,19 @@ class _ContactScreenState extends State<ContactScreen> {
     }
   }
 
+  String _normalizePhone(String phone) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const englishDigits = '0123456789';
+    String result = phone;
+    for (int i = 0; i < arabicDigits.length; i++) {
+      result = result.replaceAll(arabicDigits[i], englishDigits[i]);
+    }
+    return result.replaceAll(RegExp(r'[^0-9]'), '');
+  }
+
   Future<void> _openWhatsApp() async {
     final message = 'السلام عليكم، أنا ${_senderName ?? ''} من تطبيق عائلة القويز';
-    final url = Uri.parse('https://wa.me/$_adminPhone?text=${Uri.encodeComponent(message)}');
+    final url = Uri.parse('https://wa.me/${_normalizePhone(_whatsapp)}?text=${Uri.encodeComponent(message)}');
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
@@ -622,7 +653,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
   Future<void> _openEmail() async {
     final subject = 'تواصل من تطبيق عائلة القويز - ${_senderName ?? ''}';
-    final url = Uri.parse('mailto:$_adminEmail?subject=${Uri.encodeComponent(subject)}');
+    final url = Uri.parse('mailto:${_email.trim()}?subject=${Uri.encodeComponent(subject)}');
     try {
       await launchUrl(url);
     } catch (e) {

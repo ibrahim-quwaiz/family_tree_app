@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/config/supabase_config.dart';
 import '../../../screens/home_screen.dart';
 import '../../../core/constants/current_user.dart';
 import '../services/auth_service.dart';
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   String? _errorMessage;
   int _failedAttempts = 0;
   bool _obscurePin = true;
+  String _adminWhatsapp = '966555113730';
 
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
@@ -37,6 +39,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
     _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
     _animController.forward();
+    _loadAdminWhatsapp();
+  }
+
+  Future<void> _loadAdminWhatsapp() async {
+    try {
+      final response = await SupabaseConfig.client
+          .from('family_info')
+          .select('content')
+          .eq('type', 'whatsapp')
+          .maybeSingle();
+      if (response != null && mounted) {
+        setState(() {
+          _adminWhatsapp = response['content'] as String? ?? _adminWhatsapp;
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -131,51 +149,27 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Widget _buildHeader() {
     return Column(
       children: [
-        // شعار العائلة
-        Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                AppColors.gold,
-                AppColors.goldDark,
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.gold.withOpacity(0.3),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Text(
-              'ق',
-              style: TextStyle(
-                fontSize: 42,
-                fontWeight: FontWeight.w800,
-                color: AppColors.bgDeep,
-              ),
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Image.asset(
+            'assets/images/app_logo.png',
+            width: 120,
+            height: 120,
+            fit: BoxFit.cover,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         const Text(
           'عائلة القويز',
           style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: AppColors.gold,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         const Text(
-          'سجّل دخولك للوصول إلى شجرة العائلة',
+          'سجل دخولك للوصول إلى شجرة العائلة',
           style: TextStyle(
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -398,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           TextButton.icon(
             onPressed: () async {
               final url = Uri.parse(
-                  'https://wa.me/966555113730?text=${Uri.encodeComponent("السلام عليكم، أحتاج مساعدة في الدخول للتطبيق")}');
+                  'https://wa.me/${_normalizePhone(_adminWhatsapp)}?text=${Uri.encodeComponent("السلام عليكم، أحتاج مساعدة في الدخول للتطبيق")}');
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }
@@ -418,6 +412,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         ],
       ),
     );
+  }
+
+  String _normalizePhone(String phone) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const englishDigits = '0123456789';
+    String result = phone;
+    for (int i = 0; i < arabicDigits.length; i++) {
+      result = result.replaceAll(arabicDigits[i], englishDigits[i]);
+    }
+    return result.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
   Widget _buildFooter() {
