@@ -97,6 +97,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         color = AppColors.accentBlue;
         typeLabel = 'خبر جديد';
         break;
+      case 'support_reply':
+        icon = Icons.support_agent_rounded;
+        color = AppColors.accentGreen;
+        typeLabel = 'رد على طلبك';
+        break;
+      case 'new_member':
+        icon = Icons.person_add_rounded;
+        color = AppColors.accentPurple;
+        typeLabel = 'عضو جديد';
+        break;
       case 'admin_message':
       default:
         icon = Icons.admin_panel_settings_rounded;

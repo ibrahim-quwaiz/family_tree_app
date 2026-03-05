@@ -150,6 +150,37 @@ class _AboutScreenState extends State<AboutScreen> {
                         _buildAboutAppSection(),
                         const SizedBox(height: 24),
                         _buildContactSection(),
+                        const SizedBox(height: 24),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppColors.bgCard,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white.withOpacity(0.04)),
+                          ),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'شجرة عائلة القويز',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.gold),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'الإصدار 1.0.0',
+                                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              ),
+                              const SizedBox(height: 12),
+                              Divider(color: Colors.white.withOpacity(0.06)),
+                              const SizedBox(height: 12),
+                              const Text(
+                                'تطوير: إبراهيم بن عبدالله القويز',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),

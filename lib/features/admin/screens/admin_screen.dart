@@ -46,6 +46,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   final _whatsappSettingsController = TextEditingController();
   final _emailSettingsController = TextEditingController();
   final _smsSettingsController = TextEditingController();
+  final _manualNotifTitleController = TextEditingController();
+  final _manualNotifBodyController = TextEditingController();
 
   @override
   void initState() {
@@ -69,7 +71,27 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     _whatsappSettingsController.dispose();
     _emailSettingsController.dispose();
     _smsSettingsController.dispose();
+    _manualNotifTitleController.dispose();
+    _manualNotifBodyController.dispose();
     super.dispose();
+  }
+
+  Future<void> _createNotification({
+    required String title,
+    required String body,
+    required String type,
+    String? relatedId,
+  }) async {
+    try {
+      await SupabaseConfig.client.from('notifications').insert({
+        'title': title,
+        'body': body,
+        'type': type,
+        if (relatedId != null) 'related_id': relatedId,
+      });
+    } catch (e) {
+      print('خطأ في إنشاء الإشعار: $e');
+    }
   }
 
   void _loadTabData(int index) {
@@ -2346,6 +2368,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               'facebook': facebookController.text.trim().isEmpty ? null : facebookController.text.trim(),
                             });
                           }
+                          await _createNotification(
+                            title: 'عضو جديد في العائلة',
+                            body: 'تمت إضافة ${nameController.text.trim()} إلى شجرة العائلة',
+                            type: 'new_member',
+                          );
                           _showSuccess('تم إضافة "${nameController.text.trim()}" برقم $qfId');
                           _loadPeople();
                         } catch (e) {
@@ -4037,6 +4064,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                           onPressed: () async {
                                             try {
                                               await SupabaseConfig.client.from('news').update({'is_approved': true}).eq('id', news['id']);
+                                              await _createNotification(
+                                                title: 'خبر جديد: ${news['title']}',
+                                                body: 'تم نشر خبر جديد في قسم الأخبار',
+                                                type: 'news',
+                                                relatedId: news['id']?.toString(),
+                                              );
                                               _showSuccess('تم نشر الخبر');
                                               _loadNews();
                                             } catch (e) {
@@ -4516,6 +4549,62 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ],
               ),
             ),
+          const SizedBox(height: 24),
+          const Text('إرسال إشعار يدوي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.bgCard,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLabel('عنوان الإشعار'),
+                const SizedBox(height: 8),
+                _buildTextField(_manualNotifTitleController, 'عنوان الإشعار'),
+                const SizedBox(height: 16),
+                _buildLabel('نص الإشعار'),
+                const SizedBox(height: 8),
+                _buildTextField(_manualNotifBodyController, 'نص الإشعار'),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      if (_manualNotifTitleController.text.trim().isEmpty) {
+                        _showError('أدخل عنوان الإشعار');
+                        return;
+                      }
+                      try {
+                        await _createNotification(
+                          title: _manualNotifTitleController.text.trim(),
+                          body: _manualNotifBodyController.text.trim(),
+                          type: 'admin_message',
+                        );
+                        _manualNotifTitleController.clear();
+                        _manualNotifBodyController.clear();
+                        setState(() {});
+                        _showSuccess('تم إرسال الإشعار');
+                      } catch (e) {
+                        _showError('خطأ في إرسال الإشعار: $e');
+                      }
+                    },
+                    icon: const Icon(Icons.send_rounded),
+                    label: const Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.accentBlue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -4550,6 +4639,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               Navigator.pop(context);
               try {
                 await SupabaseConfig.client.from('support_requests').update({'admin_reply': reply, 'status': 'تم الرد'}).eq('id', id);
+                await _createNotification(
+                  title: 'تم الرد على طلبك',
+                  body: 'تم الرد على طلب: ${req['subject']}',
+                  type: 'support_reply',
+                  relatedId: id,
+                );
                 _loadSupportRequests();
               } catch (e) {
                 _showError('خطأ في حفظ الرد: $e');
