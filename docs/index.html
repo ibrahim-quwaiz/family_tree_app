@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سياسة الخصوصية - شجرة عائلة القويز | Privacy Policy</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Crimson+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8A45C;
+    --gold-light: #E8D48B;
+    --bg-deep: #0A1628;
+    --bg-card: #111E36;
+    --text-primary: #F0EDE6;
+    --text-secondary: #8A9BB5;
+    --border: rgba(200, 164, 92, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Tajawal', sans-serif;
+    line-height: 1.85;
+    min-height: 100vh;
+  }
+
+  /* Subtle background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(200,164,92,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header .logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    font-size: 36px;
+    color: var(--gold);
+    font-weight: 800;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+
+  /* Language toggle */
+  .lang-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+
+  .lang-btn {
+    padding: 8px 24px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .lang-btn.active {
+    background: rgba(200,164,92,0.12);
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .lang-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Content sections */
+  .content { display: block; }
+  .content.hidden { display: none; }
+
+  .section {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.03);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    opacity: 0.4;
+  }
+
+  .section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h2 .icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(200,164,92,0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .section p, .section li {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.9;
+  }
+
+  .section ul {
+    padding-right: 20px;
+    margin-top: 8px;
+  }
+
+  [dir="ltr"] .section ul {
+    padding-right: 0;
+    padding-left: 20px;
+  }
+
+  .section li {
+    margin-bottom: 6px;
+  }
+
+  .section li::marker {
+    color: var(--gold);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .footer p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .footer .date {
+    font-size: 12px;
+    color: rgba(138,155,181,0.6);
+  }
+
+  /* English content direction */
+  .en-content {
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px 60px; }
+    .header h1 { font-size: 22px; }
+    .section { padding: 20px; }
+    .section h2 { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">ق</div>
+    <h1>سياسة الخصوصية</h1>
+    <p class="subtitle">تطبيق شجرة عائلة القويز</p>
+  </div>
+
+  <!-- Language Toggle -->
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="showLang('ar')">العربية</button>
+    <button class="lang-btn" onclick="showLang('en')">English</button>
+  </div>
+
+  <!-- Arabic Content -->
+  <div id="ar-content" class="content">
+
+    <div class="section">
+      <h2><span class="icon">📋</span> مقدمة</h2>
+      <p>نحن في تطبيق "شجرة عائلة القويز" نلتزم بحماية خصوصية مستخدمينا. توضح هذه السياسة كيفية جمع واستخدام وحماية بياناتك الشخصية عند استخدام التطبيق.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📊</span> البيانات التي نجمعها</h2>
+      <p>يجمع التطبيق البيانات التالية لتقديم خدمة شجرة العائلة:</p>
+      <ul>
+        <li>الاسم والمعلومات الشخصية (تاريخ الميلاد، مدينة الإقامة، الوظيفة، التعليم)</li>
+        <li>بيانات التواصل (رقم الجوال، البريد الإلكتروني، حسابات التواصل الاجتماعي)</li>
+        <li>معلومات العلاقات العائلية (الأب، الأم، الزوج/الزوجة، الأبناء)</li>
+        <li>الصور الشخصية وصور الأخبار</li>
+        <li>بيانات تسجيل الدخول (رقم العضوية والرقم السري)</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🎯</span> كيف نستخدم بياناتك</h2>
+      <p>نستخدم بياناتك للأغراض التالية فقط:</p>
+      <ul>
+        <li>عرض شجرة العائلة وربط الأفراد ببعضهم</li>
+        <li>تسهيل التواصل بين أفراد العائلة</li>
+        <li>عرض الأخبار والمناسبات العائلية</li>
+        <li>إرسال الإشعارات المتعلقة بأنشطة العائلة</li>
+        <li>تحسين تجربة استخدام التطبيق</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🔒</span> حماية البيانات</h2>
+      <p>نحرص على حماية بياناتك من خلال:</p>
+      <ul>
+        <li>تخزين البيانات على خوادم آمنة عبر منصة Supabase المشفرة</li>
+        <li>تسجيل الدخول برقم عضوية ورقم سري خاص</li>
+        <li>عدم مشاركة البيانات مع أي أطراف خارجية</li>
+        <li>تقييد الوصول للبيانات على أفراد العائلة المسجلين فقط</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">👤</span> إعدادات الخصوصية</h2>
+      <p>يوفر التطبيق تحكماً كاملاً في خصوصية بياناتك:</p>
+      <ul>
+        <li>إمكانية إخفاء أو إظهار رقم الجوال</li>
+        <li>إمكانية إخفاء أو إظهار البريد الإلكتروني</li>
+        <li>إمكانية إخفاء أو إظهار كل حساب من حسابات التواصل الاجتماعي بشكل منفصل</li>
+        <li>جميع بيانات التواصل مخفية افتراضياً حتى يقرر المستخدم إظهارها</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🤝</span> مشاركة البيانات</h2>
+      <p>نحن لا نبيع أو نشارك أو نؤجر بياناتك الشخصية لأي طرف خارجي. البيانات متاحة فقط لأفراد عائلة القويز المسجلين في التطبيق، وفقاً لإعدادات الخصوصية التي تختارها.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">✏️</span> حقوقك</h2>
+      <p>لديك الحقوق التالية فيما يخص بياناتك:</p>
+      <ul>
+        <li>تعديل بياناتك الشخصية في أي وقت</li>
+        <li>التحكم في ظهور بيانات التواصل الخاصة بك</li>
+        <li>طلب حذف حسابك من خلال التواصل مع إدارة التطبيق</li>
+        <li>الاستفسار عن أي بيانات مخزنة عنك</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">👶</span> خصوصية الأطفال</h2>
+      <p>التطبيق مخصص لأفراد عائلة القويز من جميع الأعمار. بيانات القُصّر تُدار من قبل أولياء أمورهم، ونحرص على حمايتها بنفس مستوى حماية بيانات البالغين.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📝</span> التعديلات على السياسة</h2>
+      <p>قد نقوم بتحديث هذه السياسة من وقت لآخر. سيتم إشعار المستخدمين بأي تغييرات جوهرية عبر إشعارات التطبيق.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📞</span> تواصل معنا</h2>
+      <p>لأي استفسارات حول سياسة الخصوصية أو بياناتك الشخصية، يمكنك التواصل معنا عبر:</p>
+      <ul>
+        <li>البريد الإلكتروني: support@alquwaizfamily.com</li>
+        <li>من خلال نموذج التواصل داخل التطبيق</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- English Content -->
+  <div id="en-content" class="content hidden en-content">
+
+    <div class="section">
+      <h2><span class="icon">📋</span> Introduction</h2>
+      <p>At "Al-Quwaiz Family Tree" app, we are committed to protecting the privacy of our users. This policy explains how we collect, use, and protect your personal data when using the application.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📊</span> Data We Collect</h2>
+      <p>The app collects the following data to provide the family tree service:</p>
+      <ul>
+        <li>Name and personal information (date of birth, city of residence, occupation, education)</li>
+        <li>Contact information (phone number, email, social media accounts)</li>
+        <li>Family relationship data (father, mother, spouse, children)</li>
+        <li>Profile photos and news images</li>
+        <li>Login credentials (membership number and PIN)</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🎯</span> How We Use Your Data</h2>
+      <p>We use your data for the following purposes only:</p>
+      <ul>
+        <li>Displaying the family tree and connecting family members</li>
+        <li>Facilitating communication between family members</li>
+        <li>Displaying family news and events</li>
+        <li>Sending notifications related to family activities</li>
+        <li>Improving the app experience</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🔒</span> Data Protection</h2>
+      <p>We protect your data through:</p>
+      <ul>
+        <li>Storing data on secure servers via encrypted Supabase platform</li>
+        <li>Login authentication with membership number and private PIN</li>
+        <li>No sharing of data with any third parties</li>
+        <li>Restricting data access to registered family members only</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">👤</span> Privacy Settings</h2>
+      <p>The app provides full control over your data privacy:</p>
+      <ul>
+        <li>Option to hide or show your phone number</li>
+        <li>Option to hide or show your email address</li>
+        <li>Option to hide or show each social media account separately</li>
+        <li>All contact information is hidden by default until you choose to show it</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">🤝</span> Data Sharing</h2>
+      <p>We do not sell, share, or rent your personal data to any third party. Data is only accessible to registered Al-Quwaiz family members, according to the privacy settings you choose.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">✏️</span> Your Rights</h2>
+      <p>You have the following rights regarding your data:</p>
+      <ul>
+        <li>Modify your personal data at any time</li>
+        <li>Control the visibility of your contact information</li>
+        <li>Request account deletion by contacting the app administration</li>
+        <li>Inquire about any stored data about you</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">👶</span> Children's Privacy</h2>
+      <p>The app is designed for Al-Quwaiz family members of all ages. Minors' data is managed by their parents/guardians, and we ensure it is protected at the same level as adult data.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📝</span> Policy Updates</h2>
+      <p>We may update this policy from time to time. Users will be notified of any significant changes through app notifications.</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="icon">📞</span> Contact Us</h2>
+      <p>For any questions about this privacy policy or your personal data, you can reach us via:</p>
+      <ul>
+        <li>Email: support@alquwaizfamily.com</li>
+        <li>Through the contact form within the app</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>شجرة عائلة القويز — Al-Quwaiz Family Tree</p>
+    <p class="date">آخر تحديث: مارس 2026 | Last updated: March 2026</p>
+  </div>
+
+</div>
+
+<script>
+function showLang(lang) {
+  document.getElementById('ar-content').classList.toggle('hidden', lang !== 'ar');
+  document.getElementById('en-content').classList.toggle('hidden', lang !== 'en');
+  
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+}
+</script>
+
+</body>
+</html>
