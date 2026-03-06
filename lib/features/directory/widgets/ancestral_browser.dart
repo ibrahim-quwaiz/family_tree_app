@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart';
 import '../models/directory_person.dart';
-import '../../tree/widgets/person_card.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AncestralBrowser extends StatefulWidget {

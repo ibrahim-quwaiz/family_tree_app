@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/directory_person.dart';
 import '../utils/ancestral_chain_search.dart';
-import '../utils/arabic_search.dart';
 import '../../../core/theme/app_theme.dart';
 
 class ChainSearchTab extends StatefulWidget {

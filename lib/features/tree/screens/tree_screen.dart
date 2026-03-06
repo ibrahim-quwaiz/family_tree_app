@@ -232,32 +232,6 @@ class _TreeScreenState extends State<TreeScreen> {
     _loadPerson(person['id'] as String);
   }
 
-  /// بناء مسار الأجداد
-  Future<String> _buildAncestorPath(String personId) async {
-    final parts = <String>[];
-    String? currentId = personId;
-    int safetyCounter = 0;
-
-    while (currentId != null && safetyCounter < 10) {
-      safetyCounter++;
-      try {
-        final person = await SupabaseConfig.client
-            .from('people')
-            .select('name, father_id')
-            .eq('id', currentId)
-            .maybeSingle();
-
-        if (person == null) break;
-        parts.insert(0, (person['name'] as String).split(' ').first);
-        currentId = person['father_id'] as String?;
-      } catch (e) {
-        break;
-      }
-    }
-
-    return parts.join(' ← ');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(

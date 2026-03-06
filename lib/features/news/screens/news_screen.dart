@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/services/auth_service.dart';
-import '../../../core/constants/current_user.dart';
 
 /// أنواع الأخبار
 const Map<String, _NewsTypeInfo> _newsTypeInfo = {

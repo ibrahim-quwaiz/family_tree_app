@@ -120,6 +120,21 @@ class _ContactScreenState extends State<ContactScreen> {
 
   // ─── طرق التواصل السريعة ───
   Widget _buildQuickContactSection() {
+    if (_isLoadingInfo) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('تواصل مباشر', Icons.flash_on_rounded),
+          const SizedBox(height: 12),
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

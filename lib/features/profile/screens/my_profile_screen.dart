@@ -788,7 +788,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   bool _isCurrentUser() {
-    final personQf = _personData?['legacy_user_id'] as String? ?? '';
     return true;
   }
 

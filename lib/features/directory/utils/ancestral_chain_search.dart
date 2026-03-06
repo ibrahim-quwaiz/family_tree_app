@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import '../models/directory_person.dart';
 import 'arabic_search.dart';
 

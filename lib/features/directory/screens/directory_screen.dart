@@ -159,12 +159,12 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
 
       final Map<String, Map<String, dynamic>> peopleMap = {};
       for (var p in response) {
-        final personJson = p as Map<String, dynamic>;
+        final personJson = Map<String, dynamic>.from(p as Map);
         peopleMap[personJson['id'] as String] = personJson;
       }
 
       final enrichedPeople = response.map((p) {
-        final personJson = Map<String, dynamic>.from(p as Map<String, dynamic>);
+        final personJson = Map<String, dynamic>.from(p as Map);
         final fatherId = personJson['father_id'] as String?;
         final father = fatherId != null ? peopleMap[fatherId] : null;
         
@@ -201,7 +201,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           .map((json) {
             try {
               return DirectoryPerson.fromJson(json);
-            } catch (e, stackTrace) {
+            } catch (e) {
               print('❌ خطأ في تحويل JSON: $e');
               return null;
             }
@@ -218,7 +218,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       });
       
       _performSearch();
-    } catch (e, stackTrace) {
+    } catch (e) {
       print('❌ خطأ في جلب البيانات: $e');
       setState(() {
         _allPeople = [];
@@ -264,15 +264,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     return _allPeople.where((p) => p.fatherId == personId).toList();
   }
 
-  DirectoryPerson? _getSpouse(String? spouseId) {
-    if (spouseId == null) return null;
-    try {
-      return _allPeople.firstWhere((p) => p.id == spouseId);
-    } catch (e) {
-      return null;
-    }
-  }
-
   /// استنتاج أزواج البنت من أبنائها (من داخل العائلة)
   List<Map<String, dynamic>> _getHusbandsFromChildren(String motherId) {
     final children = _allPeople.where((p) => p.motherId == motherId).toList();
@@ -305,27 +296,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     }
 
     return result;
-  }
-
-  Future<Map<String, String?>> _getContactInfo(String personId) async {
-    try {
-      final response = await SupabaseConfig.client
-          .from('contact_info')
-          .select('instagram, twitter, snapchat, facebook')
-          .eq('person_id', personId)
-          .maybeSingle();
-      if (response != null) {
-        return {
-          'instagram': response['instagram'] as String?,
-          'twitter': response['twitter'] as String?,
-          'snapchat': response['snapchat'] as String?,
-          'facebook': response['facebook'] as String?,
-        };
-      }
-    } catch (e) {
-      print('خطأ في جلب معلومات التواصل: $e');
-    }
-    return {};
   }
 
   Future<List<Map<String, dynamic>>> _getGirlsChildren(String personId) async {

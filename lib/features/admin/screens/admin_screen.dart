@@ -41,7 +41,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   List<Map<String, dynamic>> _allRequests = [];
   bool _isLoadingRequests = true;
 
-  List<Map<String, dynamic>> _familyInfo = [];
   bool _isLoadingSettings = true;
   final _whatsappSettingsController = TextEditingController();
   final _emailSettingsController = TextEditingController();
@@ -264,8 +263,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     String childGender = 'male';
     DateTime? childBirthdate;
     List<String> allFatherNames = [];
-    List<String> filteredFatherNames = [];
-    bool showFatherSuggestions = false;
 
     showModalBottomSheet(
       context: context,
@@ -413,7 +410,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                       return GestureDetector(
                                         onTap: () {
                                           fatherNameController.text = name;
-                                          showFatherSuggestions = false;
                                           setModalState(() {});
                                         },
                                         child: Container(
@@ -454,7 +450,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                     GestureDetector(
                                       onTap: () {
                                         fatherNameController.clear();
-                                        showFatherSuggestions = false;
                                         setModalState(() {});
                                       },
                                       child: Container(
@@ -1119,7 +1114,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     bool isAlive = person['is_alive'] as bool? ?? true;
     final int generation = person['generation'] as int? ?? 1;
     DateTime? birthDate;
-    DateTime? deathDate;
     Map<String, dynamic>? selectedFather;
     final String? selectedFatherId = person['father_id'] as String?;
     List<Map<String, dynamic>> fatherWives = [];
@@ -1145,12 +1139,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         birthDate = DateTime.parse(person['birth_date'] as String);
       } catch (_) {}
     }
-    if (person['death_date'] != null) {
-      try {
-        deathDate = DateTime.parse(person['death_date'] as String);
-      } catch (_) {}
-    }
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1205,7 +1193,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         SupabaseConfig.client
                             .from('marriages')
                             .select('id, wife_id, wife_external_name, marriage_order, is_current')
-                            .eq('husband_id', selectedFatherId!)
+                            .eq('husband_id', selectedFatherId)
                             .order('marriage_order')
                             .then((response) async {
                           final wives = <Map<String, dynamic>>[];
@@ -4387,7 +4375,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       _emailSettingsController.text = email;
       _smsSettingsController.text = sms;
       setState(() {
-        _familyInfo = list;
         _isLoadingSettings = false;
       });
     } catch (e) {

@@ -29,7 +29,6 @@ class _StatsScreenState extends State<StatsScreen> {
   // توزيع الحالة الاجتماعية
   int _marriedCount = 0;
   int _singleCount = 0;
-  int _unknownMaritalCount = 0;
 
   // المواليد حسب السنة
   Map<int, int> _birthsByYear = {};
@@ -593,7 +592,6 @@ class _StatsScreenState extends State<StatsScreen> {
     final sortedYears = _birthsByYear.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
 
-    final maxCount = sortedYears.fold<int>(0, (max, e) => e.value > max ? e.value : max);
     final totalBirths = sortedYears.fold<int>(0, (sum, e) => sum + e.value);
 
     // تجميع حسب العقود لو البيانات كثيرة
@@ -604,7 +602,6 @@ class _StatsScreenState extends State<StatsScreen> {
     if (groupByDecade) {
       final decades = <String, int>{};
       for (final entry in sortedYears) {
-        final decade = '${(entry.key ~/ 10) * 10}s';
         final decadeLabel = '${(entry.key ~/ 10) * 10}';
         decades[decadeLabel] = (decades[decadeLabel] ?? 0) + entry.value;
       }
