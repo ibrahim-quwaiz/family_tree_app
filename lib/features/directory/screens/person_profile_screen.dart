@@ -32,7 +32,7 @@ class PersonProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الملف الشخصي'),
+        title: Text('الملف الشخصي'),
         backgroundColor: AppColors.bgDeep,
       ),
       body: SingleChildScrollView(
@@ -41,22 +41,22 @@ class PersonProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             _buildPersonalInfoSection(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildFamilySection(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             // للرجال: الزوجات والأبناء
             if (person.gender == 'male' && (wives.isNotEmpty || children.isNotEmpty))
               _buildMarriageSection(),
             // للنساء: قسم موحد للأزواج والأبناء
             if (person.gender == 'female' && (husbandsFromChildren.isNotEmpty || girlsChildren.isNotEmpty))
               _buildFemaleHusbandsAndChildrenSection(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildContactSection(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildSocialMediaSection(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildActionButtons(context),
           ],
         ),
@@ -78,20 +78,20 @@ class PersonProfileScreen extends StatelessWidget {
               backgroundColor: _getPersonColor(),
               backgroundImage: person.photoUrl != null ? NetworkImage(person.photoUrl!) : null,
               child: person.photoUrl == null
-                  ? Text(person.name.isNotEmpty ? person.name[0] : '؟', style: const TextStyle(fontSize: 48, color: Colors.white))
+                  ? Text(person.name.isNotEmpty ? person.name[0] : '؟', style: TextStyle(fontSize: 48, color: Colors.white))
                   : null,
             ),
             if (person.isVip)
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(color: Colors.amber, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4, offset: const Offset(0, 2))]),
-                child: const Icon(Icons.star, color: Colors.white, size: 20),
+                child: Icon(Icons.star, color: Colors.white, size: 20),
               ),
           ],
         ),
-        const SizedBox(height: 16),
-        Text(_buildPersonFullName(), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, textDirection: TextDirection.rtl),
-        const SizedBox(height: 8),
+        SizedBox(height: 16),
+        Text(_buildPersonFullName(), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, textDirection: TextDirection.rtl),
+        SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -99,14 +99,14 @@ class PersonProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                child: Text(person.legacyUserId!, style: const TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold)),
+                child: Text(person.legacyUserId!, style: TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
             ],
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(color: AppColors.bgCard, borderRadius: BorderRadius.circular(12)),
-              child: Text('الجيل ${person.generation}', style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+              child: Text('الجيل ${person.generation}', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -130,7 +130,7 @@ class PersonProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [const Icon(Icons.person, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('المعلومات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+            Row(children: [Icon(Icons.person, color: AppColors.primaryGreen), SizedBox(width: 8), Text('المعلومات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
             const Divider(height: 24),
             if (person.birthDate != null) _buildInfoRow(Icons.cake, 'تاريخ الميلاد', '${_formatDate(person.birthDate!)} (${_calculateAge(person.birthDate!)} سنة)'),
             if (!person.isAlive && person.deathDate != null) _buildInfoRow(Icons.favorite, 'تاريخ الوفاة', '${_formatDate(person.deathDate!)} رحمه الله'),
@@ -160,14 +160,14 @@ class PersonProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [const Icon(Icons.family_restroom, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('العائلة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+            Row(children: [Icon(Icons.family_restroom, color: AppColors.primaryGreen), SizedBox(width: 8), Text('العائلة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
             const Divider(height: 24),
             if (hasFather)
               _buildFamilyMemberCard(
                 name: person.fatherName!, relation: 'الأب', icon: Icons.person, color: AppColors.primaryGreen,
                 onTap: () { if (person.fatherId != null) { try { final father = allPeople.firstWhere((p) => p.id == person.fatherId); onPersonTap(father); } catch (e) {} } },
               ),
-            if (hasFather && hasMother) const SizedBox(height: 12),
+            if (hasFather && hasMother) SizedBox(height: 12),
             if (hasMother)
               _buildFamilyMemberCard(
                 name: person.motherName!, relation: 'الأم', icon: Icons.person, color: const Color(0xFFE91E8C),
@@ -191,7 +191,7 @@ class PersonProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [const Icon(Icons.favorite, color: Colors.red), const SizedBox(width: 8), Text(wives.isNotEmpty ? 'الزوجات والأبناء' : 'الأبناء', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+            Row(children: [Icon(Icons.favorite, color: Colors.red), SizedBox(width: 8), Text(wives.isNotEmpty ? 'الزوجات والأبناء' : 'الأبناء', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
             const Divider(height: 24),
             if (wives.isNotEmpty)
               ...wives.map((wifeData) => _buildWifeCard(wifeData))
@@ -232,23 +232,23 @@ class PersonProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: const Color(0xFFE91E8C).withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
           child: Row(children: [
-            CircleAvatar(backgroundColor: const Color(0xFFE91E8C), child: Text(wifeName.isNotEmpty ? wifeName[0] : '؟', style: const TextStyle(color: Colors.white))),
-            const SizedBox(width: 12),
+            CircleAvatar(backgroundColor: const Color(0xFFE91E8C), child: Text(wifeName.isNotEmpty ? wifeName[0] : '؟', style: TextStyle(color: Colors.white))),
+            SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(wifeName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
+              Text(wifeName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
               Text(isInternal ? 'من العائلة' : 'من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ])),
-            if (isInternal) const Icon(Icons.arrow_forward_ios, size: 16),
+            if (isInternal) Icon(Icons.arrow_forward_ios, size: 16),
           ]),
         ),
       ),
       if (childrenFromWife.isNotEmpty) ...[
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${childrenFromWife.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         ...childrenFromWife.map((child) => _buildChildTile(child)),
       ],
-      const SizedBox(height: 16),
+      SizedBox(height: 16),
     ]);
   }
 
@@ -264,19 +264,19 @@ class PersonProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(color: const Color(0xFFE91E8C).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
         child: Row(children: [
-          CircleAvatar(backgroundColor: const Color(0xFFE91E8C), child: Text(motherName.isNotEmpty ? motherName[0] : '؟', style: const TextStyle(color: Colors.white))),
-          const SizedBox(width: 12),
+          CircleAvatar(backgroundColor: const Color(0xFFE91E8C), child: Text(motherName.isNotEmpty ? motherName[0] : '؟', style: TextStyle(color: Colors.white))),
+          SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text(motherName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
+            Text(motherName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
             Text('من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           ])),
         ]),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: 12),
       Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
-      const SizedBox(height: 8),
+      SizedBox(height: 8),
       ...kids.map((child) => _buildChildTile(child)),
-      const SizedBox(height: 16),
+      SizedBox(height: 16),
     ]);
   }
 
@@ -301,9 +301,9 @@ class PersonProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              const Icon(Icons.favorite, color: Color(0xFFE91E8C)),
-              const SizedBox(width: 8),
-              const Text('الأزواج والأبناء', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Icon(Icons.favorite, color: Color(0xFFE91E8C)),
+              SizedBox(width: 8),
+              Text('الأزواج والأبناء', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ]),
             const Divider(height: 24),
 
@@ -324,22 +324,22 @@ class PersonProfileScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
                       child: Row(children: [
-                        CircleAvatar(backgroundColor: AppColors.primaryGreen, child: Text(fatherName.isNotEmpty ? fatherName[0] : '؟', style: const TextStyle(color: Colors.white))),
-                        const SizedBox(width: 12),
+                        CircleAvatar(backgroundColor: AppColors.primaryGreen, child: Text(fatherName.isNotEmpty ? fatherName[0] : '؟', style: TextStyle(color: Colors.white))),
+                        SizedBox(width: 12),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          Text(fatherName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
+                          Text(fatherName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
                           Text(isInternal ? 'الزوج - من العائلة' : 'الزوج', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                         ])),
-                        if (isInternal) const Icon(Icons.arrow_forward_ios, size: 16),
+                        if (isInternal) Icon(Icons.arrow_forward_ios, size: 16),
                       ]),
                     ),
                   ),
                   // الأبناء
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${kids.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   ...kids.map((child) => _buildChildTile(child)),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                 ],
               );
             }),
@@ -354,18 +354,18 @@ class PersonProfileScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(color: AppColors.primaryGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
                     child: Row(children: [
-                      CircleAvatar(backgroundColor: AppColors.primaryGreen, child: Text(entry.key.isNotEmpty ? entry.key[0] : '؟', style: const TextStyle(color: Colors.white))),
-                      const SizedBox(width: 12),
+                      CircleAvatar(backgroundColor: AppColors.primaryGreen, child: Text(entry.key.isNotEmpty ? entry.key[0] : '؟', style: TextStyle(color: Colors.white))),
+                      SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
+                        Text(entry.key, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
                         Text('الزوج - من خارج العائلة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       ])),
                     ]),
                   ),
                   // الأبناء
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Padding(padding: const EdgeInsets.only(right: 16), child: Text('👨‍👩‍👦 الأبناء (${entry.value.length}):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary))),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   ...entry.value.map((child) => Card(
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     child: ListTile(
@@ -375,10 +375,10 @@ class PersonProfileScreen extends StatelessWidget {
                         backgroundColor: child['child_gender'] == 'female' ? const Color(0xFFE91E8C) : AppColors.primaryGreen,
                         child: Icon(child['child_gender'] == 'female' ? Icons.girl : Icons.boy, size: 16, color: Colors.white),
                       ),
-                      title: Text(child['child_name'] as String? ?? '', style: const TextStyle(fontSize: 14), textDirection: TextDirection.rtl),
+                      title: Text(child['child_name'] as String? ?? '', style: TextStyle(fontSize: 14), textDirection: TextDirection.rtl),
                     ),
                   )),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                 ],
               );
             }),
@@ -394,9 +394,9 @@ class PersonProfileScreen extends StatelessWidget {
       child: ListTile(
         dense: true,
         leading: CircleAvatar(radius: 16, backgroundColor: child.gender == 'female' ? const Color(0xFFE91E8C) : AppColors.primaryGreen, child: Icon(child.gender == 'female' ? Icons.girl : Icons.boy, size: 16, color: Colors.white)),
-        title: Text(child.name, style: const TextStyle(fontSize: 14), textDirection: TextDirection.rtl),
-        subtitle: child.legacyUserId != null ? Text(child.legacyUserId!, style: const TextStyle(fontSize: 11)) : null,
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+        title: Text(child.name, style: TextStyle(fontSize: 14), textDirection: TextDirection.rtl),
+        subtitle: child.legacyUserId != null ? Text(child.legacyUserId!, style: TextStyle(fontSize: 11)) : null,
+        trailing: Icon(Icons.arrow_forward_ios, size: 14),
         onTap: () => onPersonTap(child),
       ),
     );
@@ -417,18 +417,18 @@ class PersonProfileScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Icon(Icons.contact_phone, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+          Row(children: [Icon(Icons.contact_phone, color: AppColors.primaryGreen), SizedBox(width: 8), Text('التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
           const Divider(height: 24),
           Row(children: [
             if (person.mobilePhone != null && showMobile) ...[
-              Expanded(child: ElevatedButton.icon(onPressed: () => _makePhoneCall(person.mobilePhone!), icon: const Icon(Icons.phone), label: const Text('اتصال'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen, padding: const EdgeInsets.symmetric(vertical: 12)))),
-              const SizedBox(width: 8),
-              Expanded(child: ElevatedButton.icon(onPressed: () => _openWhatsApp(person.mobilePhone!), icon: const Icon(Icons.chat), label: const Text('واتساب'), style: ElevatedButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.symmetric(vertical: 12)))),
+              Expanded(child: ElevatedButton.icon(onPressed: () => _makePhoneCall(person.mobilePhone!), icon: Icon(Icons.phone), label: Text('اتصال'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen, padding: const EdgeInsets.symmetric(vertical: 12)))),
+              SizedBox(width: 8),
+              Expanded(child: ElevatedButton.icon(onPressed: () => _openWhatsApp(person.mobilePhone!), icon: Icon(Icons.chat), label: Text('واتساب'), style: ElevatedButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.symmetric(vertical: 12)))),
             ],
           ]),
           if (person.email != null && showEmail) ...[
-            const SizedBox(height: 8),
-            SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _sendEmail(person.email!), icon: const Icon(Icons.email), label: const Text('إيميل'), style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.symmetric(vertical: 12)))),
+            SizedBox(height: 8),
+            SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _sendEmail(person.email!), icon: Icon(Icons.email), label: Text('إيميل'), style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.symmetric(vertical: 12)))),
           ],
         ]),
       ),
@@ -456,7 +456,7 @@ class PersonProfileScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Icon(Icons.public, color: AppColors.primaryGreen), const SizedBox(width: 8), const Text('وسائل التواصل الاجتماعي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+          Row(children: [Icon(Icons.public, color: AppColors.primaryGreen), SizedBox(width: 8), Text('وسائل التواصل الاجتماعي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
           const Divider(height: 24),
           Wrap(spacing: 8, runSpacing: 8, children: [
             if (instagram != null && showInsta) _buildSocialButton('Instagram', Icons.camera_alt, const Color(0xFFE1306C), () => _openUrl('https://instagram.com/$instagram')),
@@ -488,7 +488,7 @@ class PersonProfileScreen extends StatelessWidget {
           (route) => false,
         );
       },
-        icon: const Icon(Icons.account_tree), label: const Text('عرض في شجرة العائلة'),
+        icon: Icon(Icons.account_tree), label: Text('عرض في شجرة العائلة'),
         style: OutlinedButton.styleFrom(foregroundColor: AppColors.primaryGreen, padding: const EdgeInsets.symmetric(vertical: 12)),
       )),
     ]);
@@ -502,11 +502,11 @@ class PersonProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(icon, color: AppColors.primaryGreen, size: 20),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(label, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 15), textDirection: TextDirection.rtl),
+          SizedBox(height: 2),
+          Text(value, style: TextStyle(fontSize: 15), textDirection: TextDirection.rtl),
         ])),
       ]),
     );
@@ -520,12 +520,12 @@ class PersonProfileScreen extends StatelessWidget {
         decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
         child: Row(children: [
           CircleAvatar(backgroundColor: color, child: Icon(icon, color: Colors.white, size: 20)),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text(relation, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
+            Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textDirection: TextDirection.rtl),
           ])),
-          if (onTap != null) const Icon(Icons.arrow_forward_ios, size: 16),
+          if (onTap != null) Icon(Icons.arrow_forward_ios, size: 16),
         ]),
       ),
     );

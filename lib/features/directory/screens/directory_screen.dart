@@ -343,26 +343,26 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('بحث متقدم', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryGreen), textAlign: TextAlign.center),
-                const SizedBox(height: 16),
-                TextField(controller: _nameController, decoration: InputDecoration(labelText: 'الاسم', hintText: 'محمد', prefixIcon: const Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                const SizedBox(height: 12),
-                TextField(controller: _fatherController, decoration: InputDecoration(labelText: 'الأب', hintText: 'عبدالله', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                const SizedBox(height: 12),
-                TextField(controller: _grandfatherController, decoration: InputDecoration(labelText: 'الجد', hintText: 'سعد', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                const SizedBox(height: 12),
-                TextField(controller: _greatGrandfatherController, decoration: InputDecoration(labelText: 'أب الجد', hintText: 'إبراهيم', prefixIcon: const Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                const SizedBox(height: 12),
-                TextField(controller: _legacyIdController, decoration: InputDecoration(labelText: 'الرقم (QF)', hintText: 'QF07023', prefixIcon: const Icon(Icons.tag), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.ltr),
-                const SizedBox(height: 16),
-                Text('${_filteredPeople.length} نتيجة', style: const TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                Text('بحث متقدم', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryGreen), textAlign: TextAlign.center),
+                SizedBox(height: 16),
+                TextField(controller: _nameController, decoration: InputDecoration(labelText: 'الاسم', hintText: 'محمد', prefixIcon: Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
+                SizedBox(height: 12),
+                TextField(controller: _fatherController, decoration: InputDecoration(labelText: 'الأب', hintText: 'عبدالله', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
+                SizedBox(height: 12),
+                TextField(controller: _grandfatherController, decoration: InputDecoration(labelText: 'الجد', hintText: 'سعد', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
+                SizedBox(height: 12),
+                TextField(controller: _greatGrandfatherController, decoration: InputDecoration(labelText: 'أب الجد', hintText: 'إبراهيم', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
+                SizedBox(height: 12),
+                TextField(controller: _legacyIdController, decoration: InputDecoration(labelText: 'الرقم (QF)', hintText: 'QF07023', prefixIcon: Icon(Icons.tag), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.ltr),
+                SizedBox(height: 16),
+                Text('${_filteredPeople.length} نتيجة', style: TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               ],
             ),
           ),
         ),
         Expanded(
           child: _filteredPeople.isEmpty
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.search_off, size: 64, color: AppColors.textSecondary), const SizedBox(height: 16), const Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary))]))
+              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.search_off, size: 64, color: AppColors.textSecondary), SizedBox(height: 16), Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary))]))
               : ListView.builder(itemCount: _filteredPeople.length, itemBuilder: (context, index) => _buildPersonCard(_filteredPeople[index])),
         ),
       ],
@@ -373,17 +373,17 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        leading: CircleAvatar(backgroundColor: _getPersonColor(person), child: Text(person.name.isNotEmpty ? person.name[0] : '؟', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-        title: Text(_buildPersonFullName(person), style: const TextStyle(fontWeight: FontWeight.bold), textDirection: TextDirection.rtl),
+        leading: CircleAvatar(backgroundColor: _getPersonColor(person), child: Text(person.name.isNotEmpty ? person.name[0] : '؟', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+        title: Text(_buildPersonFullName(person), style: TextStyle(fontWeight: FontWeight.bold), textDirection: TextDirection.rtl),
         subtitle: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text('الجيل ${person.generation}', style: const TextStyle(fontSize: 12), textDirection: TextDirection.rtl),
-          if (person.residenceCity != null) Text(person.residenceCity!, style: const TextStyle(fontSize: 12)),
-          if (person.legacyUserId != null) Text(person.legacyUserId!, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          Text('الجيل ${person.generation}', style: TextStyle(fontSize: 12), textDirection: TextDirection.rtl),
+          if (person.residenceCity != null) Text(person.residenceCity!, style: TextStyle(fontSize: 12)),
+          if (person.legacyUserId != null) Text(person.legacyUserId!, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         ]),
         trailing: person.mobilePhone != null
             ? Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton(icon: const Icon(Icons.phone, color: AppColors.primaryGreen), onPressed: () => _callPhone(person.mobilePhone)),
-                IconButton(icon: const Icon(Icons.chat, color: Colors.green), onPressed: () => _openWhatsApp(person.mobilePhone)),
+                IconButton(icon: Icon(Icons.phone, color: AppColors.primaryGreen), onPressed: () => _callPhone(person.mobilePhone)),
+                IconButton(icon: Icon(Icons.chat, color: Colors.green), onPressed: () => _openWhatsApp(person.mobilePhone)),
               ])
             : null,
         onTap: () => _showPersonDetails(person),
@@ -462,15 +462,15 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           appBar: AppBar(
             leading: Navigator.canPop(context)
                 ? IconButton(
-                    icon: const Icon(Icons.arrow_forward_rounded),
+                    icon: Icon(Icons.arrow_forward_rounded),
                     onPressed: () => Navigator.pop(context),
                   )
                 : null,
             title: Column(children: [
-              const Text('دليل العائلة'),
-              if (!_isLoading) Text('${_allPeople.length} شخص', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.normal)),
+              Text('دليل العائلة'),
+              if (!_isLoading) Text('${_allPeople.length} شخص', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.normal)),
             ]),
-            actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _loadPeople, tooltip: 'تحديث البيانات')],
+            actions: [IconButton(icon: Icon(Icons.refresh), onPressed: _loadPeople, tooltip: 'تحديث البيانات')],
             bottom: TabBar(
               tabs: const [Tab(icon: Icon(Icons.search), text: 'بحث'), Tab(icon: Icon(Icons.account_tree), text: 'تصفح')],
               labelColor: AppColors.gold,
@@ -479,7 +479,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             ),
           ),
           body: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : TabBarView(children: [_buildAdvancedSearchTab(), AncestralBrowser(allPeople: _allPeople, onPersonSelected: _showPersonDetails)]),
         ),
       ),

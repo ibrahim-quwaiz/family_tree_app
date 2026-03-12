@@ -268,7 +268,7 @@ class _TreeScreenState extends State<TreeScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
       child: Row(
         children: [
-          const Text(
+          Text(
             'شجرة العائلة',
             style: TextStyle(
               fontSize: 18,
@@ -278,7 +278,7 @@ class _TreeScreenState extends State<TreeScreen> {
           ),
           const Spacer(),
           _buildIconButton(Icons.home_rounded, _goToRoot),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           _buildIconButton(Icons.refresh_rounded, _isLoading ? null : () {
             if (_currentPerson != null) {
               _loadPerson(_currentPerson!['id']);
@@ -322,14 +322,14 @@ class _TreeScreenState extends State<TreeScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
-            const SizedBox(width: 10),
+            Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
+            SizedBox(width: 10),
             Expanded(
               child: TextField(
                 controller: _searchController,
                 onChanged: _performSearch,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                decoration: const InputDecoration(
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                decoration: InputDecoration(
                   hintText: 'ابحث عن اسم...',
                   hintStyle: TextStyle(color: AppColors.textSecondary),
                   border: InputBorder.none,
@@ -346,7 +346,7 @@ class _TreeScreenState extends State<TreeScreen> {
                     _searchResults = [];
                   });
                 },
-                child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 18),
+                child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 18),
               ),
           ],
         ),
@@ -381,7 +381,7 @@ class _TreeScreenState extends State<TreeScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.gold.withOpacity(0.2)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('↑', style: TextStyle(color: AppColors.gold, fontSize: 14)),
@@ -398,11 +398,11 @@ class _TreeScreenState extends State<TreeScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               pathStr,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -426,10 +426,10 @@ class _TreeScreenState extends State<TreeScreen> {
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
         children: [
           _buildCurrentPersonCard(),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           if (_children.isNotEmpty) ...[
             _buildChildrenHeader(),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildChildrenList(),
           ] else
             _buildEmptyState(),
@@ -500,20 +500,20 @@ class _TreeScreenState extends State<TreeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          SizedBox(height: 5),
                           Wrap(
                             spacing: 6,
                             runSpacing: 4,
@@ -531,9 +531,9 @@ class _TreeScreenState extends State<TreeScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 Divider(color: Colors.white.withOpacity(0.05), height: 1),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 // الإحصائيات
                 Row(
@@ -573,16 +573,16 @@ class _TreeScreenState extends State<TreeScreen> {
         children: [
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: AppColors.gold,
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -604,13 +604,13 @@ class _TreeScreenState extends State<TreeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'الأبناء والبنات',
           style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
         ),
         Text(
           '${_children.length} أفراد',
-          style: const TextStyle(fontSize: 12, color: AppColors.gold, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 12, color: AppColors.gold, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -735,7 +735,7 @@ class _TreeScreenState extends State<TreeScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
 
                   // الأفاتار
                   Container(
@@ -756,7 +756,7 @@ class _TreeScreenState extends State<TreeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
 
                   // الاسم والتفاصيل
                   Expanded(
@@ -771,12 +771,12 @@ class _TreeScreenState extends State<TreeScreen> {
                             color: isAlive ? AppColors.textPrimary : AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Row(
                           children: [
                             Text(
                               isAlive ? '🟢 حي' : '⚪ متوفى',
-                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                             ),
                             if (directChildrenCount > 0) ...[
                               Container(
@@ -790,7 +790,7 @@ class _TreeScreenState extends State<TreeScreen> {
                               ),
                               Text(
                                 '$directChildrenCount أبناء',
-                                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                               ),
                             ],
                           ],
@@ -809,14 +809,14 @@ class _TreeScreenState extends State<TreeScreen> {
                       ),
                       child: Text(
                         '$directChildrenCount',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: AppColors.gold,
                         ),
                       ),
                     ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 14,
@@ -841,10 +841,10 @@ class _TreeScreenState extends State<TreeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.search_off_rounded, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text(
               'لا توجد نتائج لـ "${_searchController.text}"',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -856,9 +856,9 @@ class _TreeScreenState extends State<TreeScreen> {
       children: [
         Text(
           '${_searchResults.length} نتيجة',
-          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         ..._searchResults.map((person) => _buildSearchResultItem(person)),
       ],
     );
@@ -896,18 +896,18 @@ class _TreeScreenState extends State<TreeScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                   ),
                   Text(
                     'الجيل $gen',
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -934,7 +934,7 @@ class _TreeScreenState extends State<TreeScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.04), style: BorderStyle.solid),
       ),
-      child: const Column(
+      child: Column(
         children: [
           Text('🍃', style: TextStyle(fontSize: 32)),
           SizedBox(height: 10),
@@ -951,7 +951,7 @@ class _TreeScreenState extends State<TreeScreen> {
   // التحميل والخطأ
   // ═══════════════════════════════════════════
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -970,17 +970,17 @@ class _TreeScreenState extends State<TreeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
-            const SizedBox(height: 12),
+            Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
+            SizedBox(height: 12),
             Text(
               _error ?? 'حدث خطأ',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             FilledButton(
               onPressed: _loadRoot,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),

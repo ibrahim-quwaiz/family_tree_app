@@ -104,12 +104,12 @@ class _AncestralBrowserState extends State<AncestralBrowser> {
                           size: 64,
                           color: AppColors.textSecondary,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
                         Text(
                           _currentPerson == null
                               ? 'لا يوجد أشخاص في الجيل الأول'
                               : '${_currentPerson!.name} لا يملك أبناء',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             color: AppColors.textSecondary,
                           ),
@@ -160,8 +160,8 @@ class _AncestralBrowserState extends State<AncestralBrowser> {
             // زر الرجوع للبداية
             TextButton.icon(
               onPressed: _goToRoot,
-              icon: const Icon(Icons.home, size: 18),
-              label: const Text('الكل'),
+              icon: Icon(Icons.home, size: 18),
+              label: Text('الكل'),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
               ),
@@ -170,7 +170,7 @@ class _AncestralBrowserState extends State<AncestralBrowser> {
             // المسار المختار
             ..._navigationPath.map((person) => Row(
                   children: [
-                    const Icon(Icons.chevron_left, size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.chevron_left, size: 16, color: AppColors.textSecondary),
                     TextButton(
                       onPressed: () => _navigateBackTo(person),
                       child: Text(person.name),
@@ -183,10 +183,10 @@ class _AncestralBrowserState extends State<AncestralBrowser> {
             
             // الشخص الحالي
             if (_currentPerson != null) ...[
-              const Icon(Icons.chevron_left, size: 16, color: AppColors.textSecondary),
+              Icon(Icons.chevron_left, size: 16, color: AppColors.textSecondary),
               Text(
                 _currentPerson!.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryGreen,
                 ),
@@ -236,7 +236,7 @@ class _PersonTile extends StatelessWidget {
               child: person.photoUrl == null
                   ? Text(
                       person.firstLetter,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -244,7 +244,7 @@ class _PersonTile extends StatelessWidget {
                     )
                   : null,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // الاسم
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -253,25 +253,25 @@ class _PersonTile extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             // الجيل
             Text(
               'الجيل ${person.generation}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 color: AppColors.textSecondary,
               ),
             ),
             // أيقونة إذا عنده أبناء
             if (hasChildren) ...[
-              const SizedBox(height: 4),
-              const Icon(
+              SizedBox(height: 4),
+              Icon(
                 Icons.keyboard_arrow_down,
                 size: 20,
                 color: AppColors.primaryGreen,

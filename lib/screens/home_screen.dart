@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isSelected ? AppColors.gold : AppColors.textSecondary.withOpacity(0.5),
               size: isSelected ? 24 : 22,
             ),
-            const SizedBox(height: 3),
+            SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
@@ -249,13 +249,13 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   _buildStatsRow(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   _buildSectionTitle('القائمة الرئيسية'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildGrid(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   _buildLatestNewsSection(),
                 ],
               ),
@@ -297,34 +297,34 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.gold.withOpacity(0.3)),
             ),
-            child: const Icon(Icons.person_rounded, color: AppColors.gold, size: 28),
+            child: Icon(Icons.person_rounded, color: AppColors.gold, size: 28),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'أهلاً ${_userName ?? ''}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Row(
                   children: [
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.accentGreen,
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Text(
+                    SizedBox(width: 6),
+                    Text(
                       'عائلة القويز',
                       style: TextStyle(
                         fontSize: 13,
@@ -346,7 +346,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
-              child: const Icon(Icons.logout_rounded, color: AppColors.textSecondary, size: 20),
+              child: Icon(Icons.logout_rounded, color: AppColors.textSecondary, size: 20),
             ),
           ),
         ],
@@ -375,11 +375,11 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
     return Row(
       children: [
         _buildStatCard('الإجمالي', _totalMembers.toString(), Icons.groups_rounded, AppColors.gold),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         _buildStatCard('ذكور', _maleCount.toString(), Icons.male_rounded, AppColors.accentBlue),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         _buildStatCard('إناث', _femaleCount.toString(), Icons.female_rounded, AppColors.accentPurple),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         _buildStatCard('أحياء', _aliveCount.toString(), Icons.favorite_rounded, AppColors.accentGreen),
       ],
     );
@@ -409,7 +409,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
           child: Column(
             children: [
               Icon(icon, color: color, size: 20),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                 value,
                 style: TextStyle(
@@ -418,7 +418,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                   color: color,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(
                 label,
                 style: TextStyle(
@@ -446,10 +446,10 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -512,10 +512,10 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
               ),
               child: Icon(item.icon, color: item.color, size: 24),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(
               item.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -591,7 +591,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                   color: AppColors.gold.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
+                child: Text(
                   'عرض الكل',
                   style: TextStyle(fontSize: 12, color: AppColors.gold, fontWeight: FontWeight.w600),
                 ),
@@ -599,7 +599,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _newsLoading
             ? _buildNewsShimmer()
             : _latestNews.isEmpty
@@ -644,7 +644,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
               ),
               child: Icon(typeConfig['icon'] as IconData, color: typeConfig['color'] as Color, size: 20),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             // المحتوى
             Expanded(
               child: Column(
@@ -678,10 +678,10 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                         ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     news['title'] as String? ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -689,7 +689,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3),
                   Text(
                     news['content'] as String? ?? '',
                     style: TextStyle(
@@ -744,7 +744,7 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
       child: Column(
         children: [
           Icon(Icons.newspaper_rounded, color: AppColors.textSecondary.withOpacity(0.3), size: 36),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'لا توجد أخبار حالياً',
             style: TextStyle(
@@ -789,17 +789,17 @@ class _HomePageState extends State<_HomePage> with SingleTickerProviderStateMixi
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary)),
-          content: const Text('هل تريد تسجيل الخروج؟', style: TextStyle(color: AppColors.textSecondary)),
+          title: Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('هل تريد تسجيل الخروج؟', style: TextStyle(color: AppColors.textSecondary)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
               style: FilledButton.styleFrom(backgroundColor: AppColors.accentRed),
-              child: const Text('خروج'),
+              child: Text('خروج'),
             ),
           ],
         ),

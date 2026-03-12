@@ -163,19 +163,19 @@ class _StatsScreenState extends State<StatsScreen> {
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
-          title: const Text('إحصائيات العائلة'),
+          title: Text('إحصائيات العائلة'),
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(Icons.arrow_forward_rounded),
+                  icon: Icon(Icons.arrow_forward_rounded),
                   onPressed: () => Navigator.pop(context),
                 )
               : null,
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+            ? Center(child: CircularProgressIndicator(color: AppColors.gold))
             : _error != null
                 ? _buildError()
                 : RefreshIndicator(
@@ -188,15 +188,15 @@ class _StatsScreenState extends State<StatsScreen> {
                       child: Column(
                         children: [
                           _buildGeneralStats(),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           _buildMaritalStatusSection(),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           _buildGenerationChart(),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           _buildBirthsByYearSection(),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           _buildCityDistributionSection(),
-                          const SizedBox(height: 30),
+                          SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -220,51 +220,51 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.people_alt_rounded, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.people_alt_rounded, color: AppColors.gold, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'الإحصائيات العامة',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           Text(
             '$_totalCount',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.w800,
               color: AppColors.gold,
               height: 1,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             'إجمالي أفراد العائلة',
             style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           Row(
             children: [
               _buildStatCard('👨', 'ذكور', '$_maleCount', AppColors.accentBlue),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               _buildStatCard('👩', 'إناث', '$_femaleCount', const Color(0xFFE91E8C)),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(
             children: [
               _buildStatCard('🟢', 'أحياء', '$_aliveCount', AppColors.accentGreen),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               _buildStatCard('⚪', 'متوفين', '$_deceasedCount', AppColors.neutralGray),
             ],
           ),
 
           if (_totalCount > 0) ...[
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: Row(
@@ -280,17 +280,17 @@ class _StatsScreenState extends State<StatsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'ذكور ${_totalCount > 0 ? (_maleCount * 100 ~/ _totalCount) : 0}%',
-                  style: const TextStyle(fontSize: 11, color: AppColors.accentBlue),
+                  style: TextStyle(fontSize: 11, color: AppColors.accentBlue),
                 ),
                 Text(
                   'إناث ${_totalCount > 0 ? (_femaleCount * 100 ~/ _totalCount) : 0}%',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFFE91E8C)),
+                  style: TextStyle(fontSize: 11, color: Color(0xFFE91E8C)),
                 ),
               ],
             ),
@@ -311,8 +311,8 @@ class _StatsScreenState extends State<StatsScreen> {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 10),
+            Text(emoji, style: TextStyle(fontSize: 20)),
+            SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -350,15 +350,15 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.favorite_rounded, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.favorite_rounded, color: AppColors.gold, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'الحالة الاجتماعية',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // الدوائر
           Row(
@@ -372,7 +372,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   Icons.people_rounded,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: _buildCircularStat(
                   'أعزب',
@@ -385,7 +385,7 @@ class _StatsScreenState extends State<StatsScreen> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // شريط النسبة
           ClipRRect(
@@ -403,17 +403,17 @@ class _StatsScreenState extends State<StatsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'متزوج $marriedPercent%',
-                style: const TextStyle(fontSize: 11, color: AppColors.accentGreen),
+                style: TextStyle(fontSize: 11, color: AppColors.accentGreen),
               ),
               Text(
                 'أعزب $singlePercent%',
-                style: const TextStyle(fontSize: 11, color: AppColors.accentBlue),
+                style: TextStyle(fontSize: 11, color: AppColors.accentBlue),
               ),
             ],
           ),
@@ -455,7 +455,7 @@ class _StatsScreenState extends State<StatsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Text(
             '$count',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color),
@@ -492,15 +492,15 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.bar_chart_rounded, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.bar_chart_rounded, color: AppColors.gold, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'توزيع الأجيال',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           ...sortedGens.map((entry) {
             final percentage = maxCount > 0 ? entry.value / maxCount : 0.0;
@@ -514,10 +514,10 @@ class _StatsScreenState extends State<StatsScreen> {
                     width: 55,
                     child: Text(
                       'الجيل ${entry.key}',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -545,7 +545,7 @@ class _StatsScreenState extends State<StatsScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   '${entry.value}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -624,26 +624,26 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.cake_rounded, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.cake_rounded, color: AppColors.gold, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'المواليد حسب السنة',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
               const Spacer(),
               Text(
                 '$totalBirths مسجل',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           if (groupByDecade)
             Text(
               'مجمّع حسب العقد',
               style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.6)),
             ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // رسم بياني عمودي
           SizedBox(
@@ -669,7 +669,7 @@ class _StatsScreenState extends State<StatsScreen> {
                             color: color,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 500),
                           height: barHeight,
@@ -682,7 +682,7 @@ class _StatsScreenState extends State<StatsScreen> {
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         RotatedBox(
                           quarterTurns: -1,
                           child: Text(
@@ -703,9 +703,9 @@ class _StatsScreenState extends State<StatsScreen> {
 
           // أعلى وأقل سنة
           if (sortedYears.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Divider(color: Colors.white.withOpacity(0.06)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -717,7 +717,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     Icons.trending_up_rounded,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: _buildBirthHighlight(
                     'أقدم مولود مسجل',
@@ -752,7 +752,7 @@ class _StatsScreenState extends State<StatsScreen> {
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -794,16 +794,16 @@ class _StatsScreenState extends State<StatsScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.location_on_rounded, color: AppColors.gold, size: 20),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.location_on_rounded, color: AppColors.gold, size: 20),
+                SizedBox(width: 8),
+                Text(
                   'توزيع المدن',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               'لا توجد بيانات سكن مسجلة حالياً',
               style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
@@ -840,20 +840,20 @@ class _StatsScreenState extends State<StatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.location_on_rounded, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Icons.location_on_rounded, color: AppColors.gold, size: 20),
+              SizedBox(width: 8),
+              Text(
                 'توزيع المدن',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
               const Spacer(),
               Text(
                 '$total شخص',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
@@ -867,7 +867,7 @@ class _StatsScreenState extends State<StatsScreen> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           ...sortedCities.take(10).toList().asMap().entries.map((entry) {
             final index = entry.key;
@@ -887,11 +887,11 @@ class _StatsScreenState extends State<StatsScreen> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       city.key,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                      style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
                     ),
                   ),
                   Text(
@@ -917,17 +917,17 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
-            const SizedBox(height: 12),
+            Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
+            SizedBox(height: 12),
             Text(
               _error ?? 'حدث خطأ',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             FilledButton(
               onPressed: _loadStats,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),

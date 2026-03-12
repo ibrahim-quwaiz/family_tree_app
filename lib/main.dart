@@ -6,6 +6,8 @@ import 'features/auth/screens/login_screen.dart';
 import 'features/auth/services/auth_service.dart';
 import 'core/constants/current_user.dart';
 import 'screens/home_screen.dart';
+import 'core/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,13 +46,25 @@ class FamilyTreeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'شجرة عائلة القويز',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme.copyWith(
-        textTheme: GoogleFonts.tajawalTextTheme(AppTheme.darkTheme.textTheme),
+    return ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          final isDark = themeProvider.themeMode == ThemeMode.dark ||
+              (themeProvider.themeMode == ThemeMode.system &&
+                  WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                      Brightness.dark);
+
+          return MaterialApp(
+            key: ValueKey(isDark),
+            title: 'شجرة عائلة القويز',
+            debugShowCheckedModeBanner: false,
+            theme: isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+            themeMode: ThemeMode.light,
+            home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+          );
+        },
       ),
-      home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
     );
   }
 }

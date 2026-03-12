@@ -122,17 +122,17 @@ class _AboutScreenState extends State<AboutScreen> {
       appBar: AppBar(
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.arrow_forward_rounded),
+                icon: Icon(Icons.arrow_forward_rounded),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
-        title: const Text('عن العائلة'),
+        title: Text('عن العائلة'),
         backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _error != null
               ? _buildError()
               : RefreshIndicator(
@@ -144,13 +144,13 @@ class _AboutScreenState extends State<AboutScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildStatsSection(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         _buildLineageSection(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         _buildAboutAppSection(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         _buildContactSection(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -161,26 +161,26 @@ class _AboutScreenState extends State<AboutScreen> {
                           ),
                           child: Column(
                             children: [
-                              const Text(
+                              Text(
                                 'شجرة عائلة القويز',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.gold),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
+                              SizedBox(height: 4),
+                              Text(
                                 'الإصدار 1.0.0',
                                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                               Divider(color: Colors.white.withOpacity(0.06)),
-                              const SizedBox(height: 12),
-                              const Text(
+                              SizedBox(height: 12),
+                              Text(
                                 'تطوير: إبراهيم بن عبدالله القويز',
                                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -199,7 +199,7 @@ class _AboutScreenState extends State<AboutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'إحصائيات العائلة',
               style: TextStyle(
                 fontSize: 18,
@@ -207,7 +207,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -244,7 +244,7 @@ class _AboutScreenState extends State<AboutScreen> {
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
@@ -268,7 +268,7 @@ class _AboutScreenState extends State<AboutScreen> {
               color: AppColors.gold,
               size: 28,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'نسب العائلة',
               style: TextStyle(
@@ -279,7 +279,7 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -298,7 +298,7 @@ class _AboutScreenState extends State<AboutScreen> {
             _lineageContent.isNotEmpty
                 ? _lineageContent
                 : 'لا يوجد محتوى للنسب حالياً.',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               height: 1.7,
               color: AppColors.textPrimary,
@@ -320,7 +320,7 @@ class _AboutScreenState extends State<AboutScreen> {
               color: AppColors.gold,
               size: 28,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'عن التطبيق',
               style: TextStyle(
@@ -331,7 +331,7 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -350,7 +350,7 @@ class _AboutScreenState extends State<AboutScreen> {
             _aboutAppContent.isNotEmpty
                 ? _aboutAppContent
                 : 'لا يوجد محتوى لعن التطبيق حالياً.',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               height: 1.7,
               color: AppColors.textPrimary,
@@ -372,7 +372,7 @@ class _AboutScreenState extends State<AboutScreen> {
               color: AppColors.gold,
               size: 28,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'تواصل معنا',
               style: TextStyle(
@@ -383,7 +383,7 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: Column(
@@ -394,14 +394,14 @@ class _AboutScreenState extends State<AboutScreen> {
                 color: const Color(0xFF25D366),
                 onTap: () => _launchUrl('https://wa.me/${_normalizePhone(_whatsappNumber)}'),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _buildContactButton(
                 label: 'رسالة SMS',
                 icon: Icons.sms,
                 color: Colors.blue.shade600,
                 onTap: () => _launchUrl('sms:$_smsNumber'),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _buildContactButton(
                 label: 'إيميل',
                 icon: Icons.email,
@@ -451,7 +451,7 @@ class _AboutScreenState extends State<AboutScreen> {
             child: Row(
               children: [
                 Icon(icon, color: color, size: 24),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Text(
                   label,
                   style: TextStyle(
@@ -476,15 +476,15 @@ class _AboutScreenState extends State<AboutScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, size: 64, color: AppColors.accentRed),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'حدث خطأ في تحميل البيانات',
               style: TextStyle(fontSize: 18, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             FilledButton(
               onPressed: _loadData,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),

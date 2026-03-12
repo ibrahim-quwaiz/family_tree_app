@@ -56,8 +56,8 @@ class SearchAndFiltersBar extends StatelessWidget {
               textDirection: TextDirection.rtl,
               decoration: InputDecoration(
                 hintText: 'ابحث عن شخص...',
-                hintStyle: const TextStyle(color: AppColors.textSecondary),
-                prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+                hintStyle: TextStyle(color: AppColors.textSecondary),
+                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
                 filled: true,
                 fillColor: AppColors.bgCard,
                 border: OutlineInputBorder(

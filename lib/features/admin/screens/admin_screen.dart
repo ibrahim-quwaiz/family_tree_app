@@ -292,22 +292,22 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           color: const Color(0xFFE91E8C).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.child_care_rounded, color: Color(0xFFE91E8C), size: 20),
+                        child: Icon(Icons.child_care_rounded, color: Color(0xFFE91E8C), size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Expanded(
+                      SizedBox(width: 12),
+                      Expanded(
                         child: Text('إضافة ابن/بنت لبنت العائلة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   _buildLabel('الأم (بنت العائلة) — رقم QF *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(child: _buildTextField(motherQfController, 'مثال: QF05012')),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () async {
                           final qf = motherQfController.text.trim().toUpperCase();
@@ -340,13 +340,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         child: Container(
                           width: 46, height: 46,
                           decoration: BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(12)),
-                          child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                          child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
                         ),
                       ),
                     ],
                   ),
                   if (selectedMother != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
@@ -357,31 +357,31 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
-                          const SizedBox(width: 8),
+                          Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${selectedMother!['name']} (${selectedMother!['legacy_user_id']})',
-                              style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                              style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                             ),
                           ),
                           GestureDetector(
                             onTap: () => setModalState(() { selectedMother = null; motherQfController.clear(); }),
-                            child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                            child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
                           ),
                         ],
                       ),
                     ),
                   ],
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('اسم الطفل *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(childNameController, 'الاسم الكامل'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('الأب'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   if (selectedMother == null)
                     Text('اختر الأم أولاً', style: TextStyle(fontSize: 12, color: AppColors.textSecondary))
                   else
@@ -399,8 +399,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                const SizedBox(height: 6),
+                                Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                SizedBox(height: 6),
                                 Wrap(
                                   spacing: 6,
                                   runSpacing: 6,
@@ -433,7 +433,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                                 size: 14,
                                                 color: isSelected ? AppColors.accentGreen : AppColors.textSecondary,
                                               ),
-                                              const SizedBox(width: 4),
+                                              SizedBox(width: 4),
                                               Text(
                                                 name,
                                                 style: TextStyle(
@@ -459,7 +459,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                           borderRadius: BorderRadius.circular(8),
                                           border: Border.all(color: AppColors.gold.withOpacity(0.3)),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(Icons.add_rounded, size: 14, color: AppColors.gold),
@@ -474,27 +474,27 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               ],
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                         ],
                         if (allFatherNames.isEmpty || fatherNameController.text.isEmpty || !allFatherNames.contains(fatherNameController.text))
                           _buildTextField(fatherNameController, 'اكتب اسم الأب'),
                       ],
                     ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('الجنس'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       _buildGenderOption('ذكر', 'male', childGender, (val) => setModalState(() => childGender = val)),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       _buildGenderOption('أنثى', 'female', childGender, (val) => setModalState(() => childGender = val)),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -519,7 +519,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   SizedBox(
                     width: double.infinity,
@@ -553,7 +553,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -601,29 +601,29 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.edit_rounded, color: AppColors.gold, size: 20),
+                        child: Icon(Icons.edit_rounded, color: AppColors.gold, size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('تعديل: ${child['child_name']}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                            Text('تعديل: ${child['child_name']}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                             Text('ابن/بنت: ${child['mother_name'] ?? '—'}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7))),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   _buildLabel('اسم الطفل *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(childNameController, 'الاسم'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('الأب'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Builder(
                     builder: (context) {
                       final motherId = child['mother_id'] as String?;
@@ -658,8 +658,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                  const SizedBox(height: 6),
+                                  Text('آباء مسجلين:', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                  SizedBox(height: 6),
                                   Wrap(
                                     spacing: 6,
                                     runSpacing: 6,
@@ -692,7 +692,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                                   size: 14,
                                                   color: isSelected ? AppColors.accentGreen : AppColors.textSecondary,
                                                 ),
-                                                const SizedBox(width: 4),
+                                                SizedBox(width: 4),
                                                 Text(
                                                   name,
                                                   style: TextStyle(
@@ -718,7 +718,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                             borderRadius: BorderRadius.circular(8),
                                             border: Border.all(color: AppColors.gold.withOpacity(0.3)),
                                           ),
-                                          child: const Row(
+                                          child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Icon(Icons.add_rounded, size: 14, color: AppColors.gold),
@@ -733,7 +733,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                           ],
                           if (allFatherNames.isEmpty || fatherNameController.text.isEmpty || !allFatherNames.contains(fatherNameController.text))
                             _buildTextField(fatherNameController, 'اكتب اسم الأب'),
@@ -741,21 +741,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       );
                     },
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('الجنس'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       _buildGenderOption('ذكر', 'male', childGender, (val) => setModalState(() => childGender = val)),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       _buildGenderOption('أنثى', 'female', childGender, (val) => setModalState(() => childGender = val)),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   _buildLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -780,7 +780,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   SizedBox(
                     width: double.infinity,
@@ -810,7 +810,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -829,11 +829,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: const Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
-          content: Text('حذف "${child['child_name']}"؟', style: const TextStyle(color: AppColors.textSecondary)),
+          title: Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('حذف "${child['child_name']}"؟', style: TextStyle(color: AppColors.textSecondary)),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('حذف', style: TextStyle(color: AppColors.accentRed))),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('حذف', style: TextStyle(color: AppColors.accentRed))),
           ],
         ),
       ),
@@ -955,9 +955,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             backgroundColor: AppColors.bgCard,
             title: Row(
               children: [
-                const Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
-                const SizedBox(width: 8),
-                const Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
+                Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
+                SizedBox(width: 8),
+                Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
               ],
             ),
             content: Column(
@@ -966,9 +966,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               children: [
                 Text(
                   '"$personName" ($personQf) مرتبط بالتالي:',
-                  style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -977,10 +977,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.accentRed.withOpacity(0.2)),
                   ),
-                  child: Text(details, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.8)),
+                  child: Text(details, style: TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.8)),
                 ),
-                const SizedBox(height: 12),
-                const Text(
+                SizedBox(height: 12),
+                Text(
                   'لحذف هذا الشخص، يجب أولاً حذف أو نقل جميع الارتباطات المتعلقة به من التبويبات المخصصة (الأشخاص، الزواجات، أبناء البنات).',
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
                 ),
@@ -989,7 +989,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('فهمت', style: TextStyle(color: AppColors.gold)),
+                child: Text('فهمت', style: TextStyle(color: AppColors.gold)),
               ),
             ],
           ),
@@ -1005,19 +1005,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: const Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
+          title: Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
             'هل أنت متأكد من حذف "$personName"؟\nهذا الإجراء لا يمكن التراجع عنه.',
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
+              child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -1041,7 +1041,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   Widget _buildLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
     );
   }
 
@@ -1054,10 +1054,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       ),
       child: TextField(
         controller: controller,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.textSecondary),
+          hintStyle: TextStyle(color: AppColors.textSecondary),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           border: InputBorder.none,
         ),
@@ -1245,13 +1245,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           color: AppColors.gold.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.edit_rounded, color: AppColors.gold, size: 20),
+                        child: Icon(Icons.edit_rounded, color: AppColors.gold, size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'تعديل: ${person['name']}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -1261,39 +1261,39 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     'QF: ${person['legacy_user_id'] ?? '—'}',
                     style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7)),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('الاسم *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(nameController, 'الاسم الكامل'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الجنس'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       _buildGenderOption('ذكر', 'male', selectedGender, (val) => setModalState(() => selectedGender = val)),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       _buildGenderOption('أنثى', 'female', selectedGender, (val) => setModalState(() => selectedGender = val)),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(
                     'الجيل: $generation',
-                    style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الأب (أدخل رقم QF)'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(
                         child: _buildTextField(fatherQfController, 'مثال: QF03001'),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           final qf = fatherQfController.text.trim().toUpperCase();
@@ -1374,13 +1374,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             color: AppColors.gold,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                          child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
                         ),
                       ),
                     ],
                   ),
                   if (selectedFather != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
@@ -1391,12 +1391,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
-                          const SizedBox(width: 8),
+                          Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${selectedFather!['name']} (${selectedFather!['legacy_user_id']}) — ج${selectedFather!['generation']}',
-                              style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                              style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                             ),
                           ),
                           GestureDetector(
@@ -1406,15 +1406,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               fatherWives = [];
                               selectedMotherMarriage = null;
                             }),
-                            child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                            child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
                           ),
                         ],
                       ),
                     ),
                   ],
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الأم (من زوجات الأب)'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   if (selectedFather == null && selectedFatherId == null)
                     Container(
                       width: double.infinity,
@@ -1437,7 +1437,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
                       ),
-                      child: const Text(
+                      child: Text(
                         '⚠️ لا توجد زوجات مسجلة لهذا الأب.\nأضف زوجة من تبويب الزواجات أولاً.',
                         style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
                       ),
@@ -1458,10 +1458,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               final i = fatherWives.indexWhere((m) => m['id'] == selectedMotherMarriage!['id']);
                               return i >= 0 ? i : null;
                             }(),
-                          hint: const Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                          hint: Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                           isExpanded: true,
                           dropdownColor: AppColors.bgCard,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           items: fatherWives.asMap().entries.map((entry) {
                             final m = entry.value;
                             final name = m['wife_name'] as String? ?? 'غير معروفة';
@@ -1479,11 +1479,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       _buildLabel('الحالة:'),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       GestureDetector(
                         onTap: () => setModalState(() => isAlive = true),
                         child: Container(
@@ -1505,7 +1505,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () => setModalState(() => isAlive = false),
                         child: Container(
@@ -1529,9 +1529,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -1560,7 +1560,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1568,29 +1568,29 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('مدينة الميلاد'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(birthCityController, 'المدينة'),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('الدولة'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(birthCountryController, 'الدولة'),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('مدينة الإقامة'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(residenceCityController, 'مدينة الإقامة'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1598,25 +1598,25 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('الوظيفة'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(jobController, 'الوظيفة'),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('التعليم'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(educationController, 'التعليم'),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الحالة الاجتماعية'),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -1630,8 +1630,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         value: maritalStatus.isEmpty ? null : maritalStatus,
                         isExpanded: true,
                         dropdownColor: AppColors.bgCard,
-                        hint: const Text('اختر الحالة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                        hint: Text('اختر الحالة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                        style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                         items: const [
                           DropdownMenuItem(value: 'متزوج', child: Text('متزوج')),
                           DropdownMenuItem(value: 'أعزب', child: Text('أعزب')),
@@ -1644,26 +1644,26 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('رمز PIN'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(pinController, 'رمز الدخول (4 أرقام)'),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Container(height: 1, color: Colors.white.withOpacity(0.06)),
-                  const SizedBox(height: 16),
-                  const Text('معلومات الاتصال',
+                  SizedBox(height: 16),
+                  Text('معلومات الاتصال',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.gold)),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('رقم الجوال'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(mobileController, '05xxxxxxxx'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('البريد الإلكتروني'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(emailController, 'email@example.com'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الصورة الشخصية'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Container(
@@ -1679,10 +1679,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                   : null,
                         ),
                         child: (selectedImageBytes == null && (currentPhotoUrl == null || currentPhotoUrl!.isEmpty))
-                            ? const Icon(Icons.person_rounded, color: AppColors.textSecondary, size: 28)
+                            ? Icon(Icons.person_rounded, color: AppColors.textSecondary, size: 28)
                             : null,
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1719,17 +1719,17 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.upload_rounded, color: AppColors.gold, size: 18),
-                                    const SizedBox(width: 6),
+                                    Icon(Icons.upload_rounded, color: AppColors.gold, size: 18),
+                                    SizedBox(width: 6),
                                     Text(
                                       selectedImageBytes != null ? 'تم اختيار صورة ✓' : 'اختر صورة',
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.gold),
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.gold),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               'الحد: 400×400 بكسل، 500KB',
                               style: TextStyle(fontSize: 10, color: AppColors.textSecondary.withOpacity(0.6)),
@@ -1739,7 +1739,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1747,23 +1747,23 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLabel('انستقرام'),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           _buildTextField(instagramController, '@username'),
                         ],
                       )),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                           child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLabel('تويتر'),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           _buildTextField(twitterController, '@username'),
                         ],
                       )),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -1771,23 +1771,23 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLabel('سناب شات'),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           _buildTextField(snapchatController, '@username'),
                         ],
                       )),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                           child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLabel('فيسبوك'),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           _buildTextField(facebookController, '@username'),
                         ],
                       )                      ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -1896,7 +1896,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('حفظ التعديلات',
+                      child: Text('حفظ التعديلات',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
@@ -1958,36 +1958,36 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           color: AppColors.accentGreen.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.person_add_rounded, color: AppColors.accentGreen, size: 20),
+                        child: Icon(Icons.person_add_rounded, color: AppColors.accentGreen, size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Text('إضافة شخص جديد',
+                      SizedBox(width: 12),
+                      Text('إضافة شخص جديد',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('الاسم *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(nameController, 'الاسم الكامل'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الجنس'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       _buildGenderOption('ذكر', 'male', selectedGender, (val) => setModalState(() => selectedGender = val)),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       _buildGenderOption('أنثى', 'female', selectedGender, (val) => setModalState(() => selectedGender = val)),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الأب (أدخل رقم QF)'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(
                         child: _buildTextField(fatherQfController, 'مثال: QF03001'),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           final qf = fatherQfController.text.trim().toUpperCase();
@@ -2053,19 +2053,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             color: AppColors.gold,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                          child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
                         ),
                       ),
                     ],
                   ),
                   if (selectedFather != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Text(
                       'الجيل: ${(selectedFather!['generation'] as int? ?? 0) + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, color: AppColors.gold, fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
@@ -2076,12 +2076,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
-                          const SizedBox(width: 8),
+                          Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${selectedFather!['name']} (${selectedFather!['legacy_user_id']}) — ج${selectedFather!['generation']}',
-                              style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                              style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                             ),
                           ),
                           GestureDetector(
@@ -2091,15 +2091,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               fatherWives = [];
                               selectedMotherMarriage = null;
                             }),
-                            child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                            child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
                           ),
                         ],
                       ),
                     ),
                   ],
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الأم (من زوجات الأب)'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   if (selectedFather == null)
                     Container(
                       width: double.infinity,
@@ -2122,7 +2122,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
                       ),
-                      child: const Text(
+                      child: Text(
                         '⚠️ لا توجد زوجات مسجلة لهذا الأب.\nأضف زوجة من تبويب الزواجات أولاً.',
                         style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
                       ),
@@ -2144,10 +2144,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                   return i >= 0 ? i : null;
                                 })()
                               : null,
-                          hint: const Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                          hint: Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                           isExpanded: true,
                           dropdownColor: AppColors.bgCard,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           items: fatherWives.asMap().entries.map((entry) {
                             final m = entry.value;
                             final name = m['wife_name'] as String? ?? 'غير معروفة';
@@ -2165,9 +2165,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -2196,7 +2196,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -2204,41 +2204,41 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('مدينة الميلاد'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(birthCityController, 'المدينة'),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel('الدولة'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             _buildTextField(birthCountryController, 'الدولة'),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Container(height: 1, color: Colors.white.withOpacity(0.06)),
-                  const SizedBox(height: 16),
-                  const Text('معلومات الاتصال', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.gold)),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 16),
+                  Text('معلومات الاتصال', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.gold)),
+                  SizedBox(height: 12),
                   _buildLabel('رقم الجوال'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(mobileController, '05xxxxxxxx'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('البريد الإلكتروني'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(emailController, 'email@example.com'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('رابط الصورة'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(photoUrlController, 'https://...'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -2246,21 +2246,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildLabel('انستقرام'),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 _buildTextField(instagramController, '@username'),
                               ])),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildLabel('تويتر'),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 _buildTextField(twitterController, '@username'),
                               ])),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -2268,21 +2268,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildLabel('سناب شات'),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 _buildTextField(snapchatController, '@username'),
                               ])),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildLabel('فيسبوك'),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 _buildTextField(facebookController, '@username'),
                               ])),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -2372,7 +2372,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2424,20 +2424,20 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           color: const Color(0xFFE91E8C).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.favorite_rounded, color: Color(0xFFE91E8C), size: 20),
+                        child: Icon(Icons.favorite_rounded, color: Color(0xFFE91E8C), size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Text('إضافة زواج',
+                      SizedBox(width: 12),
+                      Text('إضافة زواج',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('الزوج (أدخل رقم QF) *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(child: _buildTextField(husbandQfController, 'مثال: QF03001')),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           final qf = husbandQfController.text.trim().toUpperCase();
@@ -2484,13 +2484,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             color: AppColors.gold,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                          child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
                         ),
                       ),
                     ],
                   ),
                   if (selectedHusband != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
@@ -2501,12 +2501,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
-                          const SizedBox(width: 8),
+                          Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${selectedHusband!['name']} (${selectedHusband!['legacy_user_id']}) — ج${selectedHusband!['generation']}',
-                              style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                              style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                             ),
                           ),
                           GestureDetector(
@@ -2514,15 +2514,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               selectedHusband = null;
                               husbandQfController.clear();
                             }),
-                            child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                            child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
                           ),
                         ],
                       ),
                     ),
                   ],
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('الزوجة *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(
@@ -2550,7 +2550,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: GestureDetector(
                           onTap: () => setModalState(() => isExternalWife = true),
@@ -2578,12 +2578,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   if (!isExternalWife) ...[
                     Row(
                       children: [
                         Expanded(child: _buildTextField(wifeQfController, 'أدخل رقم QF للزوجة')),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
                             final qf = wifeQfController.text.trim().toUpperCase();
@@ -2612,13 +2612,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           child: Container(
                             width: 46, height: 46,
                             decoration: BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(12)),
-                            child: const Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                            child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
                           ),
                         ),
                       ],
                     ),
                     if (selectedWife != null) ...[
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
@@ -2629,12 +2629,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
-                            const SizedBox(width: 8),
+                            Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 16),
+                            SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 '${selectedWife!['name']} (${selectedWife!['legacy_user_id']}) — ج${selectedWife!['generation']}',
-                                style: const TextStyle(fontSize: 13, color: AppColors.accentGreen),
+                                style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                               ),
                             ),
                             GestureDetector(
@@ -2642,7 +2642,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                 selectedWife = null;
                                 wifeQfController.clear();
                               }),
-                              child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
+                              child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 16),
                             ),
                           ],
                         ),
@@ -2650,7 +2650,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ],
                   ] else
                     _buildTextField(externalNameController, 'اسم الزوجة'),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -2660,12 +2660,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     child: Row(
                       children: [
                         _buildLabel('رقم الزواج:'),
-                        const SizedBox(width: 8),
-                        Text('$marriageOrder', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.gold)),
+                        SizedBox(width: 8),
+                        Text('$marriageOrder', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.gold)),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -2708,7 +2708,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2752,9 +2752,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             backgroundColor: AppColors.bgCard,
             title: Row(
               children: [
-                const Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
-                const SizedBox(width: 8),
-                const Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
+                Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
+                SizedBox(width: 8),
+                Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
               ],
             ),
             content: Column(
@@ -2763,9 +2763,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               children: [
                 Text(
                   'زواج "$husbandName" و "$wifeName" مرتبط بـ:',
-                  style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -2776,11 +2776,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   ),
                   child: Text(
                     '👨‍👩‍👦 $childrenCount ابن/بنت',
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text(
+                SizedBox(height: 12),
+                Text(
                   'لحذف هذا الزواج، يجب أولاً حذف أو نقل الأبناء المرتبطين من تبويب الأشخاص.',
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
                 ),
@@ -2789,7 +2789,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('فهمت', style: TextStyle(color: AppColors.gold)),
+                child: Text('فهمت', style: TextStyle(color: AppColors.gold)),
               ),
             ],
           ),
@@ -2805,19 +2805,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: const Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
+          title: Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
             'هل أنت متأكد من حذف زواج "$husbandName" و "$wifeName"؟',
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
+              child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -2871,20 +2871,20 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           color: AppColors.gold.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.newspaper_rounded, color: AppColors.gold, size: 20),
+                        child: Icon(Icons.newspaper_rounded, color: AppColors.gold, size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Text('إضافة خبر',
+                      SizedBox(width: 12),
+                      Text('إضافة خبر',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('العنوان *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _buildTextField(titleController, 'عنوان الخبر'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('المحتوى *'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.bgDeep.withOpacity(0.5),
@@ -2894,8 +2894,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     child: TextField(
                       controller: bodyController,
                       maxLines: 5,
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                      decoration: InputDecoration(
                         hintText: 'محتوى الخبر...',
                         hintStyle: TextStyle(color: AppColors.textSecondary),
                         contentPadding: EdgeInsets.all(14),
@@ -2903,9 +2903,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildLabel('التصنيف'),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Wrap(
                     spacing: 8,
                     children: ['general', 'event', 'announcement', 'condolence'].map((cat) {
@@ -2938,7 +2938,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -2966,7 +2966,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('نشر الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('نشر الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2985,15 +2985,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: const Text('حذف الخبر؟', style: TextStyle(color: AppColors.textPrimary)),
-          content: Text('حذف "${news['title']}"؟', style: const TextStyle(color: AppColors.textSecondary)),
+          title: Text('حذف الخبر؟', style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('حذف "${news['title']}"؟', style: TextStyle(color: AppColors.textSecondary)),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+                child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
             TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('حذف', style: TextStyle(color: AppColors.accentRed))),
+                child: Text('حذف', style: TextStyle(color: AppColors.accentRed))),
           ],
         ),
       ),
@@ -3035,9 +3035,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-                const SizedBox(height: 16),
-                const Text('تعديل الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
+                Text('تعديل الخبر', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                SizedBox(height: 16),
                 if (news['image_url'] != null && (news['image_url'] as String).toString().isNotEmpty) ...[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -3051,7 +3051,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         return Container(
                           height: 200,
                           color: AppColors.bgCard,
-                          child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                          child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
                         );
                       },
                       errorBuilder: (_, __, ___) => Container(
@@ -3061,7 +3061,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                 ],
                 _buildLabel('نوع الخبر'),
                 Container(
@@ -3072,23 +3072,23 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       value: selectedType,
                       isExpanded: true,
                       dropdownColor: AppColors.bgCard,
-                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                      style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                       items: newsTypes.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
                       onChanged: (v) => setModalState(() => selectedType = v ?? 'general'),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 _buildLabel('العنوان'),
                 _buildTextField(titleController, 'عنوان الخبر'),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 _buildLabel('المحتوى'),
                 TextField(
                   controller: contentController,
                   maxLines: 5,
-                  style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     hintText: 'محتوى الخبر...',
                     hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
@@ -3098,7 +3098,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 Row(
                   children: [
@@ -3121,7 +3121,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 SizedBox(
                   width: double.infinity,
@@ -3143,7 +3143,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       }
                     },
                     style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep),
-                    child: const Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -3188,20 +3188,20 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         color: AppColors.gold.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.notifications_active_rounded, color: AppColors.gold, size: 20),
+                      child: Icon(Icons.notifications_active_rounded, color: AppColors.gold, size: 20),
                     ),
-                    const SizedBox(width: 12),
-                    const Text('إرسال إشعار',
+                    SizedBox(width: 12),
+                    Text('إرسال إشعار',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildLabel('العنوان *'),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 _buildTextField(titleController, 'عنوان الإشعار'),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 _buildLabel('المحتوى *'),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.bgDeep.withOpacity(0.5),
@@ -3211,8 +3211,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   child: TextField(
                     controller: bodyController,
                     maxLines: 3,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
                       hintText: 'نص الإشعار...',
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       contentPadding: EdgeInsets.all(14),
@@ -3220,7 +3220,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -3248,7 +3248,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                       foregroundColor: AppColors.bgDeep,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    child: Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],
@@ -3269,15 +3269,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: Text(action, style: const TextStyle(color: AppColors.textPrimary)),
+          title: Text(action, style: TextStyle(color: AppColors.textPrimary)),
           content: Text(
             '${isCurrentlyAdmin ? 'إزالة صلاحية المدير من' : 'تعيين'} "${person['name']}" ${isCurrentlyAdmin ? '؟' : 'كمدير؟'}',
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+                child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
             TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
                 child: Text('تأكيد',
@@ -3323,10 +3323,10 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         appBar: AppBar(
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
-          title: const Text('لوحة التحكم', style: TextStyle(fontWeight: FontWeight.w700)),
+          title: Text('لوحة التحكم', style: TextStyle(fontWeight: FontWeight.w700)),
           centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_forward_rounded),
+            icon: Icon(Icons.arrow_forward_rounded),
             onPressed: () => Navigator.pop(context),
           ),
           bottom: TabBar(
@@ -3335,7 +3335,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             indicatorColor: AppColors.gold,
             labelColor: AppColors.gold,
             unselectedLabelColor: AppColors.textSecondary,
-            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             tabs: const [
               Tab(text: 'الأشخاص', icon: Icon(Icons.people_rounded, size: 18)),
               Tab(text: 'الزواجات', icon: Icon(Icons.favorite_rounded, size: 18)),
@@ -3379,8 +3379,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   child: TextField(
                     controller: _searchController,
                     onChanged: _filterPeople,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
                       hintText: 'بحث بالاسم أو QF...',
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
@@ -3390,7 +3390,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               GestureDetector(
                 onTap: _showAddPersonDialog,
                 child: Container(
@@ -3400,7 +3400,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     color: AppColors.gold,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
+                  child: Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
                 ),
               ),
             ],
@@ -3412,20 +3412,20 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             children: [
               Text(
                 '${_filteredPeople.length} شخص',
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: _loadPeople,
-                child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20),
+                child: Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Expanded(
           child: _isLoadingPeople
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _filteredPeople.length,
@@ -3458,7 +3458,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               size: 18,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -3472,7 +3472,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                     decoration: !isAlive ? TextDecoration.lineThrough : null,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                SizedBox(height: 2),
                                 Text(
                                   '${person['legacy_user_id'] ?? '—'} • ج$gen${!isAlive ? ' • متوفى' : ''}',
                                   style: TextStyle(
@@ -3484,14 +3484,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ),
                           IconButton(
                             onPressed: () => _showEditPersonDialog(person),
-                            icon: const Icon(Icons.edit_rounded, size: 18),
+                            icon: Icon(Icons.edit_rounded, size: 18),
                             color: AppColors.gold,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                           ),
                           IconButton(
                             onPressed: () => _deletePerson(person),
-                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            icon: Icon(Icons.delete_outline_rounded, size: 18),
                             color: AppColors.accentRed,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -3522,8 +3522,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   child: TextField(
                     controller: _marriagesSearchController,
                     onChanged: _filterMarriages,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
                       hintText: 'بحث باسم أو رقم QF للزوج أو الزوجة...',
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
@@ -3533,7 +3533,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   if (_allPeople.isEmpty) _loadPeople();
@@ -3546,7 +3546,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     color: AppColors.gold,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
+                  child: Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
                 ),
               ),
             ],
@@ -3558,20 +3558,20 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             children: [
               Text(
                 '${_filteredMarriages.length} زواج',
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: _loadMarriages,
-                child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20),
+                child: Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Expanded(
           child: _isLoadingMarriages
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _filteredMarriages.length,
@@ -3603,21 +3603,21 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             child: Center(
                               child: Text(
                                 '${m['marriage_order'] ?? ''}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Color(0xFFE91E8C),
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   '${m['husband_name']} ♥ ${m['wife_name']}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textPrimary),
@@ -3626,17 +3626,17 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                   children: [
                                     Text(
                                       isCurrent ? '💍 حالية' : '📝 سابقة',
-                                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                                     ),
                                     if (isExternal) ...[
-                                      const SizedBox(width: 6),
+                                      SizedBox(width: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                         decoration: BoxDecoration(
                                           color: AppColors.accentAmber.withOpacity(0.12),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child: const Text('خارجية',
+                                        child: Text('خارجية',
                                             style: TextStyle(fontSize: 9, color: AppColors.accentAmber)),
                                       ),
                                     ],
@@ -3647,14 +3647,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           ),
                           IconButton(
                             onPressed: () => _showEditMarriageDialog(m),
-                            icon: const Icon(Icons.edit_rounded, size: 18),
+                            icon: Icon(Icons.edit_rounded, size: 18),
                             color: AppColors.gold,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                           ),
                           IconButton(
                             onPressed: () => _deleteMarriage(m),
-                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            icon: Icon(Icons.delete_outline_rounded, size: 18),
                             color: AppColors.accentRed,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -3697,16 +3697,16 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 child: Container(width: 40, height: 4,
                   decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
               ),
-              const SizedBox(height: 16),
-              const Text('تعديل الزواج', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 16),
-              Text('الزوج: ${marriage['husband_name'] ?? '—'}', style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
-              const SizedBox(height: 4),
-              Text('الزوجة: ${marriage['wife_name'] ?? '—'}', style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
+              Text('تعديل الزواج', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              SizedBox(height: 16),
+              Text('الزوج: ${marriage['husband_name'] ?? '—'}', style: TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+              SizedBox(height: 4),
+              Text('الزوجة: ${marriage['wife_name'] ?? '—'}', style: TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+              SizedBox(height: 16),
               _buildLabel('رقم الزواج'),
               _buildTextField(marriageOrderController, 'رقم الزواج (1، 2، 3...)'),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Row(
                 children: [
                   _buildLabel('حالة الزواج'),
@@ -3729,11 +3729,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ],
               ),
               if (isExternalWife) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 _buildLabel('اسم الزوجة الخارجية'),
                 _buildTextField(externalNameController, 'اسم الزوجة'),
               ],
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -3756,7 +3756,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     }
                   },
                   style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep),
-                  child: const Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text('حفظ التعديلات', style: TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -3779,8 +3779,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   child: TextField(
                     controller: _girlsChildrenSearchController,
                     onChanged: _filterGirlsChildren,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
                       hintText: 'بحث باسم الطفل أو الأم أو الأب أو رقم QF...',
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
@@ -3790,7 +3790,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
                   if (_allPeople.isEmpty) _loadPeople();
@@ -3799,7 +3799,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 child: Container(
                   width: 46, height: 46,
                   decoration: BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(12)),
-                  child: const Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
+                  child: Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 24),
                 ),
               ),
             ],
@@ -3809,23 +3809,23 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Text('${_filteredGirlsChildren.length} طفل/طفلة', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              Text('${_filteredGirlsChildren.length} طفل/طفلة', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
               const Spacer(),
-              GestureDetector(onTap: _loadGirlsChildren, child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20)),
+              GestureDetector(onTap: _loadGirlsChildren, child: Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20)),
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Expanded(
           child: _isLoadingGirlsChildren
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : _filteredGirlsChildren.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.child_care_rounded, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Text('لا يوجد أبناء بنات مسجلين', style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7))),
                         ],
                       ),
@@ -3858,13 +3858,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                   size: 18,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(child['child_name'] as String? ?? '—', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                                    const SizedBox(height: 2),
+                                    Text(child['child_name'] as String? ?? '—', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                                    SizedBox(height: 2),
                                     Text(
                                       'الأم: ${child['mother_name'] ?? '—'} • الأب: ${child['father_name'] ?? '—'}',
                                       style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.7)),
@@ -3877,14 +3877,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               ),
                               IconButton(
                                 onPressed: () => _showEditGirlChildDialog(child),
-                                icon: const Icon(Icons.edit_rounded, size: 18),
+                                icon: Icon(Icons.edit_rounded, size: 18),
                                 color: AppColors.gold,
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                               ),
                               IconButton(
                                 onPressed: () => _deleteGirlChild(child),
-                                icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                                icon: Icon(Icons.delete_outline_rounded, size: 18),
                                 color: AppColors.accentRed,
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -3910,7 +3910,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               color: AppColors.bgCard,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const TabBar(
+            child: TabBar(
               indicatorColor: AppColors.gold,
               labelColor: AppColors.gold,
               unselectedLabelColor: AppColors.textSecondary,
@@ -3932,7 +3932,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         children: [
                           Text(
                             '${_allNews.length} خبر',
-                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -3942,7 +3942,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               decoration: BoxDecoration(
                                   color: AppColors.gold,
                                   borderRadius: BorderRadius.circular(10)),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 18),
                                   SizedBox(width: 4),
@@ -3960,7 +3960,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
                     Expanded(
                       child: _isLoadingNews
-                          ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+                          ? Center(child: CircularProgressIndicator(color: AppColors.gold))
                           : ListView.builder(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               itemCount: _allNews.length,
@@ -3990,7 +3990,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                               return Container(
                                                 height: 200,
                                                 color: AppColors.bgCard,
-                                                child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                                                child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
                                               );
                                             },
                                             errorBuilder: (_, __, ___) => Container(
@@ -4000,7 +4000,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 12),
+                                        SizedBox(height: 12),
                                       ],
                                       Row(
                                         children: [
@@ -4010,7 +4010,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                               children: [
                                                 Text(
                                                   news['title'] as String? ?? '—',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.textPrimary),
@@ -4023,9 +4023,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                                   color: AppColors.accentAmber.withOpacity(0.12),
                                                   borderRadius: BorderRadius.circular(6),
                                                 ),
-                                                child: const Text('⏳ بانتظار الموافقة', style: TextStyle(fontSize: 10, color: AppColors.accentAmber, fontWeight: FontWeight.w600)),
+                                                child: Text('⏳ بانتظار الموافقة', style: TextStyle(fontSize: 10, color: AppColors.accentAmber, fontWeight: FontWeight.w600)),
                                               ),
-                                            const SizedBox(height: 4),
+                                            SizedBox(height: 4),
                                             Text(
                                               news['content'] as String? ?? '',
                                               maxLines: 2,
@@ -4042,7 +4042,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                       ),
                                       IconButton(
                                         onPressed: () => _showEditNewsDialog(news),
-                                        icon: const Icon(Icons.edit_rounded, size: 18),
+                                        icon: Icon(Icons.edit_rounded, size: 18),
                                         color: AppColors.gold,
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -4064,7 +4064,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                               _showError('خطأ: $e');
                                             }
                                           },
-                                          icon: const Icon(Icons.check_circle_rounded, size: 18),
+                                          icon: Icon(Icons.check_circle_rounded, size: 18),
                                           color: AppColors.accentGreen,
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -4072,7 +4072,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                         ),
                                       IconButton(
                                         onPressed: () => _deleteNews(news),
-                                        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                                        icon: Icon(Icons.delete_outline_rounded, size: 18),
                                         color: AppColors.accentRed,
                                       ),
                                         ],
@@ -4093,7 +4093,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         children: [
                           Text(
                             '${_allNotifications.length} إشعار',
-                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -4103,7 +4103,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               decoration: BoxDecoration(
                                   color: AppColors.gold,
                                   borderRadius: BorderRadius.circular(10)),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.add_rounded, color: AppColors.bgDeep, size: 18),
                                   SizedBox(width: 4),
@@ -4121,7 +4121,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
                     Expanded(
                       child: _isLoadingNotifications
-                          ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+                          ? Center(child: CircularProgressIndicator(color: AppColors.gold))
                           : ListView.builder(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               itemCount: _allNotifications.length,
@@ -4139,12 +4139,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                     children: [
                                       Text(
                                         notif['title'] as String? ?? '—',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.textPrimary),
                                       ),
-                                      const SizedBox(height: 2),
+                                      SizedBox(height: 2),
                                       Text(
                                         notif['body'] as String? ?? '',
                                         style: TextStyle(
@@ -4181,8 +4181,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: AppColors.gold, size: 18),
-                const SizedBox(width: 8),
+                Icon(Icons.info_outline_rounded, color: AppColors.gold, size: 18),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'المدير يقدر يعدّل ويضيف ويحذف كل البيانات. الشخص العادي يعدّل بياناته فقط ويضيف أبناءه.',
@@ -4203,8 +4203,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             child: TextField(
               controller: _usersSearchController,
               onChanged: _filterUsers,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-              decoration: const InputDecoration(
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+              decoration: InputDecoration(
                 hintText: 'بحث باسم أو رقم QF...',
                 hintStyle: TextStyle(color: AppColors.textSecondary),
                 prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
@@ -4216,7 +4216,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         ),
         Expanded(
           child: _isLoadingPeople
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _filteredUsers.length,
@@ -4253,14 +4253,14 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               size: 18,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   person['name'] as String? ?? '—',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textPrimary),
@@ -4274,26 +4274,26 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                           color: AppColors.textSecondary.withOpacity(0.7)),
                                     ),
                                     if (hasPin) ...[
-                                      const SizedBox(width: 6),
+                                      SizedBox(width: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                         decoration: BoxDecoration(
                                           color: AppColors.accentGreen.withOpacity(0.12),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child: const Text('فعّال',
+                                        child: Text('فعّال',
                                             style: TextStyle(fontSize: 9, color: AppColors.accentGreen)),
                                       ),
                                     ],
                                     if (isAdmin) ...[
-                                      const SizedBox(width: 6),
+                                      SizedBox(width: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                         decoration: BoxDecoration(
                                           color: AppColors.gold.withOpacity(0.12),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child: const Text('مدير',
+                                        child: Text('مدير',
                                             style: TextStyle(fontSize: 9, color: AppColors.gold)),
                                       ),
                                     ],
@@ -4390,19 +4390,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text('${_allRequests.length} طلب', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              Text('${_allRequests.length} طلب', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
               const Spacer(),
-              GestureDetector(onTap: _loadSupportRequests, child: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20)),
+              GestureDetector(onTap: _loadSupportRequests, child: Icon(Icons.refresh_rounded, color: AppColors.textSecondary, size: 20)),
             ],
           ),
         ),
         Expanded(
           child: _isLoadingRequests
-              ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+              ? Center(child: CircularProgressIndicator(color: AppColors.gold))
               : _allRequests.isEmpty
                   ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Icon(Icons.inbox_rounded, size: 48, color: AppColors.textSecondary.withOpacity(0.3)),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text('لا توجد طلبات', style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7))),
                     ]))
                   : ListView.builder(
@@ -4423,30 +4423,30 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             Row(children: [
                               Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                                 child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor))),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(6)),
-                                child: Text(req['request_type'] as String? ?? '', style: const TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600))),
+                                child: Text(req['request_type'] as String? ?? '', style: TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600))),
                               const Spacer(),
                               Text(req['sender_name'] as String? ?? 'مجهول', style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.7))),
                             ]),
-                            const SizedBox(height: 8),
-                            Text(req['subject'] as String? ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 8),
+                            Text(req['subject'] as String? ?? '', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                            SizedBox(height: 4),
                             Text(req['message'] as String? ?? '', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7)), maxLines: 3, overflow: TextOverflow.ellipsis),
                             if (req['admin_reply'] != null && (req['admin_reply'] as String).isNotEmpty) ...[
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Container(width: double.infinity, padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AppColors.accentGreen.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
                                 child: Text('الرد: ${req['admin_reply']}', style: TextStyle(fontSize: 12, color: AppColors.accentGreen.withOpacity(0.8)))),
                             ],
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             Row(children: [
                               Expanded(child: GestureDetector(onTap: () => _showReplyDialog(req),
                                 child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                                  child: const Center(child: Text('رد', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w600, fontSize: 12)))))),
-                              const SizedBox(width: 8),
+                                  child: Center(child: Text('رد', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w600, fontSize: 12)))))),
+                              SizedBox(width: 8),
                               Expanded(child: GestureDetector(onTap: () => _changeRequestStatus(req),
                                 child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: AppColors.accentBlue.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                                  child: const Center(child: Text('تغيير الحالة', style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600, fontSize: 12)))))),
+                                  child: Center(child: Text('تغيير الحالة', style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600, fontSize: 12)))))),
                             ]),
                           ]),
                         );
@@ -4463,13 +4463,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'إعدادات التطبيق',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           if (_isLoadingSettings)
-            const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator(color: AppColors.gold)))
+            Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator(color: AppColors.gold)))
           else
             Container(
               padding: const EdgeInsets.all(20),
@@ -4482,17 +4482,17 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLabel('رقم الواتساب'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildTextField(_whatsappSettingsController, 'مثال: 966555113730'),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('الإيميل'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildTextField(_emailSettingsController, 'مثال: admin@example.com'),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _buildLabel('رقم SMS'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildTextField(_smsSettingsController, 'رقم SMS للتنبيهات'),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -4514,7 +4514,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('✅ تم تحديث الإعدادات بنجاح'),
+                                content: Text('✅ تم تحديث الإعدادات بنجاح'),
                                 backgroundColor: AppColors.bgCard,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -4530,15 +4530,15 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      child: Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
               ),
             ),
-          const SizedBox(height: 24),
-          const Text('إرسال إشعار يدوي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          const SizedBox(height: 12),
+          SizedBox(height: 24),
+          Text('إرسال إشعار يدوي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -4550,13 +4550,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildLabel('عنوان الإشعار'),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _buildTextField(_manualNotifTitleController, 'عنوان الإشعار'),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildLabel('نص الإشعار'),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 _buildTextField(_manualNotifBodyController, 'نص الإشعار'),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -4580,8 +4580,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                         _showError('خطأ في إرسال الإشعار: $e');
                       }
                     },
-                    icon: const Icon(Icons.send_rounded),
-                    label: const Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    icon: Icon(Icons.send_rounded),
+                    label: Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.accentBlue,
                       foregroundColor: Colors.white,
@@ -4606,11 +4606,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.bgCard,
-        title: Text('رد على الطلب', style: const TextStyle(color: AppColors.textPrimary)),
+        title: Text('رد على الطلب', style: TextStyle(color: AppColors.textPrimary)),
         content: TextField(
           controller: replyController,
           maxLines: 4,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: 'اكتب ردك...',
             hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.6)),
@@ -4637,7 +4637,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 _showError('خطأ في حفظ الرد: $e');
               }
             },
-            child: const Text('إرسال'),
+            child: Text('إرسال'),
           ),
         ],
       ),
@@ -4654,9 +4654,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         padding: const EdgeInsets.all(16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-          const SizedBox(height: 16),
-          const Text('تغيير الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
+          Text('تغيير الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          SizedBox(height: 16),
           ...statuses.map((s) => ListTile(
             title: Text(s, style: TextStyle(color: s == request['status'] ? AppColors.gold : AppColors.textPrimary)),
             leading: Icon(Icons.circle, size: 12, color: s == request['status'] ? AppColors.gold : AppColors.textSecondary.withOpacity(0.3)),

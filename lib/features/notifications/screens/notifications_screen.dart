@@ -52,13 +52,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
-          title: const Text('الإشعارات'),
+          title: Text('الإشعارات'),
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
+            ? Center(child: CircularProgressIndicator(color: AppColors.gold))
             : _error != null
                 ? _buildError()
                 : _notifications.isEmpty
@@ -145,7 +145,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ),
                       child: Icon(icon, color: color, size: 18),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +161,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           if (createdAt != null)
                             Text(
                               _formatDate(createdAt),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textSecondary,
                               ),
@@ -172,12 +172,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
                 // العنوان
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -187,10 +187,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 // النص
                 if (body.isNotEmpty) ...[
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     body,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                       height: 1.6,
@@ -215,8 +215,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             size: 56,
             color: AppColors.textSecondary.withOpacity(0.3),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'لا توجد إشعارات',
             style: TextStyle(
               fontSize: 16,
@@ -224,8 +224,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 6),
-          const Text(
+          SizedBox(height: 6),
+          Text(
             'ستصلك إشعارات عند وجود أخبار أو رسائل جديدة',
             style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
@@ -242,17 +242,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
-            const SizedBox(height: 12),
+            Icon(Icons.error_outline_rounded, size: 48, color: AppColors.accentRed),
+            SizedBox(height: 12),
             Text(
               _error ?? 'حدث خطأ',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             FilledButton(
               onPressed: _loadNotifications,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),

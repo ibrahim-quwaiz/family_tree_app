@@ -44,14 +44,14 @@ class PersonCard extends StatelessWidget {
             const SizedBox(height: 8),
             Container(height: 1, color: AppColors.borderLight),
             const SizedBox(height: 8),
-            Text(person.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, maxLines: 2),
+            Text(person.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary), textAlign: TextAlign.center, maxLines: 2),
             const SizedBox(height: 4),
-            Text('الجيل ${person.generation}', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+            Text('الجيل ${person.generation}', style: TextStyle(fontSize: 14, color: AppColors.textSecondary)),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(person.isAlive ? '🟢' : '⚪', style: const TextStyle(fontSize: 12)),
+                Text(person.isAlive ? '🟢' : '⚪', style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
                 Text(person.isAlive ? 'حي' : 'متوفى', style: TextStyle(fontSize: 12, color: person.isAlive ? AppColors.successGreen : AppColors.neutralGray)),
               ],
@@ -62,7 +62,7 @@ class PersonCard extends StatelessWidget {
               children: [
                 const Text('👥', style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
-                Text('${person.childrenCount}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                Text('${person.childrenCount}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               ],
             ),
           ],
@@ -78,7 +78,7 @@ class PersonCard extends StatelessWidget {
     return CircleAvatar(
       radius: 30,
       backgroundColor: AppColors.primaryGreen,
-      child: Text(person.name[0], style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+      child: Text(person.name[0], style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
     );
   }
 

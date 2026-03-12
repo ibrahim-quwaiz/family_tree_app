@@ -130,11 +130,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               padding: const EdgeInsets.symmetric(horizontal: 28),
               child: Column(
                 children: [
-                  const SizedBox(height: 60),
+                  SizedBox(height: 60),
                   _buildHeader(),
-                  const SizedBox(height: 50),
+                  SizedBox(height: 50),
                   _buildLoginForm(),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 30),
                   _buildFooter(),
                 ],
               ),
@@ -157,8 +157,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             fit: BoxFit.cover,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text(
+        SizedBox(height: 16),
+        Text(
           'عائلة القويز',
           style: TextStyle(
             fontSize: 22,
@@ -166,8 +166,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             color: AppColors.gold,
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
+        SizedBox(height: 6),
+        Text(
           'سجل دخولك للوصول إلى شجرة العائلة',
           style: TextStyle(
             fontSize: 14,
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // حقل رقم العضوية
-          const Text(
+          Text(
             'رقم العضوية',
             style: TextStyle(
               fontSize: 13,
@@ -205,13 +205,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           TextField(
             controller: _qfController,
             focusNode: _qfFocus,
             textInputAction: TextInputAction.next,
             textDirection: TextDirection.ltr,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   color: AppColors.gold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.badge_rounded, color: AppColors.gold, size: 18),
+                child: Icon(Icons.badge_rounded, color: AppColors.gold, size: 18),
               ),
               filled: true,
               fillColor: AppColors.bgDeep.withOpacity(0.5),
@@ -253,10 +253,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             onSubmitted: (_) => _pinFocus.requestFocus(),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // حقل الرقم السري
-          const Text(
+          Text(
             'الرقم السري',
             style: TextStyle(
               fontSize: 13,
@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           TextField(
             controller: _pinController,
             focusNode: _pinFocus,
@@ -272,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             obscureText: _obscurePin,
             textDirection: TextDirection.ltr,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -292,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   color: AppColors.gold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.lock_rounded, color: AppColors.gold, size: 18),
+                child: Icon(Icons.lock_rounded, color: AppColors.gold, size: 18),
               ),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -326,7 +326,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
           // رسالة الخطأ
           if (_errorMessage != null) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -337,12 +337,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: AppColors.accentRed, size: 18),
-                  const SizedBox(width: 8),
+                  Icon(Icons.error_outline_rounded, color: AppColors.accentRed, size: 18),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColors.accentRed,
                       ),
@@ -353,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             ),
           ],
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // زر الدخول
           SizedBox(
@@ -370,7 +370,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 ),
               ),
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
@@ -378,7 +378,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         color: AppColors.bgDeep,
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'تسجيل الدخول',
                       style: TextStyle(
                         fontSize: 16,
@@ -387,7 +387,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     ),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           TextButton.icon(
             onPressed: () async {
               final url = Uri.parse(
@@ -433,8 +433,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             color: AppColors.textSecondary.withOpacity(0.7),
           ),
         ),
-        const SizedBox(height: 4),
-        const Text(
+        SizedBox(height: 4),
+        Text(
           'تواصل مع إدارة التطبيق للحصول على بيانات الدخول',
           style: TextStyle(
             fontSize: 12,

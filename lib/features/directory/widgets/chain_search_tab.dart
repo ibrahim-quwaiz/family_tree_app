@@ -124,12 +124,12 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lightbulb_outline, color: AppColors.primaryGreen, size: 20),
+                      Icon(Icons.lightbulb_outline, color: AppColors.primaryGreen, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'اكتب: اسمه ثم اسم أبيه ثم اسم جده\nمثال: "محمد عبدالله" أو "محمد عبدالله سعد"',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary,
                           ),
@@ -150,7 +150,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                 children: [
                   Text(
                     '${_results.length} نتيجة',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.primaryGreen,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -234,7 +234,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                                 child: person.photoUrl == null
                                     ? Text(
                                         person.firstLetter,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -244,7 +244,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                               ),
                               title: Text(
                                 person.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -255,7 +255,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                                   const SizedBox(height: 4),
                                   Text(
                                     ancestralPath,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.primaryGreen,
                                       fontWeight: FontWeight.w500,
@@ -264,7 +264,7 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                                   const SizedBox(height: 4),
                                   Text(
                                     'الجيل ${person.generation}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
                                     ),
@@ -273,11 +273,11 @@ class _ChainSearchTabState extends State<ChainSearchTab> {
                                     const SizedBox(height: 2),
                                     Row(
                                       children: [
-                                        const Icon(Icons.location_on, size: 14, color: AppColors.textSecondary),
+                                        Icon(Icons.location_on, size: 14, color: AppColors.textSecondary),
                                         const SizedBox(width: 4),
                                         Text(
                                           person.residenceCity!,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
                                             color: AppColors.textSecondary,
                                           ),

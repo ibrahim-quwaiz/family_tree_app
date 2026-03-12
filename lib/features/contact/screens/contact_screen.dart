@@ -85,13 +85,13 @@ class _ContactScreenState extends State<ContactScreen> {
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
-          title: const Text('تواصل معنا'),
+          title: Text('تواصل معنا'),
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(Icons.arrow_forward_rounded),
+                  icon: Icon(Icons.arrow_forward_rounded),
                   onPressed: () => Navigator.pop(context),
                 )
               : null,
@@ -104,13 +104,13 @@ class _ContactScreenState extends State<ContactScreen> {
             children: [
               // طرق التواصل السريعة
               _buildQuickContactSection(),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               // نموذج الطلب
               _buildRequestForm(),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               // الطلبات السابقة
               _buildPreviousRequests(),
-              const SizedBox(height: 30),
+              SizedBox(height: 30),
             ],
           ),
         ),
@@ -125,8 +125,8 @@ class _ContactScreenState extends State<ContactScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionTitle('تواصل مباشر', Icons.flash_on_rounded),
-          const SizedBox(height: 12),
-          const Center(
+          SizedBox(height: 12),
+          Center(
             child: Padding(
               padding: EdgeInsets.all(24),
               child: CircularProgressIndicator(),
@@ -139,7 +139,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('تواصل مباشر', Icons.flash_on_rounded),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -151,7 +151,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 onTap: _openWhatsApp,
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: _buildContactCard(
                 icon: Icons.email_rounded,
@@ -194,7 +194,7 @@ class _ContactScreenState extends State<ContactScreen> {
               ),
               child: Icon(icon, color: color, size: 26),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(
               title,
               style: TextStyle(
@@ -203,7 +203,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 color: color,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               subtitle,
               style: TextStyle(
@@ -223,7 +223,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('إرسال طلب', Icons.edit_note_rounded),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -237,11 +237,11 @@ class _ContactScreenState extends State<ContactScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // نوع الطلب
-                const Text(
+                Text(
                   'نوع الطلب',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
@@ -254,8 +254,8 @@ class _ContactScreenState extends State<ContactScreen> {
                       value: _selectedType,
                       isExpanded: true,
                       dropdownColor: AppColors.bgCard,
-                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.gold),
+                      style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                      icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.gold),
                       items: _requestTypes.map((type) {
                         return DropdownMenuItem(
                           value: type,
@@ -268,17 +268,17 @@ class _ContactScreenState extends State<ContactScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // الموضوع
-                const Text(
+                Text(
                   'الموضوع',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _subjectController,
-                  style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                   decoration: InputDecoration(
                     hintText: 'اكتب موضوع الطلب...',
                     hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
@@ -303,17 +303,17 @@ class _ContactScreenState extends State<ContactScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // الرسالة
-                const Text(
+                Text(
                   'التفاصيل',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _messageController,
-                  style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: 'اكتب تفاصيل طلبك هنا...',
@@ -339,7 +339,7 @@ class _ContactScreenState extends State<ContactScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // زر الإرسال
                 SizedBox(
@@ -353,12 +353,12 @@ class _ContactScreenState extends State<ContactScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     child: _isSending
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 22,
                             height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bgDeep),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.send_rounded, size: 18),
@@ -384,7 +384,7 @@ class _ContactScreenState extends State<ContactScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('طلباتي السابقة', Icons.history_rounded),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         FutureBuilder(
           future: SupabaseConfig.client
               .from('support_requests')
@@ -420,7 +420,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 child: Column(
                   children: [
                     Icon(Icons.inbox_rounded, color: AppColors.textSecondary.withOpacity(0.3), size: 36),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       'لا توجد طلبات سابقة',
                       style: TextStyle(fontSize: 13, color: AppColors.textSecondary.withOpacity(0.5)),
@@ -471,7 +471,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(statusConfig['icon'] as IconData, size: 12, color: statusConfig['color'] as Color),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
                       status,
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusConfig['color'] as Color),
@@ -479,7 +479,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -488,7 +488,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 ),
                 child: Text(
                   request['request_type'] as String? ?? '',
-                  style: const TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600),
                 ),
               ),
               const Spacer(),
@@ -499,12 +499,12 @@ class _ContactScreenState extends State<ContactScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             request['subject'] as String? ?? '',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             request['message'] as String? ?? '',
             style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7), height: 1.4),
@@ -512,7 +512,7 @@ class _ContactScreenState extends State<ContactScreen> {
             overflow: TextOverflow.ellipsis,
           ),
           if (adminReply != null && adminReply.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(10),
@@ -525,7 +525,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(Icons.reply_rounded, size: 16, color: AppColors.accentGreen.withOpacity(0.7)),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +534,7 @@ class _ContactScreenState extends State<ContactScreen> {
                           'رد الإدارة',
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.accentGreen.withOpacity(0.8)),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           adminReply,
                           style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.8), height: 1.4),
@@ -563,12 +563,12 @@ class _ContactScreenState extends State<ContactScreen> {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Icon(icon, color: AppColors.gold, size: 18),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ],
     );
@@ -600,7 +600,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 20),
                 SizedBox(width: 8),
@@ -623,8 +623,8 @@ class _ContactScreenState extends State<ContactScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.error_rounded, color: AppColors.accentRed, size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.error_rounded, color: AppColors.accentRed, size: 20),
+                SizedBox(width: 8),
                 Expanded(child: Text('حدث خطأ: $e')),
               ],
             ),
@@ -656,7 +656,7 @@ class _ContactScreenState extends State<ContactScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('لم يتم العثور على تطبيق واتساب'),
+            content: Text('لم يتم العثور على تطبيق واتساب'),
             backgroundColor: AppColors.bgCard,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -675,7 +675,7 @@ class _ContactScreenState extends State<ContactScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('لم يتم العثور على تطبيق البريد'),
+            content: Text('لم يتم العثور على تطبيق البريد'),
             backgroundColor: AppColors.bgCard,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

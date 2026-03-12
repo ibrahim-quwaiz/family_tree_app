@@ -158,14 +158,14 @@ class _NewsScreenState extends State<NewsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
-              const SizedBox(height: 16),
-              const Text('إضافة خبر جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 4),
+              SizedBox(height: 16),
+              Text('إضافة خبر جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              SizedBox(height: 4),
               Text('سيتم مراجعة الخبر من الإدارة قبل النشر', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7))),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
-              const Text('نوع الخبر', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-              const SizedBox(height: 8),
+              Text('نوع الخبر', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 children: _newsTypeInfo.entries.map((e) {
@@ -183,7 +183,7 @@ class _NewsScreenState extends State<NewsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(e.value.icon, size: 16, color: isSelected ? e.value.color : AppColors.textSecondary),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           Text(e.value.label, style: TextStyle(fontSize: 12, color: isSelected ? e.value.color : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal)),
                         ],
                       ),
@@ -191,13 +191,13 @@ class _NewsScreenState extends State<NewsScreen> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
-              const Text('العنوان', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-              const SizedBox(height: 8),
+              Text('العنوان', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              SizedBox(height: 8),
               TextField(
                 controller: titleController,
-                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'عنوان الخبر...',
                   hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
@@ -207,14 +207,14 @@ class _NewsScreenState extends State<NewsScreen> {
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
-              const Text('المحتوى', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-              const SizedBox(height: 8),
+              Text('المحتوى', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              SizedBox(height: 8),
               TextField(
                 controller: contentController,
                 maxLines: 4,
-                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'اكتب تفاصيل الخبر...',
                   hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
@@ -224,9 +224,9 @@ class _NewsScreenState extends State<NewsScreen> {
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold, width: 1.5)),
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text('صورة (اختياري)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-              const SizedBox(height: 8),
+              SizedBox(height: 16),
+              Text('صورة (اختياري)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+              SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
                   final picker = ImagePicker();
@@ -261,7 +261,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(color: AppColors.accentRed, borderRadius: BorderRadius.circular(8)),
-                                  child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
+                                  child: Icon(Icons.close_rounded, size: 16, color: Colors.white),
                                 ),
                               ),
                             ),
@@ -271,13 +271,13 @@ class _NewsScreenState extends State<NewsScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.add_photo_alternate_rounded, size: 32, color: AppColors.textSecondary.withOpacity(0.4)),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6),
                             Text('اضغط لإضافة صورة', style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.5))),
                           ],
                         ),
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               SizedBox(
                 width: double.infinity,
@@ -286,7 +286,7 @@ class _NewsScreenState extends State<NewsScreen> {
                   onPressed: () async {
                     if (titleController.text.trim().isEmpty || contentController.text.trim().isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: const Text('الرجاء تعبئة العنوان والمحتوى'), backgroundColor: AppColors.bgCard, behavior: SnackBarBehavior.floating,
+                        SnackBar(content: Text('الرجاء تعبئة العنوان والمحتوى'), backgroundColor: AppColors.bgCard, behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       );
                       return;
@@ -313,7 +313,7 @@ class _NewsScreenState extends State<NewsScreen> {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Row(children: [
+                          content: Row(children: [
                             Icon(Icons.check_circle_rounded, color: AppColors.accentGreen, size: 20),
                             SizedBox(width: 8),
                             Text('تم إرسال الخبر للمراجعة'),
@@ -331,7 +331,7 @@ class _NewsScreenState extends State<NewsScreen> {
                   },
                   style: FilledButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.bgDeep,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.send_rounded, size: 18),
@@ -365,11 +365,11 @@ class _NewsScreenState extends State<NewsScreen> {
       appBar: AppBar(
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.arrow_forward_rounded),
+                icon: Icon(Icons.arrow_forward_rounded),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
-        title: const Text('الأخبار'),
+        title: Text('الأخبار'),
         backgroundColor: AppColors.bgDeep,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
@@ -379,7 +379,7 @@ class _NewsScreenState extends State<NewsScreen> {
           _buildFilterTabs(),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : _error != null
                     ? _buildError()
                     : _filteredNews.isEmpty
@@ -400,8 +400,8 @@ class _NewsScreenState extends State<NewsScreen> {
         onPressed: _showAddNewsDialog,
         backgroundColor: AppColors.gold,
         foregroundColor: AppColors.bgDeep,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('أضف خبر', style: TextStyle(fontWeight: FontWeight.w700)),
+        icon: Icon(Icons.add_rounded),
+        label: Text('أضف خبر', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -469,7 +469,7 @@ class _NewsScreenState extends State<NewsScreen> {
                     return Container(
                       height: 180,
                       color: AppColors.bgCard,
-                      child: const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
                     );
                   },
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
@@ -495,16 +495,16 @@ class _NewsScreenState extends State<NewsScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     news.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(
                     children: [
                       if (news.authorName != null && news.authorName!.isNotEmpty)
@@ -524,7 +524,7 @@ class _NewsScreenState extends State<NewsScreen> {
                     ],
                   ),
                   if (previewText.isNotEmpty) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       previewText,
                       style: TextStyle(
@@ -570,7 +570,7 @@ class _NewsScreenState extends State<NewsScreen> {
         minChildSize: 0.5,
         maxChildSize: 1,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.bgCard,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
@@ -604,12 +604,12 @@ class _NewsScreenState extends State<NewsScreen> {
                                 const SizedBox.shrink(),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
                       ],
                       Row(
                         children: [
                           Icon(news.typeIcon, color: news.typeColor, size: 22),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
                             news.typeLabel,
                             style: TextStyle(
@@ -620,16 +620,16 @@ class _NewsScreenState extends State<NewsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text(
                         news.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Row(
                         children: [
                           if (news.authorName != null &&
@@ -658,7 +658,7 @@ class _NewsScreenState extends State<NewsScreen> {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       Text(
                         news.content,
                         style: TextStyle(
@@ -684,7 +684,7 @@ class _NewsScreenState extends State<NewsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.newspaper_outlined, size: 80, color: AppColors.textSecondary),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             'لا توجد أخبار حالياً',
             style: TextStyle(
@@ -705,15 +705,15 @@ class _NewsScreenState extends State<NewsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'حدث خطأ في تحميل الأخبار',
               style: TextStyle(fontSize: 18, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             FilledButton(
               onPressed: _loadNews,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),

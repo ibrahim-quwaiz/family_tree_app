@@ -10,6 +10,8 @@ import '../../../core/constants/current_user.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../../screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../../../core/theme/theme_provider.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -158,21 +160,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
         appBar: AppBar(
-          title: const Text('حسابي'),
+          title: Text('حسابي'),
           backgroundColor: AppColors.bgDeep,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           actions: [
             if (_personData != null)
               IconButton(
-                icon: const Icon(Icons.refresh_rounded),
+                icon: Icon(Icons.refresh_rounded),
                 color: AppColors.gold,
                 onPressed: _loadProfile,
               ),
           ],
         ),
         body: _isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(color: AppColors.gold),
               )
             : _error != null
@@ -187,17 +189,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       child: Column(
                         children: [
                           _buildProfileHeader(),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                           _buildPersonalInfo(),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           _buildContactInfo(),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           _buildSocialMedia(),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           _buildMarriagesSection(),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           _buildChildrenSection(),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 16),
+                          _buildThemeSection(),
+                          SizedBox(height: 8),
+                          SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -208,7 +213,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 side: BorderSide(color: AppColors.gold.withOpacity(0.3)),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.lock_rounded, size: 18),
@@ -218,7 +223,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -230,16 +235,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                     textDirection: TextDirection.rtl,
                                     child: AlertDialog(
                                       backgroundColor: AppColors.bgCard,
-                                      title: const Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
-                                      content: const Text('هل تريد تسجيل الخروج من التطبيق؟', style: TextStyle(color: AppColors.textSecondary)),
+                                      title: Text('تسجيل الخروج', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
+                                      content: Text('هل تريد تسجيل الخروج من التطبيق؟', style: TextStyle(color: AppColors.textSecondary)),
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+                                          child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
                                         ),
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, true),
-                                          child: const Text('خروج', style: TextStyle(color: AppColors.accentRed)),
+                                          child: Text('خروج', style: TextStyle(color: AppColors.accentRed)),
                                         ),
                                       ],
                                     ),
@@ -259,7 +264,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 side: BorderSide(color: AppColors.accentRed.withOpacity(0.3)),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.logout_rounded, size: 18),
@@ -269,7 +274,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -313,7 +318,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 child: photoUrl == null || photoUrl.isEmpty
                     ? Text(
                         name.isNotEmpty ? name[0] : '؟',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                           color: AppColors.gold,
@@ -380,7 +385,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.bgCard, width: 2),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.camera_alt_rounded,
                       size: 16,
                       color: AppColors.bgDeep,
@@ -390,18 +395,18 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // الاسم
           Text(
             name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
 
           // المعرّف والجيل
           Row(
@@ -415,14 +420,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
                 child: Text(
                   legacyId,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.gold,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
@@ -431,14 +436,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
                 child: Text(
                   'الجيل $generation',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.accentBlue,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
@@ -456,7 +461,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -470,8 +475,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   (route) => false,
                 );
               },
-              icon: const Icon(Icons.account_tree_rounded, size: 18),
-              label: const Text('عرض في شجرة العائلة'),
+              icon: Icon(Icons.account_tree_rounded, size: 18),
+              label: Text('عرض في شجرة العائلة'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
                 side: BorderSide(color: AppColors.primaryGreen.withOpacity(0.4)),
@@ -521,7 +526,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         _buildInfoRow(Icons.phone_rounded, 'الجوال', phone ?? '-'),
         _buildInfoRow(Icons.email_rounded, 'الإيميل', email ?? '-'),
         if (phone != null && phone.isNotEmpty) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -532,7 +537,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   onTap: () => _launchUrl('tel:$phone'),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: _buildActionButton(
                   label: 'واتساب',
@@ -547,11 +552,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ],
           ),
         ],
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Divider(color: Colors.white.withOpacity(0.06)),
-        const SizedBox(height: 8),
-        const Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-        const SizedBox(height: 4),
+        SizedBox(height: 8),
+        Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+        SizedBox(height: 4),
         _buildPrivacyToggle('إظهار رقم الجوال', 'show_mobile', _contactData?['show_mobile'] ?? true),
         _buildPrivacyToggle('إظهار الإيميل', 'show_email', _contactData?['show_email'] ?? true),
       ],
@@ -576,11 +581,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         _buildInfoRow(Icons.alternate_email_rounded, 'Twitter', twitter ?? '-'),
         _buildInfoRow(Icons.photo_camera_front_rounded, 'Snapchat', snapchat ?? '-'),
         _buildInfoRow(Icons.facebook_rounded, 'Facebook', facebook ?? '-'),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Divider(color: Colors.white.withOpacity(0.06)),
-        const SizedBox(height: 8),
-        const Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-        const SizedBox(height: 4),
+        SizedBox(height: 8),
+        Text('إعدادات الخصوصية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+        SizedBox(height: 4),
         _buildPrivacyToggle('إظهار Instagram', 'show_instagram', _contactData?['show_instagram'] ?? true),
         _buildPrivacyToggle('إظهار Twitter', 'show_twitter', _contactData?['show_twitter'] ?? true),
         _buildPrivacyToggle('إظهار Snapchat', 'show_snapchat', _contactData?['show_snapchat'] ?? true),
@@ -595,7 +600,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
+          Text(label, style: TextStyle(fontSize: 13, color: AppColors.textPrimary)),
           Switch(
             value: value,
             activeTrackColor: AppColors.gold,
@@ -617,7 +622,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       icon: Icons.family_restroom_rounded,
       onEdit: null,
       trailing: IconButton(
-        icon: const Icon(Icons.add_circle_rounded, color: AppColors.gold),
+        icon: Icon(Icons.add_circle_rounded, color: AppColors.gold),
         onPressed: () => _showAddChildDialog(),
         tooltip: 'إضافة ابن/ابنة',
       ),
@@ -625,7 +630,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         if (_children.isEmpty)
           Container(
             padding: const EdgeInsets.all(20),
-            child: const Center(
+            child: Center(
               child: Text(
                 'لا يوجد أبناء مسجلين',
                 style: TextStyle(color: AppColors.textSecondary),
@@ -665,21 +670,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
                 child: Icon(icon, color: const Color(0xFFE91E8C), size: 18),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
               const Spacer(),
               Text(
                 '${_marriages.length}',
-                style: const TextStyle(fontSize: 13, color: AppColors.gold, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 13, color: AppColors.gold, fontWeight: FontWeight.w600),
               ),
             ],
           ),
 
           if (_marriages.isEmpty) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Center(
               child: Text(
                 'لا توجد بيانات زواج مسجلة',
@@ -687,7 +692,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
             ),
           ] else ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             ..._marriages.asMap().entries.map((entry) {
               final index = entry.key;
               final marriage = entry.value;
@@ -696,7 +701,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           ],
 
           if (gender == 'male' && _isCurrentUser()) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             GestureDetector(
               onTap: _showAddMarriageDialog,
               child: Container(
@@ -707,7 +712,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.gold.withOpacity(0.2)),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.add_rounded, color: AppColors.gold, size: 18),
@@ -772,7 +777,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             child: Center(
               child: Text(
                 '$order',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFFE91E8C),
@@ -780,7 +785,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -790,7 +795,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     Flexible(
                       child: Text(
                         name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -798,14 +803,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ),
                     if (isExternal) ...[
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                         decoration: BoxDecoration(
                           color: AppColors.accentAmber.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'خارجية',
                           style: TextStyle(fontSize: 9, color: AppColors.accentAmber),
                         ),
@@ -813,12 +818,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Row(
                   children: [
                     Text(
                       isCurrent ? '💍 حالية' : '📝 سابقة',
-                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                     if (childrenCount > 0) ...[
                       Container(
@@ -831,7 +836,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       Text(
                         '$childrenCount أبناء',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                     if (marriageDate.isNotEmpty) ...[
@@ -845,7 +850,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       Text(
                         marriageDate,
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                   ],
@@ -888,14 +893,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               color: gender == 'female' ? const Color(0xFFE91E8C) : AppColors.accentBlue,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -904,7 +909,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 if (legacyId != null)
                   Text(
                     legacyId,
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   ),
               ],
             ),
@@ -958,16 +963,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-                const SizedBox(height: 20),
-                const Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
+                Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                SizedBox(height: 20),
                 _buildTextField(nameCtrl, 'الاسم', Icons.badge_rounded),
                 _buildTextField(jobCtrl, 'الوظيفة', Icons.work_rounded),
                 _buildTextField(educationCtrl, 'التعليم', Icons.school_rounded),
                 _buildTextField(residenceCtrl, 'مدينة الإقامة', Icons.home_rounded),
                 _buildTextField(birthCityCtrl, 'مدينة الميلاد', Icons.location_city_rounded),
                 _buildTextField(birthCountryCtrl, 'بلد الميلاد', Icons.public_rounded),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -987,7 +992,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       foregroundColor: AppColors.bgDeep,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -1024,12 +1029,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-                const SizedBox(height: 20),
-                const Text('تعديل بيانات التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
+                Text('تعديل بيانات التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                SizedBox(height: 20),
                 _buildTextField(phoneCtrl, 'رقم الجوال', Icons.phone_rounded, keyboardType: TextInputType.phone),
                 _buildTextField(emailCtrl, 'الإيميل', Icons.email_rounded, keyboardType: TextInputType.emailAddress),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -1045,7 +1050,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       foregroundColor: AppColors.bgDeep,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -1084,14 +1089,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-                const SizedBox(height: 20),
-                const Text('تعديل وسائل التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
+                Text('تعديل وسائل التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                SizedBox(height: 20),
                 _buildTextField(instagramCtrl, 'Instagram', Icons.camera_alt_rounded),
                 _buildTextField(twitterCtrl, 'Twitter', Icons.alternate_email_rounded),
                 _buildTextField(snapchatCtrl, 'Snapchat', Icons.photo_camera_front_rounded),
                 _buildTextField(facebookCtrl, 'Facebook', Icons.facebook_rounded),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -1109,7 +1114,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       foregroundColor: AppColors.bgDeep,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -1163,31 +1168,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           color: AppColors.gold.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.person_add_rounded, color: AppColors.gold, size: 20),
+                        child: Icon(Icons.person_add_rounded, color: AppColors.gold, size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Text(
+                      SizedBox(width: 12),
+                      Text(
                         'إضافة ابن/ابنة',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     'سيتم توليد رقم QF تلقائياً',
                     style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.7)),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
 
                   // الاسم (مطلوب)
                   _buildDialogLabel('الاسم *'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   _buildDialogTextField(nameController, 'أدخل اسم الابن/الابنة'),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // الجنس
                   _buildDialogLabel('الجنس *'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(
                     children: [
                       Expanded(
@@ -1210,7 +1215,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text('👨', style: TextStyle(fontSize: 18)),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6),
                                 Text(
                                   'ذكر',
                                   style: TextStyle(
@@ -1223,7 +1228,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: GestureDetector(
                           onTap: () => setModalState(() => selectedGender = 'female'),
@@ -1244,7 +1249,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text('👩', style: TextStyle(fontSize: 18)),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6),
                                 Text(
                                   'أنثى',
                                   style: TextStyle(
@@ -1259,11 +1264,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // اختيار الأم (من زوجات الأب)
                   _buildDialogLabel('الأم *'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   if (_marriages.isEmpty)
                     Container(
                       width: double.infinity,
@@ -1273,7 +1278,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
                       ),
-                      child: const Text(
+                      child: Text(
                         '⚠️ لا توجد زوجات مسجلة. أضف زوجة أولاً من قسم الزوجات.',
                         style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
                       ),
@@ -1292,10 +1297,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           value: selectedMotherMarriage != null
                               ? _marriages.indexOf(selectedMotherMarriage!)
                               : null,
-                          hint: const Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                          hint: Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                           isExpanded: true,
                           dropdownColor: AppColors.bgCard,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           items: _marriages.asMap().entries.map((entry) {
                             final m = entry.value;
                             final name = m['wife_name'] as String? ?? m['wife_external_name'] as String? ?? 'غير معروفة';
@@ -1315,11 +1320,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         ),
                       ),
                     ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // تاريخ الميلاد
                   _buildDialogLabel('تاريخ الميلاد'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -1329,7 +1334,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         lastDate: DateTime.now(),
                         builder: (context, child) => Theme(
                           data: ThemeData.dark().copyWith(
-                            colorScheme: const ColorScheme.dark(
+                            colorScheme: ColorScheme.dark(
                               primary: AppColors.gold,
                               surface: AppColors.bgCard,
                             ),
@@ -1351,8 +1356,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded, color: AppColors.textSecondary, size: 18),
-                          const SizedBox(width: 10),
+                          Icon(Icons.calendar_today_rounded, color: AppColors.textSecondary, size: 18),
+                          SizedBox(width: 10),
                           Text(
                             selectedDate != null
                                 ? '${selectedDate!.year}/${selectedDate!.month}/${selectedDate!.day}'
@@ -1366,7 +1371,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // مدينة الميلاد + الدولة (صف واحد)
                   Row(
@@ -1376,25 +1381,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildDialogLabel('مدينة الميلاد'),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6),
                             _buildDialogTextField(birthCityController, 'المدينة'),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildDialogLabel('الدولة'),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6),
                             _buildDialogTextField(birthCountryController, 'الدولة'),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // زر الإضافة
                   SizedBox(
@@ -1430,7 +1435,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         foregroundColor: AppColors.bgDeep,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
+                      child: Text(
                         'إضافة',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                       ),
@@ -1448,14 +1453,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Widget _buildDialogLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
     );
   }
 
   Widget _buildDialogTextField(TextEditingController controller, String hint) {
     return TextField(
       controller: controller,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.5)),
@@ -1522,16 +1527,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             color: const Color(0xFFE91E8C).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.favorite_rounded, color: Color(0xFFE91E8C), size: 20),
+                          child: Icon(Icons.favorite_rounded, color: Color(0xFFE91E8C), size: 20),
                         ),
-                        const SizedBox(width: 12),
-                        const Text('إضافة زوجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                        SizedBox(width: 12),
+                        Text('إضافة زوجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     _buildDialogLabel('الزوجة'),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(
                       children: [
                         Expanded(
@@ -1550,7 +1555,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: GestureDetector(
                             onTap: () => setModalState(() => isExternalWife = true),
@@ -1569,7 +1574,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     if (!isExternalWife)
                       Container(
@@ -1583,10 +1588,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: selectedWife?['id'] as String?,
-                            hint: const Text('اختر الزوجة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                            hint: Text('اختر الزوجة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
                             isExpanded: true,
                             dropdownColor: AppColors.bgCard,
-                            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                            style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                             items: femalesList.map((f) {
                               return DropdownMenuItem<String>(value: f['id'] as String, child: Text(f['name'] as String));
                             }).toList(),
@@ -1601,7 +1606,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     else
                       _buildDialogTextField(externalNameController, 'اكتب اسم الزوجة'),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     SizedBox(
                       width: double.infinity,
@@ -1660,7 +1665,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           foregroundColor: AppColors.bgDeep,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        child: Text('إضافة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                       ),
                     ),
                   ],
@@ -1835,10 +1840,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             child: Row(
               children: [
                 Icon(icon, color: AppColors.gold, size: 20),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1855,7 +1860,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         color: AppColors.gold.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.edit_rounded, size: 14, color: AppColors.gold),
@@ -1884,13 +1889,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: Row(
         children: [
           Icon(icon, color: AppColors.textSecondary, size: 18),
-          const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+          SizedBox(width: 10),
+          Text(label, style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
           const Spacer(),
           Flexible(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
             ),
@@ -1906,7 +1911,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: TextField(
         controller: ctrl,
         keyboardType: keyboardType,
-        style: const TextStyle(color: AppColors.textPrimary),
+        style: TextStyle(color: AppColors.textPrimary),
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon, size: 20),
@@ -1947,7 +1952,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, color: color, size: 18),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color)),
             ],
           ),
@@ -1982,7 +1987,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Row(
                     children: [
                       Container(
@@ -1991,19 +1996,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           color: AppColors.gold.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.lock_rounded, color: AppColors.gold, size: 20),
+                        child: Icon(Icons.lock_rounded, color: AppColors.gold, size: 20),
                       ),
-                      const SizedBox(width: 12),
-                      const Text('تغيير الرقم السري', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      SizedBox(width: 12),
+                      Text('تغيير الرقم السري', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   _buildPinField(currentPinCtrl, 'الرقم السري الحالي', Icons.lock_outline_rounded),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildPinField(newPinCtrl, 'الرقم السري الجديد', Icons.lock_rounded),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   _buildPinField(confirmPinCtrl, 'تأكيد الرقم السري الجديد', Icons.lock_rounded),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -2085,8 +2090,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: isLoading
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bgDeep))
-                          : const Text('تغيير الرقم السري', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bgDeep))
+                          : Text('تغيير الرقم السري', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2104,10 +2109,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       keyboardType: TextInputType.number,
       obscureText: true,
       maxLength: 4,
-      style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, letterSpacing: 8),
+      style: TextStyle(color: AppColors.textPrimary, fontSize: 20, letterSpacing: 8),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13),
         prefixIcon: Icon(icon, size: 20, color: AppColors.textSecondary),
         counterText: '',
         filled: true,
@@ -2119,6 +2124,80 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
+  Widget _buildThemeSection() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final current = themeProvider.themeMode;
+
+    return _buildSection(
+      title: 'المظهر',
+      icon: Icons.palette_rounded,
+      onEdit: null,
+      children: [
+        Row(
+          children: [
+            _buildThemeOption(
+              label: 'داكن',
+              icon: Icons.dark_mode_rounded,
+              selected: current == ThemeMode.dark,
+              onTap: () => themeProvider.setTheme(ThemeMode.dark),
+            ),
+            SizedBox(width: 8),
+            _buildThemeOption(
+              label: 'فاتح',
+              icon: Icons.light_mode_rounded,
+              selected: current == ThemeMode.light,
+              onTap: () => themeProvider.setTheme(ThemeMode.light),
+            ),
+            SizedBox(width: 8),
+            _buildThemeOption(
+              label: 'تلقائي',
+              icon: Icons.brightness_auto_rounded,
+              selected: current == ThemeMode.system,
+              onTap: () => themeProvider.setTheme(ThemeMode.system),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeOption({
+    required String label,
+    required IconData icon,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.gold.withOpacity(0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? AppColors.gold : Colors.white.withOpacity(0.08),
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: selected ? AppColors.gold : AppColors.textSecondary, size: 22),
+              SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                  color: selected ? AppColors.gold : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildError() {
     return Center(
       child: Padding(
@@ -2126,13 +2205,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: AppColors.accentRed),
-            const SizedBox(height: 16),
-            Text(_error ?? 'حدث خطأ', style: const TextStyle(fontSize: 16, color: AppColors.textSecondary)),
-            const SizedBox(height: 24),
+            Icon(Icons.error_outline, size: 64, color: AppColors.accentRed),
+            SizedBox(height: 16),
+            Text(_error ?? 'حدث خطأ', style: TextStyle(fontSize: 16, color: AppColors.textSecondary)),
+            SizedBox(height: 24),
             FilledButton(
               onPressed: _loadProfile,
-              child: const Text('إعادة المحاولة'),
+              child: Text('إعادة المحاولة'),
             ),
           ],
         ),
