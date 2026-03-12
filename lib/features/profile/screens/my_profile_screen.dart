@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase/supabase.dart';
+import 'dart:typed_data';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/current_user.dart';
@@ -23,6 +27,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Map<String, dynamic>? _contactData;
   List<Map<String, dynamic>> _children = [];
   List<Map<String, dynamic>> _marriages = [];
+  Uint8List? _selectedImageBytes;
+  int _photoCacheKey = 0;
 
   @override
   void initState() {
@@ -62,9 +68,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             .eq('person_id', _personData!['id'])
             .maybeSingle();
         _contactData = contactResponse;
-      } catch (e) {
-        print('⚠️ لا توجد بيانات تواصل: $e');
-      }
+      } catch (e) {}
 
       // جلب الأبناء
       try {
@@ -74,9 +78,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             .eq('father_id', _personData!['id'])
             .order('birth_date', ascending: true);
         _children = List<Map<String, dynamic>>.from(childrenResponse);
-      } catch (e) {
-        print('⚠️ خطأ في جلب الأبناء: $e');
-      }
+      } catch (e) {}
 
       await _loadMarriages();
 
@@ -146,9 +148,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       if (mounted) {
         setState(() => _marriages = marriagesWithNames);
       }
-    } catch (e) {
-      print('خطأ في تحميل الزوجات: $e');
-    }
+    } catch (e) {}
   }
 
   @override
@@ -198,6 +198,27 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           const SizedBox(height: 16),
                           _buildChildrenSection(),
                           const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: _showChangePinDialog,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.gold,
+                                side: BorderSide(color: AppColors.gold.withOpacity(0.3)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.lock_rounded, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('تغيير الرقم السري', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -262,7 +283,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   // ═══════════════════════════════════════════
   Widget _buildProfileHeader() {
     final name = _personData?['name'] ?? '';
-    final photoUrl = _contactData?['photo_url'] as String?;
+    final rawPhotoUrl = _contactData?['photo_url'] as String?;
+    final photoUrl = rawPhotoUrl != null && rawPhotoUrl.isNotEmpty
+        ? '$rawPhotoUrl?v=$_photoCacheKey'
+        : null;
     final legacyId = _personData?['legacy_user_id'] ?? '';
     final generation = _personData?['generation'] ?? 0;
     final isAlive = _personData?['is_alive'] ?? true;
@@ -301,7 +325,54 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 bottom: 0,
                 left: 0,
                 child: GestureDetector(
-                  onTap: () => _showEditPhotoDialog(),
+                  onTap: () async {
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      maxWidth: 400,
+                      maxHeight: 400,
+                      imageQuality: 70,
+                    );
+                    if (picked == null) return;
+                    final bytes = await picked.readAsBytes();
+                    if (bytes.length > 500 * 1024) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('الصورة كبيرة جداً. الحد الأقصى 500 كيلوبايت'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    try {
+                      final personId = _personData!['id'] as String;
+                      final storagePath = 'profiles/profile_$personId.jpg';
+                      await SupabaseConfig.client.storage
+                          .from('photos')
+                          .uploadBinary(
+                            storagePath,
+                            bytes,
+                            fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+                          );
+                      final photoUrl = SupabaseConfig.client.storage
+                          .from('photos')
+                          .getPublicUrl('profiles/profile_$personId.jpg');
+                      await _updateContactData({'photo_url': photoUrl});
+                      if (mounted) {
+                        setState(() {
+                          _photoCacheKey++;
+                        });
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('خطأ في رفع الصورة: $e'), backgroundColor: Colors.red),
+                        );
+                      }
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
@@ -865,6 +936,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final jobCtrl = TextEditingController(text: _personData?['job'] ?? '');
     final educationCtrl = TextEditingController(text: _personData?['education'] ?? '');
     final residenceCtrl = TextEditingController(text: _personData?['residence_city'] ?? '');
+    final birthCityCtrl = TextEditingController(text: _personData?['birth_city'] ?? '');
+    final birthCountryCtrl = TextEditingController(text: _personData?['birth_country'] ?? '');
 
     showModalBottomSheet(
       context: context,
@@ -892,6 +965,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 _buildTextField(jobCtrl, 'الوظيفة', Icons.work_rounded),
                 _buildTextField(educationCtrl, 'التعليم', Icons.school_rounded),
                 _buildTextField(residenceCtrl, 'مدينة الإقامة', Icons.home_rounded),
+                _buildTextField(birthCityCtrl, 'مدينة الميلاد', Icons.location_city_rounded),
+                _buildTextField(birthCountryCtrl, 'بلد الميلاد', Icons.public_rounded),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -902,6 +977,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         'job': jobCtrl.text.trim().isEmpty ? null : jobCtrl.text.trim(),
                         'education': educationCtrl.text.trim().isEmpty ? null : educationCtrl.text.trim(),
                         'residence_city': residenceCtrl.text.trim().isEmpty ? null : residenceCtrl.text.trim(),
+                        'birth_city': birthCityCtrl.text.trim().isEmpty ? null : birthCityCtrl.text.trim(),
+                        'birth_country': birthCountryCtrl.text.trim().isEmpty ? null : birthCountryCtrl.text.trim(),
                       });
                       if (mounted) Navigator.pop(context);
                     },
@@ -1596,55 +1673,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
-  void _showEditPhotoDialog() {
-    final urlCtrl = TextEditingController(text: _contactData?['photo_url'] ?? '');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.bgCard,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 24, right: 24, left: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-              const SizedBox(height: 20),
-              const Text('تعديل الصورة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 20),
-              _buildTextField(urlCtrl, 'رابط الصورة', Icons.link_rounded),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () async {
-                    await _updateContactData({
-                      'photo_url': urlCtrl.text.trim().isEmpty ? null : urlCtrl.text.trim(),
-                    });
-                    if (mounted) Navigator.pop(context);
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.gold,
-                    foregroundColor: AppColors.bgDeep,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   // ═══════════════════════════════════════════
   // عمليات Supabase
@@ -1924,6 +1952,169 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showChangePinDialog() {
+    final currentPinCtrl = TextEditingController();
+    final newPinCtrl = TextEditingController();
+    final confirmPinCtrl = TextEditingController();
+    bool isLoading = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 24, right: 24, left: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.lock_rounded, color: AppColors.gold, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('تغيير الرقم السري', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildPinField(currentPinCtrl, 'الرقم السري الحالي', Icons.lock_outline_rounded),
+                  const SizedBox(height: 12),
+                  _buildPinField(newPinCtrl, 'الرقم السري الجديد', Icons.lock_rounded),
+                  const SizedBox(height: 12),
+                  _buildPinField(confirmPinCtrl, 'تأكيد الرقم السري الجديد', Icons.lock_rounded),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      onPressed: isLoading ? null : () async {
+                        final currentPin = currentPinCtrl.text.trim();
+                        final newPin = newPinCtrl.text.trim();
+                        final confirmPin = confirmPinCtrl.text.trim();
+
+                        if (currentPin.isEmpty || newPin.isEmpty || confirmPin.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('يرجى ملء جميع الحقول'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+                        if (newPin.length != 4) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('الرقم السري يجب أن يكون 4 أرقام بالضبط'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+                        if (!RegExp(r'^\d{4}$').hasMatch(newPin)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('الرقم السري يجب أن يحتوي على أرقام فقط'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+                        if (newPin != confirmPin) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('الرقم السري الجديد غير متطابق'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+
+                        final storedPin = _personData?['pin_code'] as String?;
+                        if (storedPin != currentPin) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('الرقم السري الحالي غير صحيح'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+
+                        setModalState(() => isLoading = true);
+
+                        try {
+                          final qfId = _personData?['legacy_user_id'] as String? ?? '';
+
+                          await SupabaseConfig.client
+                              .from('people')
+                              .update({'pin_code': newPin})
+                              .eq('id', _personData!['id']);
+
+                          await SupabaseConfig.client.auth.updateUser(
+                            UserAttributes(password: '${qfId.toUpperCase()}_$newPin'),
+                          );
+
+                          if (mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('✅ تم تغيير الرقم السري بنجاح'),
+                                backgroundColor: AppColors.accentGreen,
+                              ),
+                            );
+                            _loadProfile();
+                          }
+                        } catch (e) {
+                          setModalState(() => isLoading = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('❌ خطأ: $e'), backgroundColor: AppColors.accentRed),
+                            );
+                          }
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.gold,
+                        foregroundColor: AppColors.bgDeep,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: isLoading
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bgDeep))
+                          : const Text('تغيير الرقم السري', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPinField(TextEditingController ctrl, String label, IconData icon) {
+    return TextField(
+      controller: ctrl,
+      keyboardType: TextInputType.number,
+      obscureText: true,
+      maxLength: 4,
+      style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, letterSpacing: 8),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        prefixIcon: Icon(icon, size: 20, color: AppColors.textSecondary),
+        counterText: '',
+        filled: true,
+        fillColor: AppColors.bgDeep.withOpacity(0.5),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.06))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.gold)),
       ),
     );
   }

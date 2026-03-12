@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'core/config/supabase_config.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/services/auth_service.dart';
+import 'core/constants/current_user.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
@@ -23,11 +24,14 @@ void main() async {
     final session = SupabaseConfig.client.auth.currentSession;
     if (session != null) {
       isLoggedIn = true;
+      await CurrentUser.loadFromSession();
     } else {
       isLoggedIn = await AuthService.isLoggedIn();
+      if (isLoggedIn) await CurrentUser.loadFromSession();
     }
   } catch (e) {
     isLoggedIn = await AuthService.isLoggedIn();
+    if (isLoggedIn) await CurrentUser.loadFromSession();
   }
 
   runApp(FamilyTreeApp(isLoggedIn: isLoggedIn));
