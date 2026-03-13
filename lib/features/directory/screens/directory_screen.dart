@@ -18,6 +18,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   List<DirectoryPerson> _allPeople = [];
   List<DirectoryPerson> _filteredPeople = [];
   bool _isLoading = true;
+  bool _isSearchExpanded = false;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _fatherController = TextEditingController();
@@ -125,10 +126,10 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             education,
             job,
             is_vip,
+            photo_url,
             contact_info(
               mobile_phone,
               email,
-              photo_url,
               instagram,
               twitter,
               snapchat,
@@ -333,37 +334,285 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   }
 
   Widget _buildAdvancedSearchTab() {
+    final activeFilters = <String>[];
+    if (_nameController.text.trim().isNotEmpty) activeFilters.add('الاسم: ${_nameController.text.trim()}');
+    if (_fatherController.text.trim().isNotEmpty) activeFilters.add('الأب: ${_fatherController.text.trim()}');
+    if (_grandfatherController.text.trim().isNotEmpty) activeFilters.add('الجد: ${_grandfatherController.text.trim()}');
+    if (_greatGrandfatherController.text.trim().isNotEmpty) activeFilters.add('جد الأب: ${_greatGrandfatherController.text.trim()}');
+    if (_legacyIdController.text.trim().isNotEmpty) activeFilters.add('رقم العضوية: ${_legacyIdController.text.trim()}');
+
     return Column(
       children: [
-        Card(
-          margin: const EdgeInsets.all(16),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('بحث متقدم', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryGreen), textAlign: TextAlign.center),
-                SizedBox(height: 16),
-                TextField(controller: _nameController, decoration: InputDecoration(labelText: 'الاسم', hintText: 'محمد', prefixIcon: Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                SizedBox(height: 12),
-                TextField(controller: _fatherController, decoration: InputDecoration(labelText: 'الأب', hintText: 'عبدالله', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                SizedBox(height: 12),
-                TextField(controller: _grandfatherController, decoration: InputDecoration(labelText: 'الجد', hintText: 'سعد', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                SizedBox(height: 12),
-                TextField(controller: _greatGrandfatherController, decoration: InputDecoration(labelText: 'أب الجد', hintText: 'إبراهيم', prefixIcon: Icon(Icons.person_outline), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.rtl),
-                SizedBox(height: 12),
-                TextField(controller: _legacyIdController, decoration: InputDecoration(labelText: 'الرقم (QF)', hintText: 'QF07023', prefixIcon: Icon(Icons.tag), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), textDirection: TextDirection.ltr),
-                SizedBox(height: 16),
-                Text('${_filteredPeople.length} نتيجة', style: TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.bgDeep,
+            border: Border(bottom: BorderSide(color: AppColors.borderLight, width: 1)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => setState(() => _isSearchExpanded = !_isSearchExpanded),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                        decoration: BoxDecoration(
+                          color: _isSearchExpanded ? AppColors.gold.withOpacity(0.08) : AppColors.bgCard,
+                          border: Border.all(
+                            color: _isSearchExpanded ? AppColors.gold : AppColors.borderLight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'بحث متقدم',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _isSearchExpanded ? AppColors.gold : AppColors.textSecondary,
+                              ),
+                            ),
+                            if (activeFilters.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppColors.gold,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${activeFilters.length}',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.bgDeep),
+                                ),
+                              ),
+                            ],
+                            const SizedBox(width: 6),
+                            AnimatedRotation(
+                              turns: _isSearchExpanded ? 0.5 : 0,
+                              duration: const Duration(milliseconds: 300),
+                              child: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 18,
+                                color: _isSearchExpanded ? AppColors.gold : AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              AnimatedCrossFade(
+                firstChild: const SizedBox(width: double.infinity),
+                secondChild: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Column(
+                    children: [
+                      _buildSearchField(
+                        controller: _nameController,
+                        label: 'الاسم',
+                        hint: 'اسم الشخص...',
+                        isHighlighted: true,
+                      ),
+                      const Divider(height: 16, thickness: 0.5),
+                      _buildSearchField(controller: _fatherController, label: 'الأب', hint: 'اسم الأب...'),
+                      const SizedBox(height: 8),
+                      _buildSearchField(controller: _grandfatherController, label: 'الجد', hint: 'اسم الجد...'),
+                      const SizedBox(height: 8),
+                      _buildSearchField(controller: _greatGrandfatherController, label: 'جد الأب', hint: 'اسم جد الأب...'),
+                      const SizedBox(height: 8),
+                      _buildSearchField(
+                        controller: _legacyIdController,
+                        label: 'رقم العضوية',
+                        hint: 'QF07023...',
+                        isLtr: true,
+                      ),
+                    ],
+                  ),
+                ),
+                crossFadeState: _isSearchExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 350),
+              ),
+              if (activeFilters.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _nameController.clear();
+                          _fatherController.clear();
+                          _grandfatherController.clear();
+                          _greatGrandfatherController.clear();
+                          _legacyIdController.clear();
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.delete_outline, size: 13, color: AppColors.textSecondary),
+                            const SizedBox(width: 3),
+                            Text('مسح الكل', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: activeFilters
+                        .map(
+                          (f) => Container(
+                            padding: const EdgeInsets.fromLTRB(6, 3, 10, 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withOpacity(0.1),
+                              border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if (f.startsWith('الاسم')) {
+                                      _nameController.clear();
+                                    } else if (f.startsWith('الأب')) {
+                                      _fatherController.clear();
+                                    } else if (f.startsWith('الجد') && !f.startsWith('جد')) {
+                                      _grandfatherController.clear();
+                                    } else if (f.startsWith('جد الأب')) {
+                                      _greatGrandfatherController.clear();
+                                    } else if (f.startsWith('رقم')) {
+                                      _legacyIdController.clear();
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 13,
+                                    height: 13,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.gold.withOpacity(0.25),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.close, size: 9, color: AppColors.gold),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(f, style: TextStyle(fontSize: 10, color: AppColors.goldLight)),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
               ],
-            ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Text(
+                '${_filteredPeople.length} نتيجة',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
         ),
         Expanded(
           child: _filteredPeople.isEmpty
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.search_off, size: 64, color: AppColors.textSecondary), SizedBox(height: 16), Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary))]))
-              : ListView.builder(itemCount: _filteredPeople.length, itemBuilder: (context, index) => _buildPersonCard(_filteredPeople[index])),
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_off, size: 64, color: AppColors.textSecondary),
+                      const SizedBox(height: 16),
+                      Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary)),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _filteredPeople.length,
+                  itemBuilder: (context, index) => _buildPersonCard(_filteredPeople[index]),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool isHighlighted = false,
+    bool isLtr = false,
+  }) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 68,
+          child: Text(
+            label,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isHighlighted ? AppColors.goldLight : AppColors.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            textDirection: isLtr ? TextDirection.ltr : TextDirection.rtl,
+            style: TextStyle(fontSize: isHighlighted ? 13 : 12, color: AppColors.textPrimary),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              filled: true,
+              fillColor: AppColors.bgCard,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: isHighlighted ? AppColors.gold.withOpacity(0.25) : AppColors.borderLight,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.gold),
+              ),
+              suffixIcon: ValueListenableBuilder(
+                valueListenable: controller,
+                builder: (_, value, __) => value.text.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () => controller.clear(),
+                        child: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+          ),
         ),
       ],
     );

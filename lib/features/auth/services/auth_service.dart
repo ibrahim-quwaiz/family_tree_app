@@ -103,7 +103,16 @@ class AuthService {
       }
     }
 
-    // ٤. حفظ بيانات الجلسة محلياً
+    // ٤. ربط auth_user_id إن لم يكن مضبوطاً
+    final currentUser = client.auth.currentUser;
+    if (currentUser != null) {
+      await client
+          .from('people')
+          .update({'auth_user_id': currentUser.id})
+          .eq('id', personId);
+    }
+
+    // ٥. حفظ بيانات الجلسة محلياً
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('logged_in_user_id', personId);
     await prefs.setString('logged_in_qf_id', qfId.toUpperCase());

@@ -45,7 +45,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     });
 
     try {
+      await CurrentUser.loadFromSession();
       // جلب بيانات الشخص
+      print('👤 legacyUserId: ${CurrentUser.legacyUserId}');
       final personResponse = await SupabaseConfig.client
           .from('people')
           .select()
@@ -64,12 +66,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
       // جلب بيانات التواصل
       try {
+        print("🔑 person_id: ${_personData!['id']}");
         final contactResponse = await SupabaseConfig.client
             .from('contact_info')
             .select()
             .eq('person_id', _personData!['id'])
             .maybeSingle();
         _contactData = contactResponse;
+        print("📸 photo_url: ${_contactData?['photo_url']}");
       } catch (e) {}
 
       // جلب الأبناء
@@ -288,7 +292,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   // ═══════════════════════════════════════════
   Widget _buildProfileHeader() {
     final name = _personData?['name'] ?? '';
-    final rawPhotoUrl = _contactData?['photo_url'] as String?;
+    final rawPhotoUrl = _personData?['photo_url'] as String?;
     final photoUrl = rawPhotoUrl != null && rawPhotoUrl.isNotEmpty
         ? '$rawPhotoUrl?v=$_photoCacheKey'
         : null;
@@ -364,7 +368,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       final photoUrl = SupabaseConfig.client.storage
                           .from('photos')
                           .getPublicUrl('profiles/profile_$personId.jpg');
-                      await _updateContactData({'photo_url': photoUrl});
+                      await SupabaseConfig.client
+                          .from('people')
+                          .update({'photo_url': photoUrl})
+                          .eq('id', _personData!['id']);
+                      await _loadProfile();
                       if (mounted) {
                         setState(() {
                           _photoCacheKey++;

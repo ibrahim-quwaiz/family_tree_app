@@ -1174,7 +1174,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               if (contact != null) {
                                 mobileController.text = contact['mobile_phone'] as String? ?? '';
                                 emailController.text = contact['email'] as String? ?? '';
-                                currentPhotoUrl = contact['photo_url'] as String?;
+                                currentPhotoUrl = person['photo_url'] as String?;
                                 instagramController.text = contact['instagram'] as String? ?? '';
                                 twitterController.text = contact['twitter'] as String? ?? '';
                                 snapchatController.text = contact['snapchat'] as String? ?? '';
@@ -1871,7 +1871,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             'mobile_phone':
                                 mobileController.text.trim().isEmpty ? null : mobileController.text.trim(),
                             'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
-                            'photo_url': photoUrl,
                             'instagram':
                                 instagramController.text.trim().isEmpty ? null : instagramController.text.trim(),
                             'twitter':
@@ -1884,6 +1883,12 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           await SupabaseConfig.client
                               .from('contact_info')
                               .upsert(contactData, onConflict: 'person_id');
+                          if (photoUrl != null) {
+                            await SupabaseConfig.client
+                                .from('people')
+                                .update({'photo_url': photoUrl})
+                                .eq('id', person['id']);
+                          }
 
                           _showSuccess('تم تعديل "${nameController.text.trim()}" بنجاح');
                           _loadPeople();
@@ -2349,12 +2354,17 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               'person_id': newPersonId,
                               'mobile_phone': mobileController.text.trim().isEmpty ? null : mobileController.text.trim(),
                               'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
-                              'photo_url': photoUrlController.text.trim().isEmpty ? null : photoUrlController.text.trim(),
                               'instagram': instagramController.text.trim().isEmpty ? null : instagramController.text.trim(),
                               'twitter': twitterController.text.trim().isEmpty ? null : twitterController.text.trim(),
                               'snapchat': snapchatController.text.trim().isEmpty ? null : snapchatController.text.trim(),
                               'facebook': facebookController.text.trim().isEmpty ? null : facebookController.text.trim(),
                             });
+                          }
+                          if (photoUrlController.text.trim().isNotEmpty) {
+                            await SupabaseConfig.client
+                                .from('people')
+                                .update({'photo_url': photoUrlController.text.trim()})
+                                .eq('id', newPersonId);
                           }
                           await _createNotification(
                             title: 'عضو جديد في العائلة',

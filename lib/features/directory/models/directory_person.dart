@@ -117,7 +117,7 @@ class DirectoryPerson {
       isVip: json['is_vip'] as bool? ?? false,
       mobilePhone: contactMap?['mobile_phone'] as String?,
       email: contactMap?['email'] as String?,
-      photoUrl: contactMap?['photo_url'] as String?,
+      photoUrl: json['photo_url'] as String?,
       instagram: contactMap?['instagram'] as String?,
       twitter: contactMap?['twitter'] as String?,
       snapchat: contactMap?['snapchat'] as String?,

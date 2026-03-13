@@ -33,6 +33,7 @@ class AppColors {
   static Color get textPrimary => _current.textPrimary;
   static Color get textSecondary => _current.textSecondary;
   static Color get borderLight => _current.borderLight;
+  static Color get cardBorder => _current.borderLight;
   static Color get background => _current.bgDeep;
   static Color get surface => _current.bgCard;
 }
