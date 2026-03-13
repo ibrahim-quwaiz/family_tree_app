@@ -80,6 +80,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     required String body,
     required String type,
     String? relatedId,
+    String? recipientId,
   }) async {
     try {
       await SupabaseConfig.client.from('notifications').insert({
@@ -87,6 +88,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         'body': body,
         'type': type,
         if (relatedId != null) 'related_id': relatedId,
+        if (recipientId != null) 'recipient_id': recipientId,
       });
     } catch (e) {
       print('خطأ في إنشاء الإشعار: $e');
@@ -4646,6 +4648,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   body: 'تم الرد على طلب: ${req['subject']}',
                   type: 'support_reply',
                   relatedId: id,
+                  recipientId: req['sender_id'] as String?,
                 );
                 _loadSupportRequests();
               } catch (e) {

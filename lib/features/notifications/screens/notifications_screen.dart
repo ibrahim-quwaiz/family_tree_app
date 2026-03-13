@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/services/auth_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -27,9 +28,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     });
 
     try {
+      final personId = await AuthService.getCurrentUserId();
       final response = await SupabaseConfig.client
           .from('notifications')
           .select()
+          .or('recipient_id.is.null,recipient_id.eq.$personId')
           .order('created_at', ascending: false)
           .limit(50);
 
