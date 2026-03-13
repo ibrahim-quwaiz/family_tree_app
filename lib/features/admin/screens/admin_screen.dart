@@ -1029,6 +1029,11 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     try {
       // حذف بيانات التواصل أولاً
       await SupabaseConfig.client.from('contact_info').delete().eq('person_id', personId);
+      try {
+        await SupabaseConfig.client.storage
+            .from('photos')
+            .remove(['profiles/profile_$personId.jpg']);
+      } catch (_) {}
       // حذف الشخص
       await SupabaseConfig.client.from('people').delete().eq('id', personId);
       _showSuccess('تم حذف "$personName" بنجاح');
