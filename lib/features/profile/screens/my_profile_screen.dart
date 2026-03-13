@@ -1496,13 +1496,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     try {
       final response = await SupabaseConfig.client
           .from('people')
-          .select('id, name')
+          .select('id, name, legacy_user_id')
           .eq('gender', 'female')
           .order('name');
       femalesList = List<Map<String, dynamic>>.from(response);
     } catch (_) {}
 
     final externalNameController = TextEditingController();
+    final wifeQfController = TextEditingController();
     bool isExternalWife = false;
     Map<String, dynamic>? selectedWife;
 
@@ -1585,32 +1586,51 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     SizedBox(height: 12),
 
                     if (!isExternalWife)
+                      Row(
+                        children: [
+                          Expanded(child: _buildDialogTextField(wifeQfController, 'أدخل رقم QF للزوجة')),
+                          SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              final qf = wifeQfController.text.trim().toUpperCase();
+                              if (qf.isEmpty) {
+                                setModalState(() => selectedWife = null);
+                                return;
+                              }
+                              try {
+                                final found = femalesList.firstWhere(
+                                  (p) => (p['legacy_user_id'] ?? '').toString().toUpperCase() == qf,
+                                );
+                                setModalState(() => selectedWife = {'id': found['id'], 'name': found['name'], 'legacy_user_id': found['legacy_user_id']});
+                              } catch (_) {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لم يتم العثور على زوجة بهذا الرقم')));
+                                setModalState(() => selectedWife = null);
+                              }
+                            },
+                            child: Container(
+                              width: 46, height: 46,
+                              decoration: BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(12)),
+                              child: Icon(Icons.search_rounded, color: AppColors.bgDeep, size: 22),
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (!isExternalWife && selectedWife != null) ...[
+                      SizedBox(height: 6),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.bgDeep.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.06)),
+                          color: AppColors.accentGreen.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.accentGreen.withOpacity(0.2)),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedWife?['id'] as String?,
-                            hint: Text('اختر الزوجة', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-                            isExpanded: true,
-                            dropdownColor: AppColors.bgCard,
-                            style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                            items: femalesList.map((f) {
-                              return DropdownMenuItem<String>(value: f['id'] as String, child: Text(f['name'] as String));
-                            }).toList(),
-                            onChanged: (value) {
-                              setModalState(() {
-                                selectedWife = femalesList.firstWhere((f) => f['id'] == value);
-                              });
-                            },
-                          ),
+                        child: Text(
+                          '${selectedWife!['name']} (${selectedWife!['legacy_user_id']})',
+                          style: TextStyle(fontSize: 13, color: AppColors.accentGreen),
                         ),
-                      )
+                      ),
+                    ],
                     else
                       _buildDialogTextField(externalNameController, 'اكتب اسم الزوجة'),
 
@@ -1653,6 +1673,15 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             }
 
                             await SupabaseConfig.client.from('marriages').insert(insertData);
+
+                            final wifeName = !isExternalWife
+                                ? selectedWife!['name'] as String
+                                : externalNameController.text.trim();
+                            await SupabaseConfig.client.from('notifications').insert({
+                              'title': 'زواج جديد في العائلة',
+                              'body': '${_personData!['name']} تزوج من $wifeName',
+                              'type': 'marriage',
+                            });
 
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
