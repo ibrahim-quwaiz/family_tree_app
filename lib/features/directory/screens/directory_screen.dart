@@ -259,10 +259,23 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       (p) => p.id == personId,
       orElse: () => _allPeople.first,
     );
+    List<DirectoryPerson> children;
     if (person.gender == 'female') {
-      return _allPeople.where((p) => p.motherId == personId).toList();
+      children = _allPeople.where((p) => p.motherId == personId).toList();
+    } else {
+      children = _allPeople.where((p) => p.fatherId == personId).toList();
     }
-    return _allPeople.where((p) => p.fatherId == personId).toList();
+
+    children.sort((a, b) {
+      final aDate = a.birthDate;
+      final bDate = b.birthDate;
+      if (aDate != null && bDate != null) return aDate.compareTo(bDate);
+      if (aDate != null) return -1;
+      if (bDate != null) return 1;
+      return (a.legacyUserId ?? '').compareTo(b.legacyUserId ?? '');
+    });
+
+    return children;
   }
 
   /// استنتاج أزواج البنت من أبنائها (من داخل العائلة)
