@@ -366,8 +366,6 @@ class _TreeScreenState extends State<TreeScreen> {
     if (_currentPerson != null) {
       pathParts.add((_currentPerson!['name'] as String).split(' ').first);
     }
-    final pathStr = pathParts.join(' ← ');
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
       child: Row(
@@ -400,10 +398,28 @@ class _TreeScreenState extends State<TreeScreen> {
           ),
           SizedBox(width: 10),
           Expanded(
-            child: Text(
-              pathStr,
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              overflow: TextOverflow.ellipsis,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              reverse: true,
+              child: Row(
+                children: [
+                  for (int i = 0; i < pathParts.length; i++) ...[
+                    if (i > 0)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text('←', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      ),
+                    Text(
+                      pathParts[i],
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: i == pathParts.length - 1 ? AppColors.gold : AppColors.textSecondary,
+                        fontWeight: i == pathParts.length - 1 ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         ],
