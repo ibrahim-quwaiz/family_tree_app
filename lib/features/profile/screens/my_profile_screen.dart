@@ -1506,6 +1506,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final wifeQfController = TextEditingController();
     bool isExternalWife = false;
     Map<String, dynamic>? selectedWife;
+    String? wifeSearchError;
 
     showModalBottomSheet(
       context: context,
@@ -1585,7 +1586,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     ),
                     SizedBox(height: 12),
 
-                    if (!isExternalWife)
+                    if (!isExternalWife) ...[
                       Row(
                         children: [
                           Expanded(child: _buildDialogTextField(wifeQfController, 'أدخل رقم QF للزوجة')),
@@ -1601,11 +1602,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 (p) => (p['legacy_user_id'] ?? '').toString().toUpperCase() == qf,
                               ).toList();
                               if (found.isNotEmpty) {
-                                setModalState(() => selectedWife = found.first);
+                                setModalState(() {
+                                  selectedWife = found.first;
+                                  wifeSearchError = null;
+                                });
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('لم يتم العثور على زوجة برقم $qf'), backgroundColor: AppColors.accentRed),
-                                );
+                                setModalState(() => wifeSearchError = 'لم يتم العثور على زوجة برقم $qf');
                               }
                             },
                             child: Container(
@@ -1616,6 +1618,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ),
                         ],
                       ),
+                      if (wifeSearchError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(wifeSearchError!, style: TextStyle(color: AppColors.accentRed, fontSize: 12)),
+                        ),
+                    ],
                     if (!isExternalWife && selectedWife != null) ...[
                       SizedBox(height: 6),
                       Container(
