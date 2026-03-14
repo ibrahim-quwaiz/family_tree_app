@@ -4495,6 +4495,40 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               Expanded(child: GestureDetector(onTap: () => _changeRequestStatus(req),
                                 child: Container(padding: const EdgeInsets.symmetric(vertical: 8), decoration: BoxDecoration(color: AppColors.accentBlue.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
                                   child: Center(child: Text('تغيير الحالة', style: TextStyle(color: AppColors.accentBlue, fontWeight: FontWeight.w600, fontSize: 12)))))),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final confirmed = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: AlertDialog(
+                                          backgroundColor: AppColors.bgCard,
+                                          title: Text('حذف الطلب', style: TextStyle(color: AppColors.textPrimary)),
+                                          content: Text('هل أنت متأكد من حذف هذا الطلب؟', style: TextStyle(color: AppColors.textSecondary)),
+                                          actions: [
+                                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary))),
+                                            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700))),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                    if (confirmed != true) return;
+                                    try {
+                                      await SupabaseConfig.client.from('support_requests').delete().eq('id', req['id']);
+                                      _loadSupportRequests();
+                                    } catch (e) {
+                                      _showError('خطأ في الحذف: $e');
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(color: AppColors.accentRed.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                                    child: Center(child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w600, fontSize: 12))),
+                                  ),
+                                ),
+                              ),
                             ]),
                           ]),
                         );
@@ -4584,62 +4618,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                 ],
               ),
             ),
-          SizedBox(height: 24),
-          Text('إرسال إشعار يدوي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.bgCard,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.06)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLabel('عنوان الإشعار'),
-                SizedBox(height: 8),
-                _buildTextField(_manualNotifTitleController, 'عنوان الإشعار'),
-                SizedBox(height: 16),
-                _buildLabel('نص الإشعار'),
-                SizedBox(height: 8),
-                _buildTextField(_manualNotifBodyController, 'نص الإشعار'),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      if (_manualNotifTitleController.text.trim().isEmpty) {
-                        _showError('أدخل عنوان الإشعار');
-                        return;
-                      }
-                      try {
-                        await _createNotification(
-                          title: _manualNotifTitleController.text.trim(),
-                          body: _manualNotifBodyController.text.trim(),
-                          type: 'admin_message',
-                        );
-                        _manualNotifTitleController.clear();
-                        _manualNotifBodyController.clear();
-                        setState(() {});
-                        _showSuccess('تم إرسال الإشعار');
-                      } catch (e) {
-                        _showError('خطأ في إرسال الإشعار: $e');
-                      }
-                    },
-                    icon: Icon(Icons.send_rounded),
-                    label: Text('إرسال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.accentBlue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
