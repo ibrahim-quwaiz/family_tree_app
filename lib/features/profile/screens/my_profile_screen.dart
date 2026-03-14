@@ -948,6 +948,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final residenceCtrl = TextEditingController(text: _personData?['residence_city'] ?? '');
     final birthCityCtrl = TextEditingController(text: _personData?['birth_city'] ?? '');
     final birthCountryCtrl = TextEditingController(text: _personData?['birth_country'] ?? '');
+    final birthDateCtrl = TextEditingController(text: _personData?['birth_date'] ?? '');
+    String selectedGender = _personData?['gender'] ?? 'male';
 
     showModalBottomSheet(
       context: context,
@@ -964,34 +966,71 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             bottom: MediaQuery.of(context).viewInsets.bottom + 24,
           ),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-                SizedBox(height: 20),
-                Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                SizedBox(height: 20),
-                _buildTextField(nameCtrl, 'الاسم', Icons.badge_rounded),
-                _buildTextField(jobCtrl, 'الوظيفة', Icons.work_rounded),
-                _buildTextField(educationCtrl, 'التعليم', Icons.school_rounded),
-                _buildTextField(residenceCtrl, 'مدينة الإقامة', Icons.home_rounded),
-                _buildTextField(birthCityCtrl, 'مدينة الميلاد', Icons.location_city_rounded),
-                _buildTextField(birthCountryCtrl, 'بلد الميلاد', Icons.public_rounded),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () async {
-                      await _updatePersonData({
-                        'name': nameCtrl.text.trim(),
-                        'job': jobCtrl.text.trim().isEmpty ? null : jobCtrl.text.trim(),
-                        'education': educationCtrl.text.trim().isEmpty ? null : educationCtrl.text.trim(),
-                        'residence_city': residenceCtrl.text.trim().isEmpty ? null : residenceCtrl.text.trim(),
-                        'birth_city': birthCityCtrl.text.trim().isEmpty ? null : birthCityCtrl.text.trim(),
-                        'birth_country': birthCountryCtrl.text.trim().isEmpty ? null : birthCountryCtrl.text.trim(),
-                      });
-                      if (mounted) Navigator.pop(context);
-                    },
+            child: StatefulBuilder(
+              builder: (context, setModalState) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
+                  SizedBox(height: 20),
+                  Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  SizedBox(height: 20),
+                  _buildTextField(nameCtrl, 'الاسم', Icons.badge_rounded),
+                  _buildTextField(jobCtrl, 'الوظيفة', Icons.work_rounded),
+                  _buildTextField(educationCtrl, 'التعليم', Icons.school_rounded),
+                  _buildTextField(residenceCtrl, 'مدينة الإقامة', Icons.home_rounded),
+                  _buildTextField(birthCityCtrl, 'مدينة الميلاد', Icons.location_city_rounded),
+                  _buildTextField(birthCountryCtrl, 'بلد الميلاد', Icons.public_rounded),
+                  _buildDialogLabel('الجنس'),
+                  SizedBox(height: 6),
+                  Row(children: [
+                    Expanded(child: GestureDetector(
+                      onTap: () => setModalState(() => selectedGender = 'male'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: selectedGender == 'male' ? AppColors.gold.withOpacity(0.15) : AppColors.bgDeep.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: selectedGender == 'male' ? AppColors.gold : Colors.white.withOpacity(0.06)),
+                        ),
+                        child: Center(child: Text('ذكر', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: selectedGender == 'male' ? AppColors.gold : AppColors.textSecondary))),
+                      ),
+                    )),
+                    SizedBox(width: 8),
+                    Expanded(child: GestureDetector(
+                      onTap: () => setModalState(() => selectedGender = 'female'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: selectedGender == 'female' ? AppColors.gold.withOpacity(0.15) : AppColors.bgDeep.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: selectedGender == 'female' ? AppColors.gold : Colors.white.withOpacity(0.06)),
+                        ),
+                        child: Center(child: Text('أنثى', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: selectedGender == 'female' ? AppColors.gold : AppColors.textSecondary))),
+                      ),
+                    )),
+                  ]),
+                  SizedBox(height: 12),
+                  _buildDialogLabel('تاريخ الميلاد (YYYY-MM-DD)'),
+                  SizedBox(height: 6),
+                  _buildDialogTextField(birthDateCtrl, 'مثال: 1990-01-15'),
+                  SizedBox(height: 12),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () async {
+                        await _updatePersonData({
+                          'name': nameCtrl.text.trim(),
+                          'job': jobCtrl.text.trim().isEmpty ? null : jobCtrl.text.trim(),
+                          'education': educationCtrl.text.trim().isEmpty ? null : educationCtrl.text.trim(),
+                          'residence_city': residenceCtrl.text.trim().isEmpty ? null : residenceCtrl.text.trim(),
+                          'birth_city': birthCityCtrl.text.trim().isEmpty ? null : birthCityCtrl.text.trim(),
+                          'birth_country': birthCountryCtrl.text.trim().isEmpty ? null : birthCountryCtrl.text.trim(),
+                          'gender': selectedGender,
+                          'birth_date': birthDateCtrl.text.trim().isEmpty ? null : birthDateCtrl.text.trim(),
+                        });
+                        if (mounted) Navigator.pop(context);
+                      },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.gold,
                       foregroundColor: AppColors.bgDeep,
@@ -1000,7 +1039,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: Text('حفظ التعديلات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
