@@ -1507,6 +1507,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     bool isExternalWife = false;
     Map<String, dynamic>? selectedWife;
     String? wifeSearchError;
+    String? submitError;
 
     showModalBottomSheet(
       context: context,
@@ -1551,7 +1552,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setModalState(() => isExternalWife = false),
+                            onTap: () => setModalState(() { isExternalWife = false; submitError = null; }),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
@@ -1568,7 +1569,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         SizedBox(width: 8),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setModalState(() => isExternalWife = true),
+                            onTap: () => setModalState(() { isExternalWife = true; submitError = null; }),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
@@ -1605,6 +1606,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 setModalState(() {
                                   selectedWife = found.first;
                                   wifeSearchError = null;
+                                  submitError = null;
                                 });
                               } else {
                                 setModalState(() => wifeSearchError = 'لم يتم العثور على زوجة برقم $qf');
@@ -1645,21 +1647,22 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                     SizedBox(height: 24),
 
+                    if (submitError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(submitError!, style: TextStyle(color: AppColors.accentRed, fontSize: 12)),
+                      ),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: FilledButton(
                         onPressed: () async {
                           if (!isExternalWife && selectedWife == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('الرجاء اختيار الزوجة')),
-                            );
+                            setModalState(() => submitError = 'الرجاء اختيار الزوجة');
                             return;
                           }
                           if (isExternalWife && externalNameController.text.trim().isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('الرجاء كتابة اسم الزوجة')),
-                            );
+                            setModalState(() => submitError = 'الرجاء كتابة اسم الزوجة');
                             return;
                           }
 
