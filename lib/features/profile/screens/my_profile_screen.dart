@@ -1597,14 +1597,15 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 setModalState(() => selectedWife = null);
                                 return;
                               }
-                              try {
-                                final found = femalesList.firstWhere(
-                                  (p) => (p['legacy_user_id'] ?? '').toString().toUpperCase() == qf,
+                              final found = femalesList.where(
+                                (p) => (p['legacy_user_id'] ?? '').toString().toUpperCase() == qf,
+                              ).toList();
+                              if (found.isNotEmpty) {
+                                setModalState(() => selectedWife = found.first);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('لم يتم العثور على زوجة برقم $qf'), backgroundColor: AppColors.accentRed),
                                 );
-                                setModalState(() => selectedWife = {'id': found['id'], 'name': found['name'], 'legacy_user_id': found['legacy_user_id']});
-                              } catch (_) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لم يتم العثور على زوجة بهذا الرقم')));
-                                setModalState(() => selectedWife = null);
                               }
                             },
                             child: Container(
@@ -1654,6 +1655,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             return;
                           }
 
+                          final scaffoldMessenger = ScaffoldMessenger.of(context);
                           Navigator.pop(context);
 
                           try {
@@ -1683,12 +1685,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               'type': 'marriage',
                             });
 
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('✅ تمت إضافة الزوجة بنجاح'), backgroundColor: AppColors.accentGreen),
-                              );
-                              _loadMarriages();
-                            }
+                            scaffoldMessenger.showSnackBar(
+                              const SnackBar(content: Text('✅ تمت إضافة الزوجة بنجاح'), backgroundColor: AppColors.accentGreen),
+                            );
+                            if (mounted) _loadProfile();
                           } catch (e) {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
