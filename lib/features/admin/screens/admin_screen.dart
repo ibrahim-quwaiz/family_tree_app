@@ -4146,27 +4146,58 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                                 final notif = _allNotifications[index];
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.bgCard,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
+                                  child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        notif['title'] as String? ?? '—',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.textPrimary),
+                                      Expanded(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.bgCard,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                notif['title'] as String? ?? '—',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.textPrimary),
+                                              ),
+                                              SizedBox(height: 2),
+                                              Text(
+                                                notif['body'] as String? ?? '',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: AppColors.textSecondary.withOpacity(0.7)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                      SizedBox(height: 2),
-                                      Text(
-                                        notif['body'] as String? ?? '',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.textSecondary.withOpacity(0.7)),
+                                      SizedBox(width: 8),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          try {
+                                            await SupabaseConfig.client
+                                                .from('notifications')
+                                                .delete()
+                                                .eq('id', notif['id']);
+                                            _loadNotifications();
+                                          } catch (e) {
+                                            _showError('خطأ في حذف الإشعار: $e');
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.accentRed.withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Icon(Icons.delete_outline_rounded, color: AppColors.accentRed, size: 20),
+                                        ),
                                       ),
                                     ],
                                   ),

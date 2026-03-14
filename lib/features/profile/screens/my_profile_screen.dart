@@ -1687,15 +1687,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                             await SupabaseConfig.client.from('marriages').insert(insertData);
 
-                            final wifeName = !isExternalWife
-                                ? selectedWife!['name'] as String
-                                : externalNameController.text.trim();
-                            await SupabaseConfig.client.from('notifications').insert({
-                              'title': 'زواج جديد في العائلة',
-                              'body': '${_personData!['name']} تزوج من $wifeName',
-                              'type': 'marriage',
-                            });
-
                             scaffoldMessenger.showSnackBar(
                               const SnackBar(content: Text('✅ تمت إضافة الزوجة بنجاح'), backgroundColor: AppColors.accentGreen),
                             );
