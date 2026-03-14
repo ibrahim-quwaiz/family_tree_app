@@ -1631,7 +1631,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         ),
                       ),
                     ],
-                    else
+                    if (isExternalWife)
                       _buildDialogTextField(externalNameController, 'اكتب اسم الزوجة'),
 
                     SizedBox(height: 24),
