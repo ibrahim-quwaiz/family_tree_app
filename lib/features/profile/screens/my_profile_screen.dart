@@ -78,9 +78,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         final childrenResponse = await SupabaseConfig.client
             .from('people')
             .select('id, name, gender, is_alive, birth_date, legacy_user_id, mother_id, mother_external_name')
-            .eq('father_id', _personData!['id'])
-            .order('birth_date', ascending: true);
-        _children = List<Map<String, dynamic>>.from(childrenResponse);
+            .eq('father_id', _personData!['id']);
+        final rawChildren = List<Map<String, dynamic>>.from(childrenResponse);
+        rawChildren.sort((a, b) {
+          final aDate = a['birth_date'] as String?;
+          final bDate = b['birth_date'] as String?;
+          if (aDate != null && bDate != null) return aDate.compareTo(bDate);
+          if (aDate != null) return -1;
+          if (bDate != null) return 1;
+          final aId = a['legacy_user_id'] as String? ?? '';
+          final bId = b['legacy_user_id'] as String? ?? '';
+          return aId.compareTo(bId);
+        });
+        _children = rawChildren;
       } catch (e) {}
 
       await _loadMarriages();
