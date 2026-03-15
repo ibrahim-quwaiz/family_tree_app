@@ -13,11 +13,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    print('🚀 بدء تهيئة التطبيق...');
     await SupabaseConfig.initialize();
-    print('✅ تم تهيئة Supabase بنجاح في main()');
   } catch (e) {
-    print('❌ فشل تهيئة Supabase في main(): $e');
+    // فشل تهيئة Supabase
   }
 
   // محاولة استعادة الجلسة من Supabase
