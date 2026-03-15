@@ -869,7 +869,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   bool _isCurrentUser() {
-    return true;
+    final authUser = SupabaseConfig.client.auth.currentUser;
+    if (authUser == null) return false;
+    final personAuthId = _personData?['auth_user_id'] as String?;
+    return personAuthId == authUser.id;
   }
 
   Widget _buildChildTile(Map<String, dynamic> child) {

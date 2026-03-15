@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/constants/current_user.dart';
 
 class AuthService {
   static const String _emailDomain = 'alquwaiz.family';
@@ -174,6 +175,8 @@ class AuthService {
     try {
       await SupabaseConfig.client.auth.signOut();
     } catch (_) {}
+
+    CurrentUser.legacyUserId = '';
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('logged_in_user_id');
