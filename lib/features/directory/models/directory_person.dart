@@ -84,9 +84,7 @@ class DirectoryPerson {
       if (contact is List && contact.isNotEmpty) {
         try {
           contactMap = contact.first as Map<String, dynamic>?;
-        } catch (e) {
-          print('⚠️ خطأ في تحويل contact_info من List: $e');
-        }
+        } catch (e) {}
       } else if (contact is Map<String, dynamic>) {
         contactMap = contact;
       }

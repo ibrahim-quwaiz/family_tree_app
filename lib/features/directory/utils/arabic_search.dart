@@ -69,7 +69,6 @@ class ArabicSearch {
     List<DirectoryPerson> people,
     List<String> names,
   ) {
-    print('🔍 _ancestralSearch: البحث بـ ${names.length} أسماء: $names');
     final results = <_SearchResult>[];
 
     for (var person in people) {
@@ -100,10 +99,6 @@ class ArabicSearch {
     List<String> ancestorNames,
   ) {
     if (ancestorNames.isEmpty) return 50;
-
-    print('🔍 _checkAncestralChain: البحث عن ${ancestorNames.length} أجداد');
-    print('   ancestorNames: $ancestorNames');
-    print('   person: ${person.name}, father: ${person.fatherName}, grandfather: ${person.grandfatherName}, greatGrandfather: ${person.greatGrandfatherName}, greatGreatGrandfather: ${person.greatGreatGrandfatherName}');
 
     int score = 50;
 
@@ -142,25 +137,19 @@ class ArabicSearch {
 
     // جد جد الجد (names[3])
     if (ancestorNames.length >= 4) {
-      print('   ✅ التحقق من الجيل الرابع (names[3]): "${ancestorNames[3]}"');
       final greatGreatGrandfatherName = normalize(person.greatGreatGrandfatherName ?? '');
-      print('   greatGreatGrandfatherName: "$greatGreatGrandfatherName"');
       if (greatGreatGrandfatherName.isEmpty) {
-        print('   ❌ greatGreatGrandfatherName فارغ - رفض النتيجة');
         return 0;
       }
       if (!greatGreatGrandfatherName.contains(ancestorNames[3])) {
-        print('   ❌ greatGreatGrandfatherName لا يحتوي على "${ancestorNames[3]}" - رفض النتيجة');
         return 0;
       }
-      
-      print('   ✅ تطابق الجيل الرابع!');
+
       if (greatGreatGrandfatherName == ancestorNames[3]) score += 15;
       else if (greatGreatGrandfatherName.startsWith(ancestorNames[3])) score += 8;
       else score += 3;
     }
 
-    print('   ✅ النتيجة النهائية: $score');
     return score;
   }
 

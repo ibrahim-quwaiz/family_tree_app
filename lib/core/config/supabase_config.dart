@@ -9,14 +9,11 @@ class SupabaseConfig {
   
   static Future<void> initialize() async {
     try {
-      print('🔌 تهيئة Supabase...');
       await Supabase.initialize(
         url: supabaseUrl,
         anonKey: supabaseAnonKey,
       );
-      print('✅ تم تهيئة Supabase بنجاح');
     } catch (e) {
-      print('❌ خطأ في تهيئة Supabase: $e');
       rethrow;
     }
   }

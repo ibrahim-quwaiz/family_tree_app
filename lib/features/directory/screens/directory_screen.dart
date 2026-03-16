@@ -104,8 +104,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     setState(() => _isLoading = true);
 
     try {
-      print('📡 جلب بيانات الدليل من Supabase...');
-
       final response = await SupabaseConfig.client
           .from('people')
           .select('''
@@ -146,8 +144,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           .order('generation')
           .order('name')
           .limit(1000);
-
-      print('📊 تم استلام ${response.length} سجل من people');
 
       if (response.isEmpty) {
         setState(() {
@@ -203,14 +199,11 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
             try {
               return DirectoryPerson.fromJson(json);
             } catch (e) {
-              print('❌ خطأ في تحويل JSON: $e');
               return null;
             }
           })
           .whereType<DirectoryPerson>()
           .toList();
-
-      print('✅ تم بناء ${people.length} شخص');
 
       setState(() {
         _allPeople = people;
@@ -220,7 +213,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       
       _performSearch();
     } catch (e) {
-      print('❌ خطأ في جلب البيانات: $e');
       setState(() {
         _allPeople = [];
         _filteredPeople = [];
@@ -249,7 +241,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       
       return List<Map<String, dynamic>>.from(marriages);
     } catch (e) {
-      print('❌ خطأ في جلب الزوجات: $e');
       return [];
     }
   }
@@ -320,7 +311,6 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           .eq('mother_id', personId);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('خطأ في جلب أبناء البنات: $e');
       return [];
     }
   }
@@ -533,7 +523,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Row(
             children: [
               Text(
@@ -549,14 +539,17 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
         ),
         Expanded(
           child: _filteredPeople.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.search_off, size: 64, color: AppColors.textSecondary),
-                      const SizedBox(height: 16),
-                      Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary)),
-                    ],
+              ? SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, size: 64, color: AppColors.textSecondary),
+                        const SizedBox(height: 16),
+                        Text('لا توجد نتائج', style: TextStyle(fontSize: 18, color: AppColors.textPrimary)),
+                      ],
+                    ),
                   ),
                 )
               : ListView.builder(

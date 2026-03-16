@@ -8,6 +8,7 @@ import '../../../core/config/supabase_config.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/current_user.dart';
 import '../../auth/services/auth_service.dart';
+import '../services/person_service.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../../screens/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -364,26 +365,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     }
                     try {
                       final personId = _personData!['id'] as String;
-                      final storagePath = 'profiles/profile_$personId.jpg';
-                      await SupabaseConfig.client.storage
-                          .from('photos')
-                          .uploadBinary(
-                            storagePath,
-                            bytes,
-                            fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+                      final url = await PersonService.uploadPhoto(personId, bytes);
+                      if (url != null) {
+                        await _loadProfile();
+                        if (mounted) setState(() => _photoCacheKey++);
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('خطأ في رفع الصورة'), backgroundColor: Colors.red),
                           );
-                      final photoUrl = SupabaseConfig.client.storage
-                          .from('photos')
-                          .getPublicUrl('profiles/profile_$personId.jpg');
-                      await SupabaseConfig.client
-                          .from('people')
-                          .update({'photo_url': photoUrl})
-                          .eq('id', _personData!['id']);
-                      await _loadProfile();
-                      if (mounted) {
-                        setState(() {
-                          _photoCacheKey++;
-                        });
+                        }
                       }
                     } catch (e) {
                       if (context.mounted) {
@@ -620,7 +611,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             value: value,
             activeTrackColor: AppColors.gold,
             onChanged: (newValue) async {
-              await _updateContactData({field: newValue});
+              try {
+                await PersonService.upsertContact(_personData!['id'] as String, {field: newValue});
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('✅ تم تحديث بيانات التواصل بنجاح')),
+                  );
+                  _loadProfile();
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('❌ خطأ في التحديث: $e')),
+                  );
+                }
+              }
             },
           ),
         ],
@@ -1031,19 +1036,36 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () async {
-                        await _updatePersonData({
-                          'name': nameCtrl.text.trim(),
-                          'job': jobCtrl.text.trim().isEmpty ? null : jobCtrl.text.trim(),
-                          'education': educationCtrl.text.trim().isEmpty ? null : educationCtrl.text.trim(),
-                          'residence_city': residenceCtrl.text.trim().isEmpty ? null : residenceCtrl.text.trim(),
-                          'birth_city': birthCityCtrl.text.trim().isEmpty ? null : birthCityCtrl.text.trim(),
-                          'birth_country': birthCountryCtrl.text.trim().isEmpty ? null : birthCountryCtrl.text.trim(),
-                          'gender': selectedGender,
-                          'birth_date': birthDateCtrl.text.trim().isEmpty ? null : birthDateCtrl.text.trim(),
-                        });
-                        if (mounted) Navigator.pop(context);
-                      },
+                    onPressed: () async {
+                      try {
+                        await PersonService.updatePerson(
+                          personId: _personData!['id'] as String,
+                          personData: {
+                            'name': nameCtrl.text.trim(),
+                            'job': jobCtrl.text.trim().isEmpty ? null : jobCtrl.text.trim(),
+                            'education': educationCtrl.text.trim().isEmpty ? null : educationCtrl.text.trim(),
+                            'residence_city': residenceCtrl.text.trim().isEmpty ? null : residenceCtrl.text.trim(),
+                            'birth_city': birthCityCtrl.text.trim().isEmpty ? null : birthCityCtrl.text.trim(),
+                            'birth_country': birthCountryCtrl.text.trim().isEmpty ? null : birthCountryCtrl.text.trim(),
+                            'gender': selectedGender,
+                            'birth_date': birthDateCtrl.text.trim().isEmpty ? null : birthDateCtrl.text.trim(),
+                          },
+                        );
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('✅ تم تحديث البيانات بنجاح')),
+                          );
+                          Navigator.pop(context);
+                          _loadProfile();
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('❌ خطأ في التحديث: $e')),
+                          );
+                        }
+                      }
+                    },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.gold,
                       foregroundColor: AppColors.bgDeep,
@@ -1097,11 +1119,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () async {
-                      await _updateContactData({
-                        'mobile_phone': phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
-                        'email': emailCtrl.text.trim().isEmpty ? null : emailCtrl.text.trim(),
-                      });
-                      if (mounted) Navigator.pop(context);
+                      try {
+                        await PersonService.upsertContact(_personData!['id'] as String, {
+                          'mobile_phone': phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
+                          'email': emailCtrl.text.trim().isEmpty ? null : emailCtrl.text.trim(),
+                        });
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('✅ تم تحديث بيانات التواصل بنجاح')),
+                          );
+                          Navigator.pop(context);
+                          _loadProfile();
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('❌ خطأ في التحديث: $e')),
+                          );
+                        }
+                      }
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.gold,
@@ -1159,13 +1195,27 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () async {
-                      await _updateContactData({
-                        'instagram': instagramCtrl.text.trim().isEmpty ? null : instagramCtrl.text.trim(),
-                        'twitter': twitterCtrl.text.trim().isEmpty ? null : twitterCtrl.text.trim(),
-                        'snapchat': snapchatCtrl.text.trim().isEmpty ? null : snapchatCtrl.text.trim(),
-                        'facebook': facebookCtrl.text.trim().isEmpty ? null : facebookCtrl.text.trim(),
-                      });
-                      if (mounted) Navigator.pop(context);
+                      try {
+                        await PersonService.upsertContact(_personData!['id'] as String, {
+                          'instagram': instagramCtrl.text.trim().isEmpty ? null : instagramCtrl.text.trim(),
+                          'twitter': twitterCtrl.text.trim().isEmpty ? null : twitterCtrl.text.trim(),
+                          'snapchat': snapchatCtrl.text.trim().isEmpty ? null : snapchatCtrl.text.trim(),
+                          'facebook': facebookCtrl.text.trim().isEmpty ? null : facebookCtrl.text.trim(),
+                        });
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('✅ تم تحديث بيانات التواصل بنجاح')),
+                          );
+                          Navigator.pop(context);
+                          _loadProfile();
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('❌ خطأ في التحديث: $e')),
+                          );
+                        }
+                      }
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.gold,
@@ -1193,10 +1243,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     String selectedGender = 'male';
     DateTime? selectedDate;
     Map<String, dynamic>? selectedMotherMarriage;
+    String? childNameError;
+    String? motherError;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -1229,9 +1282,23 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         child: Icon(Icons.person_add_rounded, color: AppColors.gold, size: 20),
                       ),
                       SizedBox(width: 12),
-                      Text(
-                        'إضافة ابن/ابنة',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                      Expanded(
+                        child: Text(
+                          'إضافة ابن/ابنة',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        ),
                       ),
                     ],
                   ),
@@ -1245,7 +1312,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   // الاسم (مطلوب)
                   _buildDialogLabel('الاسم *'),
                   SizedBox(height: 6),
-                  _buildDialogTextField(nameController, 'أدخل اسم الابن/الابنة'),
+                  _buildDialogTextField(
+                    nameController,
+                    'أدخل اسم الابن/الابنة',
+                    onChanged: (v) => setModalState(() => childNameError = null),
+                  ),
+                  if (childNameError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        childNameError!,
+                        style: const TextStyle(color: AppColors.accentRed, fontSize: 12),
+                      ),
+                    ),
                   SizedBox(height: 16),
 
                   // الجنس
@@ -1328,18 +1407,39 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   _buildDialogLabel('الأم *'),
                   SizedBox(height: 6),
                   if (_marriages.isEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.bgDeep.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
-                      ),
-                      child: Text(
-                        '⚠️ لا توجد زوجات مسجلة. أضف زوجة أولاً من قسم الزوجات.',
-                        style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.bgDeep.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
+                          ),
+                          child: Text(
+                            '⚠️ لا توجد زوجات مسجلة.',
+                            style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _showAddMarriageDialog();
+                            },
+                            icon: Icon(Icons.person_add_rounded, size: 18, color: AppColors.accentAmber),
+                            label: Text('إضافة زوجة', style: TextStyle(color: AppColors.accentAmber)),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.accentAmber.withOpacity(0.5)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   else
                     Container(
@@ -1372,10 +1472,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             if (index != null) {
                               setModalState(() {
                                 selectedMotherMarriage = _marriages[index];
+                                motherError = null;
                               });
                             }
                           },
                         ),
+                      ),
+                    ),
+                  if (motherError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        motherError!,
+                        style: const TextStyle(color: AppColors.accentRed, fontSize: 12),
                       ),
                     ),
                   SizedBox(height: 16),
@@ -1466,27 +1575,49 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: FilledButton(
                       onPressed: () async {
                         if (nameController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('الرجاء إدخال الاسم')),
-                          );
+                          setModalState(() => childNameError = 'الرجاء إدخال الاسم');
                           return;
                         }
                         if (_marriages.isNotEmpty && selectedMotherMarriage == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('الرجاء اختيار الأم')),
-                          );
+                          setModalState(() => motherError = 'الرجاء اختيار الأم');
                           return;
                         }
                         Navigator.pop(context);
-                        await _addChild(
-                          name: nameController.text.trim(),
-                          gender: selectedGender,
-                          motherId: selectedMotherMarriage?['wife_id'] as String?,
-                          externalMotherName: selectedMotherMarriage?['wife_external_name'] as String?,
-                          birthDate: selectedDate,
-                          birthCity: birthCityController.text.trim(),
-                          birthCountry: birthCountryController.text.trim(),
-                        );
+                        try {
+                          final parentId = _personData!['id'] as String;
+                          final parentGeneration = _personData!['generation'] as int? ?? 0;
+                          final childGeneration = parentGeneration + 1;
+                          final name = nameController.text.trim();
+                          final qfId = await PersonService.addPerson(
+                            name: name,
+                            gender: selectedGender,
+                            generation: childGeneration,
+                            fatherId: parentId,
+                            motherId: selectedMotherMarriage?['wife_id'] as String?,
+                            motherExternalName: selectedMotherMarriage?['wife_external_name'] as String?,
+                            birthDate: selectedDate,
+                            birthCity: birthCityController.text.trim().isEmpty ? null : birthCityController.text.trim(),
+                            birthCountry: birthCountryController.text.trim().isEmpty ? null : birthCountryController.text.trim(),
+                          );
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('✅ تمت إضافة $name بنجاح (رقم العضوية: $qfId)'),
+                                backgroundColor: AppColors.accentGreen,
+                              ),
+                            );
+                            _loadProfile();
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('❌ خطأ في الإضافة: $e'),
+                                backgroundColor: AppColors.accentRed,
+                              ),
+                            );
+                          }
+                        }
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.gold,
@@ -1721,22 +1852,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                           try {
                             final personId = _personData!['id'] as String;
-                            final nextOrder = _marriages.length + 1;
-
-                            final insertData = <String, dynamic>{
-                              'husband_id': personId,
-                              'marriage_order': nextOrder,
-                              'is_current': true,
-                            };
-
-                            if (!isExternalWife) {
-                              insertData['wife_id'] = selectedWife!['id'];
-                            } else {
-                              insertData['wife_external_name'] = externalNameController.text.trim();
-                            }
-
-                            await SupabaseConfig.client.from('marriages').insert(insertData);
-
+                            await PersonService.addMarriage(
+                              husbandId: personId,
+                              wifeId: !isExternalWife ? selectedWife!['id'] as String? : null,
+                              externalName: isExternalWife ? externalNameController.text.trim() : null,
+                            );
                             scaffoldMessenger.showSnackBar(
                               const SnackBar(content: Text('✅ تمت إضافة الزوجة بنجاح'), backgroundColor: AppColors.accentGreen),
                             );
@@ -1767,144 +1887,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
-
-  // ═══════════════════════════════════════════
-  // عمليات Supabase
-  // ═══════════════════════════════════════════
-  Future<void> _updatePersonData(Map<String, dynamic> data) async {
-    try {
-      await SupabaseConfig.client
-          .from('people')
-          .update(data)
-          .eq('id', _personData!['id']);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ تم تحديث البيانات بنجاح')),
-      );
-      _loadProfile();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ خطأ في التحديث: $e')),
-      );
-    }
-  }
-
-  Future<void> _updateContactData(Map<String, dynamic> data) async {
-    try {
-      if (_contactData != null) {
-        // تحديث
-        await SupabaseConfig.client
-            .from('contact_info')
-            .update(data)
-            .eq('person_id', _personData!['id']);
-      } else {
-        // إنشاء جديد
-        await SupabaseConfig.client
-            .from('contact_info')
-            .insert({
-          'person_id': _personData!['id'],
-          ...data,
-        });
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ تم تحديث بيانات التواصل بنجاح')),
-      );
-      _loadProfile();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ خطأ في التحديث: $e')),
-      );
-    }
-  }
-
-  Future<void> _addChild({
-    required String name,
-    required String gender,
-    String? motherId,
-    String? externalMotherName,
-    DateTime? birthDate,
-    String birthCity = '',
-    String birthCountry = '',
-  }) async {
-    try {
-      final parentId = _personData!['id'] as String;
-      final parentGeneration = _personData!['generation'] as int? ?? 0;
-      final childGeneration = parentGeneration + 1;
-
-      // توليد رقم QF تلقائي
-      final qfId = await _generateQfId(childGeneration);
-
-      // إدخال الابن
-      final insertData = <String, dynamic>{
-        'name': name,
-        'gender': gender,
-        'father_id': parentId,
-        'generation': childGeneration,
-        'is_alive': true,
-        'legacy_user_id': qfId,
-      };
-
-      if (motherId != null) insertData['mother_id'] = motherId;
-      if (externalMotherName != null && externalMotherName.isNotEmpty) {
-        insertData['mother_external_name'] = externalMotherName;
-      }
-      if (birthDate != null) insertData['birth_date'] = birthDate.toIso8601String().split('T').first;
-      if (birthCity.isNotEmpty) insertData['birth_city'] = birthCity;
-      if (birthCountry.isNotEmpty) insertData['birth_country'] = birthCountry;
-
-      await SupabaseConfig.client.from('people').insert(insertData);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✅ تمت إضافة $name بنجاح (رقم العضوية: $qfId)'),
-            backgroundColor: AppColors.accentGreen,
-          ),
-        );
-        _loadProfile();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ خطأ في الإضافة: $e'),
-            backgroundColor: AppColors.accentRed,
-          ),
-        );
-      }
-    }
-  }
-
-  /// توليد رقم QF تلقائي
-  /// النمط: QF + رقمين للجيل + رقم تسلسلي (3 أرقام أو أكثر)
-  Future<String> _generateQfId(int generation) async {
-    try {
-      final genPrefix = 'QF${generation.toString().padLeft(2, '0')}';
-
-      final response = await SupabaseConfig.client
-          .from('people')
-          .select('legacy_user_id')
-          .like('legacy_user_id', '$genPrefix%')
-          .order('legacy_user_id', ascending: false)
-          .limit(1)
-          .maybeSingle();
-
-      if (response != null) {
-        final lastQf = response['legacy_user_id'] as String;
-        final seqStr = lastQf.substring(4);
-        final lastSeq = int.tryParse(seqStr) ?? 0;
-        final newSeq = lastSeq + 1;
-        final seqLength = seqStr.length < 3 ? 3 : seqStr.length;
-        return '$genPrefix${newSeq.toString().padLeft(seqLength, '0')}';
-      } else {
-        return '${genPrefix}001';
-      }
-    } catch (e) {
-      final ts = DateTime.now().millisecondsSinceEpoch % 1000;
-      return 'QF${generation.toString().padLeft(2, '0')}${ts.toString().padLeft(3, '0')}';
-    }
-  }
 
   // ═══════════════════════════════════════════
   // Widgets المساعدة

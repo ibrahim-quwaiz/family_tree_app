@@ -46,19 +46,14 @@ class Person {
   // جلب من Supabase
   static Future<List<Person>> fetchFromSupabase() async {
     try {
-      print('🔄 جلب البيانات من Supabase...');
-      
       final response = await SupabaseConfig.client
           .from('people_with_children')
           .select()
           .order('generation')
           .order('name')
           .limit(1000);
-      
-      print('📊 تم استلام ${response.length} سجل');
-      
+
       if (response.isEmpty) {
-        print('⚠️ الاستجابة فارغة');
         return [];
       }
       
@@ -67,18 +62,14 @@ class Person {
             try {
               return Person.fromJson(json as Map<String, dynamic>);
             } catch (e) {
-              print('❌ خطأ في تحويل JSON: $e');
               return null;
             }
           })
           .whereType<Person>()
           .toList();
-      
-      print('✅ تم تحميل ${people.length} شخص بنجاح');
-      
+
       return people;
     } catch (e) {
-      print('❌ خطأ في جلب البيانات: $e');
       return [];
     }
   }

@@ -220,9 +220,7 @@ class _TreeScreenState extends State<TreeScreen> {
       setState(() {
         _searchResults = List<Map<String, dynamic>>.from(response);
       });
-    } catch (e) {
-      print('خطأ في البحث: $e');
-    }
+    } catch (e) {}
   }
 
   /// الانتقال من نتيجة بحث
