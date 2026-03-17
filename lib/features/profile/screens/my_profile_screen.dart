@@ -700,6 +700,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 '${_marriages.length}',
                 style: TextStyle(fontSize: 13, color: AppColors.gold, fontWeight: FontWeight.w600),
               ),
+              SizedBox(width: 8),
+              if (_personData?['gender'] == 'male')
+                GestureDetector(
+                  onTap: _showAddMarriageDialog,
+                  child: Icon(Icons.add_circle_rounded, color: const Color(0xFFE91E8C), size: 24),
+                ),
             ],
           ),
 
@@ -1407,39 +1413,18 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   _buildDialogLabel('الأم *'),
                   SizedBox(height: 6),
                   if (_marriages.isEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.bgDeep.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
-                          ),
-                          child: Text(
-                            '⚠️ لا توجد زوجات مسجلة.',
-                            style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showAddMarriageDialog();
-                            },
-                            icon: Icon(Icons.person_add_rounded, size: 18, color: AppColors.accentAmber),
-                            label: Text('إضافة زوجة', style: TextStyle(color: AppColors.accentAmber)),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: AppColors.accentAmber.withOpacity(0.5)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
+                      ),
+                      child: Text(
+                        '⚠️ لا توجد زوجات مسجلة — أضف زوجة من قسم الزوجات أعلاه ثم عد لإضافة الابن',
+                        style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
+                      ),
                     )
                   else
                     Container(
@@ -1582,7 +1567,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           setModalState(() => motherError = 'الرجاء اختيار الأم');
                           return;
                         }
-                        Navigator.pop(context);
                         try {
                           final parentId = _personData!['id'] as String;
                           final parentGeneration = _personData!['generation'] as int? ?? 0;
@@ -1600,6 +1584,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             birthCountry: birthCountryController.text.trim().isEmpty ? null : birthCountryController.text.trim(),
                           );
                           if (mounted) {
+                            Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('✅ تمت إضافة $name بنجاح (رقم العضوية: $qfId)'),
@@ -1646,9 +1631,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
-  Widget _buildDialogTextField(TextEditingController controller, String hint) {
+  Widget _buildDialogTextField(TextEditingController controller, String hint, {ValueChanged<String>? onChanged}) {
     return TextField(
       controller: controller,
+      onChanged: onChanged,
       style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
@@ -1672,7 +1658,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
-  void _showAddMarriageDialog() async {
+  Future<void> _showAddMarriageDialog() async {
     List<Map<String, dynamic>> femalesList = [];
     try {
       final response = await SupabaseConfig.client
@@ -1862,11 +1848,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             );
                             if (mounted) _loadProfile();
                           } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('❌ خطأ: $e'), backgroundColor: AppColors.accentRed),
-                              );
-                            }
+                            scaffoldMessenger.showSnackBar(
+                              SnackBar(content: Text('❌ خطأ: $e'), backgroundColor: AppColors.accentRed),
+                            );
                           }
                         },
                         style: FilledButton.styleFrom(

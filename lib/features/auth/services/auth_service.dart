@@ -59,7 +59,10 @@ class AuthService {
         }
       } on supabase.AuthException catch (e) {
         // لو الحساب موجود مسبقاً (من محاولة سابقة)
-        if (e.message.contains('already registered') || e.message.contains('already been registered')) {
+        if (e.message.contains('already registered') ||
+            e.message.contains('already been registered') ||
+            e.message.contains('User already registered') ||
+            e.statusCode == '422') {
           // سجّل دخول بدلاً من ذلك
           await client.auth.signInWithPassword(
             email: email,
