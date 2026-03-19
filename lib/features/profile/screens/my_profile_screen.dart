@@ -1020,8 +1020,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   void _showEditChildDialog(Map<String, dynamic> child) {
     final nameController = TextEditingController(text: child['name'] as String? ?? '');
     final birthDate = child['birth_date'] as String?;
+    final childMotherId = child['mother_id'] as String?;
+    final childMotherExternalName = child['mother_external_name'] as String?;
     DateTime? selectedDate = birthDate != null ? DateTime.tryParse(birthDate) : null;
+    Map<String, dynamic>? selectedMotherMarriage;
     String? nameError;
+    String? motherError;
+
+    if (_marriages.isNotEmpty) {
+      for (final marriage in _marriages) {
+        final wifeId = marriage['wife_id'] as String?;
+        final wifeExternalName = marriage['wife_external_name'] as String?;
+        final matchedById = childMotherId != null && wifeId == childMotherId;
+        final matchedByExternalName = childMotherExternalName != null && wifeExternalName == childMotherExternalName;
+        if (matchedById || matchedByExternalName) {
+          selectedMotherMarriage = marriage;
+          break;
+        }
+      }
+    }
 
     showModalBottomSheet(
       context: context,
@@ -1083,6 +1100,66 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       child: Text(nameError!, style: TextStyle(color: AppColors.accentRed, fontSize: 12)),
                     ),
                   SizedBox(height: 16),
+                  _buildDialogLabel('الأم *'),
+                  SizedBox(height: 6),
+                  if (_marriages.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.accentAmber.withOpacity(0.2)),
+                      ),
+                      child: Text(
+                        '⚠️ لا توجد زوجات مسجلة — أضف زوجة من قسم الزوجات أعلاه ثم عد لتعديل الأم',
+                        style: TextStyle(fontSize: 12, color: AppColors.accentAmber),
+                      ),
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withOpacity(0.06)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: selectedMotherMarriage != null
+                              ? _marriages.indexOf(selectedMotherMarriage!)
+                              : null,
+                          hint: Text('اختر الأم', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                          isExpanded: true,
+                          dropdownColor: AppColors.bgCard,
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                          items: _marriages.asMap().entries.map((entry) {
+                            final m = entry.value;
+                            final name = m['wife_name'] as String? ?? m['wife_external_name'] as String? ?? 'غير معروفة';
+                            final isExt = m['is_external'] as bool? ?? false;
+                            return DropdownMenuItem<int>(
+                              value: entry.key,
+                              child: Text('$name${isExt ? " (خارجية)" : ""}'),
+                            );
+                          }).toList(),
+                          onChanged: (index) {
+                            if (index != null) {
+                              setModalState(() {
+                                selectedMotherMarriage = _marriages[index];
+                                motherError = null;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  if (motherError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(motherError!, style: TextStyle(color: AppColors.accentRed, fontSize: 12)),
+                    ),
+                  SizedBox(height: 16),
                   _buildDialogLabel('تاريخ الميلاد'),
                   SizedBox(height: 6),
                   GestureDetector(
@@ -1139,6 +1216,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           setModalState(() => nameError = 'الاسم مطلوب');
                           return;
                         }
+                        if (_marriages.isNotEmpty && selectedMotherMarriage == null) {
+                          setModalState(() => motherError = 'الرجاء اختيار الأم');
+                          return;
+                        }
                         final messenger = ScaffoldMessenger.of(context);
                         Navigator.pop(context);
                         try {
@@ -1149,6 +1230,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               'birth_date': selectedDate != null
                                   ? selectedDate!.toIso8601String().split('T').first
                                   : null,
+                              'mother_id': selectedMotherMarriage?['wife_id'],
+                              'mother_external_name': selectedMotherMarriage?['wife_external_name'],
                             },
                           );
                           messenger.showSnackBar(SnackBar(
@@ -1246,25 +1329,51 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 24, right: 24, left: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: StatefulBuilder(
-              builder: (context, setModalState) => Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 24, right: 24, left: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: StatefulBuilder(
+                builder: (context, setModalState) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
                   SizedBox(height: 20),
-                  Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text('تعديل البيانات الشخصية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 20),
                   _buildTextField(nameCtrl, 'الاسم', Icons.badge_rounded),
                   _buildTextField(jobCtrl, 'الوظيفة', Icons.work_rounded),
@@ -1349,6 +1458,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                 ),
                 ],
+                ),
               ),
             ),
           ),
@@ -1367,24 +1477,50 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 24, right: 24, left: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 24, right: 24, left: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
                 SizedBox(height: 20),
-                Text('تعديل بيانات التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('تعديل بيانات التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 20),
                 _buildTextField(phoneCtrl, 'رقم الجوال', Icons.phone_rounded, keyboardType: TextInputType.phone),
                 _buildTextField(emailCtrl, 'الإيميل', Icons.email_rounded, keyboardType: TextInputType.emailAddress),
@@ -1422,6 +1558,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ),
@@ -1441,24 +1578,50 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: 24, right: 24, left: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 24, right: 24, left: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
                 SizedBox(height: 20),
-                Text('تعديل وسائل التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('تعديل وسائل التواصل', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 20),
                 _buildTextField(instagramCtrl, 'Instagram', Icons.camera_alt_rounded),
                 _buildTextField(twitterCtrl, 'Twitter', Icons.alternate_email_rounded),
@@ -1500,6 +1663,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ),
@@ -1947,21 +2111,29 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: 20, right: 20, top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => StatefulBuilder(
+          builder: (context, setModalState) {
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 20, right: 20, top: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1976,7 +2148,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           child: Icon(Icons.favorite_rounded, color: Color(0xFFE91E8C), size: 20),
                         ),
                         SizedBox(width: 12),
-                        Text('إضافة زوجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                        Expanded(
+                          child: Text('إضافة زوجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 20),
@@ -2130,11 +2316,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ),
                   ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -2482,20 +2669,28 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 24, right: 24, left: 24,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => StatefulBuilder(
+          builder: (context, setModalState) => Directionality(
+            textDirection: TextDirection.rtl,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: 24, right: 24, left: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
@@ -2511,7 +2706,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         child: Icon(Icons.lock_rounded, color: AppColors.gold, size: 20),
                       ),
                       SizedBox(width: 12),
-                      Text('تغيير الرقم السري', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      Expanded(
+                        child: Text('تغيير الرقم السري', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 20),
@@ -2607,6 +2816,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     ),
                   ),
                 ],
+                ),
               ),
             ),
           ),
