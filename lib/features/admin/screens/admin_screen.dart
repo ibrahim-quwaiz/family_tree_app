@@ -269,6 +269,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -1086,22 +1087,30 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      barrierColor: Colors.black54,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => StatefulBuilder(
+          builder: (context, setModalState) => Directionality(
+            textDirection: TextDirection.rtl,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1201,6 +1210,18 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                             color: AppColors.textPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
                         ),
                       ),
                     ],
@@ -1830,6 +1851,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     ),
                   ),
                 ],
+                ),
               ),
             ),
           ),
@@ -2445,7 +2467,8 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             child: DraggableScrollableSheet(
               initialChildSize: 0.9,
               maxChildSize: 0.95,
-              minChildSize: 0.5,
+              minChildSize: 0.6,
+              expand: false,
               builder: (context, scrollController) {
                 return Padding(
                   padding: EdgeInsets.only(

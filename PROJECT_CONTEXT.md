@@ -175,30 +175,27 @@ gold: #C8A45C / bgDeep: #0A1628 / bgCard: #111E36
 - `v1.3-news-image` — إضافة صور الأخبار
 - `v2.0-before-theme` — قبل إضافة الثيم
 
-## المهام المكتملة (آخر جلسات)
-- [x] إصلاح RLS على contact_info
-- [x] CurrentUser.loadFromSession() في main.dart
-- [x] تسجيل الدخول بـ PIN ورفع صورة الملف الشخصي
-- [x] حذف الـ print المؤقتة؛ الجنس وتاريخ الميلاد في ديالوج تعديل البيانات الشخصية
-- [x] إزالة إدراج إشعار عند إضافة زوجة؛ زر حذف إشعار وزر حذف طلب دعم في الأدمن
-- [x] حذف قسم "إرسال إشعار يدوي" من إعدادات الأدمن
-- [x] نقل photo_url من contact_info إلى جدول people (حل جذري لمشكلة RLS والصور)
-- [x] إصلاح auth_user_id لكل الحسابات + تحديث تلقائي عند تسجيل الدخول
-- [x] إضافة إشعارات خاصة وعامة مع recipient_id + RLS
-- [x] تعطيل Legacy API keys
-- [x] Foreign Keys: CASCADE على contact_info، RESTRICT على marriages وgirls_children، SET NULL على support_requests
-- [x] ترتيب الأبناء بتاريخ الميلاد ثم legacy_user_id
-- [x] تسلسل الأباء في الشجرة قابل للتمرير أفقياً
-- [x] إضافة زوجة برقم QF مع تحديث فوري وأخطاء داخل النموذج
+## المهام المنجزة مؤخراً
+- [x] إضافة تعديل وحذف الأبناء من صفحة حسابي
+- [x] إضافة تعديل وحذف الزوجات من صفحة حسابي
+- [x] توحيد `deleteMarriage()` و`deletePerson()` في `PersonService`
+- [x] إضافة `updateMarriage()` في `PersonService`
+- [x] إصلاح RLS policies على جداول `people` و`marriages` (`INSERT`, `UPDATE`, `DELETE`)
+- [x] إصلاح ربط `auth_user_id` عند أول تسجيل دخول (خطأ 422)
+- [x] إضافة `maxLength: 4` على حقول PIN في لوحة التحكم
+- [x] إضافة رسائل التحقق تحت الحقول في ديالوجات الإضافة والتعديل
+- [x] إضافة زر إضافة زوجة في قسم الزوجات في صفحة حسابي
+- [x] إصلاح `_showAddMarriageDialog()` لتكون `Future<void>`
+- [x] إضافة تعديل الأم عند تعديل بيانات الابن
 
 ## المهام المعلقة
-- [ ] تغيير PIN من صفحة حسابي
-- [ ] حذف ابن/زوجة من صفحة حسابي
-- [ ] حقول البحث في الدليل (Expandable)
+- [ ] توحيد بنية `showModalBottomSheet` (مؤجل لما قبل النشر)
 - [ ] Push Notifications (FCM + APNs)
+- [ ] Google Play: إكمال 12 مختبر + 14 يوم اختبار
+- [ ] App Store: انتظار مراجعة Apple
 - [ ] رفع نسخة جديدة للمتجر
-- [ ] حل مشكلة TestFlight على iOS 26
-- [ ] مراجعة الكود وتنظيف التكرارات
+- [ ] تغيير Display Name لـ "عائلة القويز"
+- [ ] تنظيف `print` statements المتبقية
 
 ## ملاحظات مهمة
 - photo_url مُنقول من contact_info إلى people
