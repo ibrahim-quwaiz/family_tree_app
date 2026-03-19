@@ -915,112 +915,31 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   }
 
   Future<void> _deletePerson(Map<String, dynamic> person) async {
-    final personId = person['id'] as String;
     final personName = person['name'] as String? ?? '—';
     final personQf = person['legacy_user_id'] as String? ?? '';
+    final personId = person['id'] as String;
 
-    // التحقق من الارتباطات
-    final children = _allPeople.where((p) => p['father_id'] == personId || p['mother_id'] == personId).toList();
-    final marriages = _allMarriages.where((m) => m['husband_id'] == personId || m['wife_id'] == personId).toList();
-    
-    // التحقق من أبناء البنات
-    int girlsChildrenCount = 0;
-    if (person['gender'] == 'female') {
-      try {
-        final gc = await SupabaseConfig.client
-            .from('girls_children')
-            .select('id')
-            .eq('mother_id', personId);
-        girlsChildrenCount = (gc as List).length;
-      } catch (_) {}
-    }
-
-    final hasRelations = children.isNotEmpty || marriages.isNotEmpty || girlsChildrenCount > 0;
-
-    if (hasRelations) {
-      // لا يسمح بالحذف — يعرض تفاصيل الارتباطات
-      String details = '';
-      if (children.isNotEmpty) {
-        details += '👨‍👩‍👦 ${children.length} ابن/بنت\n';
-      }
-      if (marriages.isNotEmpty) {
-        details += '💍 ${marriages.length} زواج\n';
-      }
-      if (girlsChildrenCount > 0) {
-        details += '👶 $girlsChildrenCount من أبناء البنات\n';
-      }
-
-      showDialog(
-        context: context,
-        builder: (ctx) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: AppColors.bgCard,
-            title: Row(
-              children: [
-                Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
-                SizedBox(width: 8),
-                Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '"$personName" ($personQf) مرتبط بالتالي:',
-                  style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.accentRed.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.accentRed.withOpacity(0.2)),
-                  ),
-                  child: Text(details, style: TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.8)),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'لحذف هذا الشخص، يجب أولاً حذف أو نقل جميع الارتباطات المتعلقة به من التبويبات المخصصة (الأشخاص، الزواجات، أبناء البنات).',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text('فهمت', style: TextStyle(color: AppColors.gold)),
-              ),
-            ],
-          ),
-        ),
-      );
-      return;
-    }
-
-    // لا يوجد ارتباطات — يسمح بالحذف
+    // تأكيد الحذف
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
-          content: Text(
-            'هل أنت متأكد من حذف "$personName"؟\nهذا الإجراء لا يمكن التراجع عنه.',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+          title: Text('حذف "$personName"',
+              style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('هل أنت متأكد من حذف هذا الشخص؟ لا يمكن التراجع.',
+              style: TextStyle(color: AppColors.textSecondary)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('إلغاء',
+                  style: TextStyle(color: AppColors.textSecondary)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
+              child: Text('حذف',
+                  style: TextStyle(color: AppColors.accentRed)),
             ),
           ],
         ),
@@ -1029,21 +948,34 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
     if (confirmed != true) return;
 
-    try {
-      // حذف بيانات التواصل أولاً
-      await SupabaseConfig.client.from('contact_info').delete().eq('person_id', personId);
-      try {
-        await SupabaseConfig.client.storage
-            .from('photos')
-            .remove(['profiles/profile_$personId.jpg']);
-      } catch (_) {}
-      // حذف الشخص
-      await SupabaseConfig.client.from('people').delete().eq('id', personId);
-      _showSuccess('تم حذف "$personName" بنجاح');
-      _loadPeople();
-    } catch (e) {
-      _showError('خطأ في الحذف: $e');
+    final error = await PersonService.deletePerson(personId);
+
+    if (error != null) {
+      showDialog(
+        context: context,
+        builder: (ctx) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            backgroundColor: AppColors.bgCard,
+            title: Text('لا يمكن الحذف',
+                style: TextStyle(color: AppColors.accentRed)),
+            content: Text(
+                'لا يمكن حذف "$personName" ($personQf)\n$error',
+                style: TextStyle(color: AppColors.textPrimary)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('حسناً', style: TextStyle(color: AppColors.gold)),
+              ),
+            ],
+          ),
+        ),
+      );
+      return;
     }
+
+    _showSuccess('تم حذف "$personName" بنجاح');
+    _loadPeople();
   }
 
   Widget _buildLabel(String text) {
@@ -1053,7 +985,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {VoidCallback? onChanged}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {VoidCallback? onChanged, int? maxLength}) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.bgDeep.withOpacity(0.5),
@@ -1062,11 +994,13 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       ),
       child: TextField(
         controller: controller,
+        maxLength: maxLength,
         onChanged: onChanged != null ? (_) => onChanged() : null,
         style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: AppColors.textSecondary),
+          counterText: maxLength != null ? '' : null,
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           border: InputBorder.none,
         ),
@@ -1669,7 +1603,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   SizedBox(height: 12),
                   _buildLabel('رمز PIN'),
                   SizedBox(height: 4),
-                  _buildTextField(pinController, 'رمز الدخول (4 أرقام)'),
+                  _buildTextField(pinController, 'رمز الدخول (4 أرقام)', maxLength: 4),
                   SizedBox(height: 20),
                   Container(height: 1, color: Colors.white.withOpacity(0.06)),
                   SizedBox(height: 16),
@@ -3030,95 +2964,18 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   }
 
   Future<void> _deleteMarriage(Map<String, dynamic> marriage) async {
-    final marriageId = marriage['id'] as String;
     final husbandName = marriage['husband_name'] as String? ?? '—';
-    final wifeName = marriage['wife_name'] as String? ?? '—';
-    final isExternal = marriage['is_external'] as bool? ?? false;
-    final wifeId = marriage['wife_id'] as String?;
-    final husbandId = marriage['husband_id'] as String?;
-    final wifeExternalName = marriage['wife_external_name'] as String?;
-
-    // التحقق من وجود أبناء مرتبطين بهذا الزواج
-    int childrenCount = 0;
-
-    if (husbandId != null) {
-      final allChildren = _allPeople.where((p) => p['father_id'] == husbandId).toList();
-      for (final child in allChildren) {
-        if (!isExternal && wifeId != null && child['mother_id'] == wifeId) {
-          childrenCount++;
-        } else if (isExternal && wifeExternalName != null && child['mother_external_name'] == wifeExternalName) {
-          childrenCount++;
-        }
-      }
-    }
-
-    if (childrenCount > 0) {
-      showDialog(
-        context: context,
-        builder: (ctx) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: AppColors.bgCard,
-            title: Row(
-              children: [
-                Icon(Icons.block_rounded, color: AppColors.accentRed, size: 22),
-                SizedBox(width: 8),
-                Text('لا يمكن الحذف', style: TextStyle(color: AppColors.textPrimary)),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'زواج "$husbandName" و "$wifeName" مرتبط بـ:',
-                  style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.accentRed.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.accentRed.withOpacity(0.2)),
-                  ),
-                  child: Text(
-                    '👨‍👩‍👦 $childrenCount ابن/بنت',
-                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
-                  ),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'لحذف هذا الزواج، يجب أولاً حذف أو نقل الأبناء المرتبطين من تبويب الأشخاص.',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.5),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text('فهمت', style: TextStyle(color: AppColors.gold)),
-              ),
-            ],
-          ),
-        ),
-      );
-      return;
-    }
-
-    // لا يوجد أبناء — يسمح بالحذف
+    final wifeName = marriage['wife_name'] as String? ?? marriage['wife_external_name'] as String? ?? '—';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: AppColors.bgCard,
-          title: Text('تأكيد الحذف', style: TextStyle(color: AppColors.textPrimary)),
-          content: Text(
-            'هل أنت متأكد من حذف زواج "$husbandName" و "$wifeName"؟',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+          title: Text('حذف زواج "$husbandName" و "$wifeName"',
+              style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('هل أنت متأكد؟ لا يمكن التراجع.',
+              style: TextStyle(color: AppColors.textSecondary)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -3126,7 +2983,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('حذف', style: TextStyle(color: AppColors.accentRed, fontWeight: FontWeight.w700)),
+              child: Text('حذف', style: TextStyle(color: AppColors.accentRed)),
             ),
           ],
         ),
@@ -3135,13 +2992,24 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
 
     if (confirmed != true) return;
 
-    try {
-      await SupabaseConfig.client.from('marriages').delete().eq('id', marriageId);
-      _showSuccess('تم حذف الزواج بنجاح');
-      _loadMarriages();
-    } catch (e) {
-      _showError('خطأ في الحذف: $e');
+    final wifeId = marriage['wife_id'] as String?;
+    final husbandId = marriage['husband_id'] as String? ?? '';
+    final wifeExternalName = marriage['wife_external_name'] as String?;
+
+    final error = await PersonService.deleteMarriage(
+      marriageId: marriage['id'] as String,
+      husbandId: husbandId,
+      wifeId: wifeId,
+      wifeExternalName: wifeExternalName,
+    );
+
+    if (error != null) {
+      _showError('لا يمكن الحذف: $error');
+      return;
     }
+
+    _showSuccess('تم حذف الزواج بنجاح');
+    _loadMarriages();
   }
 
   void _showAddNewsDialog() {

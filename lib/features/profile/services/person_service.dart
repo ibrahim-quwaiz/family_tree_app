@@ -164,6 +164,57 @@ class PersonService {
   }
 
   // ═══════════════════════════════════════════
+  // حذف زواج
+  // ═══════════════════════════════════════════
+  static Future<String?> deleteMarriage({
+    required String marriageId,
+    required String husbandId,
+    String? wifeId,
+    String? wifeExternalName,
+  }) async {
+    int childrenCount = 0;
+
+    if (wifeId != null) {
+      final children = await _db
+          .from('people')
+          .select('id')
+          .eq('father_id', husbandId)
+          .eq('mother_id', wifeId);
+      childrenCount = (children as List).length;
+    } else if (wifeExternalName != null) {
+      final children = await _db
+          .from('people')
+          .select('id')
+          .eq('father_id', husbandId)
+          .eq('mother_external_name', wifeExternalName);
+      childrenCount = (children as List).length;
+    }
+
+    if (childrenCount > 0) return 'مرتبط بـ $childrenCount ابن/بنت، يجب حذف الأبناء أولاً';
+
+    await _db.from('marriages').delete().eq('id', marriageId);
+    return null;
+  }
+
+  // ═══════════════════════════════════════════
+  // تعديل زواج
+  // ═══════════════════════════════════════════
+  static Future<void> updateMarriage({
+    required String marriageId,
+    bool? isCurrent,
+    String? marriageDate,
+    String? divorceDate,
+  }) async {
+    final data = <String, dynamic>{};
+    if (isCurrent != null) data['is_current'] = isCurrent;
+    if (marriageDate != null) data['marriage_date'] = marriageDate;
+    if (divorceDate != null) data['divorce_date'] = divorceDate;
+    if (data.isNotEmpty) {
+      await _db.from('marriages').update(data).eq('id', marriageId);
+    }
+  }
+
+  // ═══════════════════════════════════════════
   // جلب زوجات الأب
   // ═══════════════════════════════════════════
   static Future<List<Map<String, dynamic>>> getFatherWives(String fatherId) async {
@@ -192,5 +243,32 @@ class PersonService {
       wives.add(marriage);
     }
     return wives;
+  }
+
+  // ═══════════════════════════════════════════
+  // حذف شخص (مع التحقق من الارتباطات)
+  // ═══════════════════════════════════════════
+  static Future<String?> deletePerson(String personId) async {
+    final children = await _db
+        .from('people')
+        .select('id')
+        .eq('father_id', personId);
+
+    final marriages = await _db
+        .from('marriages')
+        .select('id')
+        .or('husband_id.eq.$personId,wife_id.eq.$personId');
+
+    final girlsChildren = await _db
+        .from('girls_children')
+        .select('id')
+        .eq('mother_id', personId);
+
+    if ((children as List).isNotEmpty) return 'لديه أبناء مسجلون';
+    if ((marriages as List).isNotEmpty) return 'لديه زيجات مسجلة';
+    if ((girlsChildren as List).isNotEmpty) return 'لديها أبناء في قسم البنات';
+
+    await _db.from('people').delete().eq('id', personId);
+    return null;
   }
 }

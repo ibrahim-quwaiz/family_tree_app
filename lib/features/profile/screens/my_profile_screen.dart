@@ -881,6 +881,37 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     ],
                   ],
                 ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _showEditMarriageDialog(marriage),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.edit_rounded, size: 16, color: AppColors.gold),
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () => _deleteMarriage(marriage),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppColors.accentRed.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.delete_rounded, size: 16, color: AppColors.accentRed),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -957,9 +988,246 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
             ),
           ),
+          SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => _showEditChildDialog(child),
+            child: Container(
+              width: 32, height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.gold.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.edit_rounded, size: 16, color: AppColors.gold),
+            ),
+          ),
+          SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => _deleteChild(child),
+            child: Container(
+              width: 32, height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.accentRed.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.delete_rounded, size: 16, color: AppColors.accentRed),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _showEditChildDialog(Map<String, dynamic> child) {
+    final nameController = TextEditingController(text: child['name'] as String? ?? '');
+    final birthDate = child['birth_date'] as String?;
+    DateTime? selectedDate = birthDate != null ? DateTime.tryParse(birthDate) : null;
+    String? nameError;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20, right: 20, top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.edit_rounded, color: AppColors.gold, size: 20),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text('تعديل بيانات الابن',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36, height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  _buildDialogLabel('الاسم *'),
+                  SizedBox(height: 6),
+                  _buildDialogTextField(nameController, 'الاسم',
+                      onChanged: (v) => setModalState(() => nameError = null)),
+                  if (nameError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(nameError!, style: TextStyle(color: AppColors.accentRed, fontSize: 12)),
+                    ),
+                  SizedBox(height: 16),
+                  _buildDialogLabel('تاريخ الميلاد'),
+                  SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) => Theme(
+                          data: ThemeData.dark().copyWith(
+                            colorScheme: ColorScheme.dark(
+                              primary: AppColors.gold,
+                              surface: AppColors.bgCard,
+                            ),
+                          ),
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) setModalState(() => selectedDate = picked);
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.bgDeep.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withOpacity(0.06)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, color: AppColors.textSecondary, size: 18),
+                          SizedBox(width: 10),
+                          Text(
+                            selectedDate != null
+                                ? '${selectedDate!.year}/${selectedDate!.month}/${selectedDate!.day}'
+                                : 'اختر التاريخ',
+                            style: TextStyle(
+                              color: selectedDate != null ? AppColors.textPrimary : AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      onPressed: () async {
+                        if (nameController.text.trim().isEmpty) {
+                          setModalState(() => nameError = 'الاسم مطلوب');
+                          return;
+                        }
+                        final messenger = ScaffoldMessenger.of(context);
+                        Navigator.pop(context);
+                        try {
+                          await PersonService.updatePerson(
+                            personId: child['id'] as String,
+                            personData: {
+                              'name': nameController.text.trim(),
+                              'birth_date': selectedDate != null
+                                  ? selectedDate!.toIso8601String().split('T').first
+                                  : null,
+                            },
+                          );
+                          messenger.showSnackBar(SnackBar(
+                            content: Text('✅ تم تعديل البيانات بنجاح'),
+                            backgroundColor: AppColors.accentGreen,
+                          ));
+                          _loadProfile();
+                        } catch (e) {
+                          messenger.showSnackBar(SnackBar(
+                            content: Text('❌ خطأ: $e'),
+                            backgroundColor: AppColors.accentRed,
+                          ));
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.gold,
+                        foregroundColor: AppColors.bgDeep,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteChild(Map<String, dynamic> child) async {
+    final childName = child['name'] as String? ?? '—';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: AppColors.bgCard,
+          title: Text('حذف "$childName"',
+              style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('هل أنت متأكد من حذف هذا الشخص؟ لا يمكن التراجع.',
+              style: TextStyle(color: AppColors.textSecondary)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('حذف', style: TextStyle(color: AppColors.accentRed)),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final error = await PersonService.deletePerson(child['id'] as String);
+
+    if (error != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('❌ لا يمكن الحذف: $error'),
+          backgroundColor: AppColors.accentRed,
+        ));
+      }
+      return;
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('✅ تم حذف "$childName" بنجاح'),
+        backgroundColor: AppColors.accentGreen,
+      ));
+      _loadProfile();
+    }
   }
 
   // ═══════════════════════════════════════════
@@ -1867,6 +2135,195 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _deleteMarriage(Map<String, dynamic> marriage) async {
+    final wifeName = marriage['wife_name'] as String? ?? marriage['wife_external_name'] as String? ?? '—';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: AppColors.bgCard,
+          title: Text('حذف الزوجة "$wifeName"',
+              style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('هل أنت متأكد؟ لا يمكن التراجع.',
+              style: TextStyle(color: AppColors.textSecondary)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('حذف', style: TextStyle(color: AppColors.accentRed)),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final error = await PersonService.deleteMarriage(
+      marriageId: marriage['id'] as String,
+      husbandId: _personData!['id'] as String,
+      wifeId: marriage['wife_id'] as String?,
+      wifeExternalName: marriage['wife_external_name'] as String?,
+    );
+
+    if (error != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('❌ لا يمكن الحذف: $error'),
+          backgroundColor: AppColors.accentRed,
+        ));
+      }
+      return;
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('✅ تم حذف الزوجة بنجاح'),
+        backgroundColor: AppColors.accentGreen,
+      ));
+      _loadProfile();
+    }
+  }
+
+  void _showEditMarriageDialog(Map<String, dynamic> marriage) {
+    bool isCurrent = marriage['is_current'] as bool? ?? true;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20, right: 20, top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40, height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE91E8C).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.edit_rounded, color: const Color(0xFFE91E8C), size: 20),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text('تعديل بيانات الزواج',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                _buildDialogLabel('حالة الزواج'),
+                SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => isCurrent = true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isCurrent ? AppColors.accentGreen.withOpacity(0.15) : AppColors.bgDeep.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isCurrent ? AppColors.accentGreen : Colors.white.withOpacity(0.06)),
+                          ),
+                          child: Center(child: Text('حالي', style: TextStyle(
+                            color: isCurrent ? AppColors.accentGreen : AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ))),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => isCurrent = false),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !isCurrent ? AppColors.accentRed.withOpacity(0.15) : AppColors.bgDeep.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: !isCurrent ? AppColors.accentRed : Colors.white.withOpacity(0.06)),
+                          ),
+                          child: Center(child: Text('سابق', style: TextStyle(
+                            color: !isCurrent ? AppColors.accentRed : AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ))),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: () async {
+                      try {
+                        final messenger = ScaffoldMessenger.of(context);
+                        Navigator.pop(context);
+                        await PersonService.updateMarriage(
+                          marriageId: marriage['id'] as String,
+                          isCurrent: isCurrent,
+                        );
+                        messenger.showSnackBar(SnackBar(
+                          content: Text('✅ تم تعديل بيانات الزواج بنجاح'),
+                          backgroundColor: AppColors.accentGreen,
+                        ));
+                        _loadProfile();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('❌ خطأ: $e'),
+                          backgroundColor: AppColors.accentRed,
+                        ));
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.bgDeep,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text('حفظ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
