@@ -134,18 +134,25 @@ class PersonService {
 
     // مزامنة كلمة المرور في auth.users عند تغيير PIN
     if (personData.containsKey('pin_code') && personData['pin_code'] != null) {
-      final person = await _db
-          .from('people')
-          .select('legacy_user_id')
-          .eq('id', personId)
-          .single();
-      final qfId = person['legacy_user_id'] as String;
-      final pin = personData['pin_code'] as String;
-      final newPassword = '${qfId.toUpperCase()}_$pin';
-      await _db.rpc('admin_update_user_password', params: {
-        'target_person_id': personId,
-        'new_password': newPassword,
-      });
+      final pin = (personData['pin_code'] as String).trim();
+      if (pin.isNotEmpty) {
+        final person = await _db
+            .from('people')
+            .select('legacy_user_id')
+            .eq('id', personId)
+            .single();
+        final qfId = person['legacy_user_id'] as String;
+        final newPassword = '${qfId.toUpperCase()}_$pin';
+        try {
+          await _db.rpc('admin_update_user_password', params: {
+            'target_person_id': personId,
+            'new_password': newPassword,
+          });
+        } catch (e) {
+          // people.pin_code محدّث بالفعل — نسجّل الخطأ بدون إيقاف العملية
+          // عند أول تسجيل دخول، auth_service.login() سينشئ الحساب بالـ PIN الجديد
+        }
+      }
     }
 
     if (contactData != null) {

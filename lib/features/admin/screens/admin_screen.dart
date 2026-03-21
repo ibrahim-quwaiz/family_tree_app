@@ -1666,7 +1666,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                           image: selectedImageBytes != null
                               ? DecorationImage(image: MemoryImage(selectedImageBytes!), fit: BoxFit.cover)
                               : (currentPhotoUrl != null && currentPhotoUrl!.isNotEmpty)
-                                  ? DecorationImage(image: NetworkImage(currentPhotoUrl!), fit: BoxFit.cover)
+                                  ? DecorationImage(image: NetworkImage('${currentPhotoUrl!}${currentPhotoUrl!.contains('?') ? '&' : '?'}t=${DateTime.now().millisecondsSinceEpoch}'), fit: BoxFit.cover)
                                   : null,
                         ),
                         child: (selectedImageBytes == null && (currentPhotoUrl == null || currentPhotoUrl!.isEmpty))
