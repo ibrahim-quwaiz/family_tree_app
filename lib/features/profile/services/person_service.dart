@@ -48,7 +48,7 @@ class PersonService {
       await _db.from('people').update({'photo_url': url}).eq('id', personId);
       return url;
     } catch (e) {
-      return null;
+      throw Exception('فشل رفع الصورة: $e');
     }
   }
 
@@ -112,7 +112,10 @@ class PersonService {
     }
 
     if (photoBytes != null) {
-      await uploadPhoto(newPersonId, photoBytes);
+      final uploadedUrl = await uploadPhoto(newPersonId, photoBytes);
+      if (uploadedUrl == null) {
+        throw Exception('فشل رفع الصورة');
+      }
     }
 
     return qfId;
@@ -129,12 +132,31 @@ class PersonService {
   }) async {
     await _db.from('people').update(personData).eq('id', personId);
 
+    // مزامنة كلمة المرور في auth.users عند تغيير PIN
+    if (personData.containsKey('pin_code') && personData['pin_code'] != null) {
+      final person = await _db
+          .from('people')
+          .select('legacy_user_id')
+          .eq('id', personId)
+          .single();
+      final qfId = person['legacy_user_id'] as String;
+      final pin = personData['pin_code'] as String;
+      final newPassword = '${qfId.toUpperCase()}_$pin';
+      await _db.rpc('admin_update_user_password', params: {
+        'target_person_id': personId,
+        'new_password': newPassword,
+      });
+    }
+
     if (contactData != null) {
       await upsertContact(personId, contactData);
     }
 
     if (photoBytes != null) {
-      await uploadPhoto(personId, photoBytes);
+      final uploadedUrl = await uploadPhoto(personId, photoBytes);
+      if (uploadedUrl == null) {
+        throw Exception('فشل رفع الصورة');
+      }
     }
   }
 

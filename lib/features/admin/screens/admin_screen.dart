@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/config/supabase_config.dart';
@@ -111,7 +112,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     try {
       final response = await SupabaseConfig.client
           .from('people')
-          .select('id, legacy_user_id, name, gender, generation, is_alive, father_id, mother_id, mother_external_name, birth_date, death_date, birth_city, birth_country, residence_city, job, education, marital_status, is_admin, pin_code, sort_order')
+          .select('id, legacy_user_id, name, gender, generation, is_alive, father_id, mother_id, mother_external_name, birth_date, death_date, birth_city, birth_country, residence_city, job, education, marital_status, is_admin, pin_code, sort_order, photo_url')
           .order('generation')
           .order('name');
 
@@ -986,7 +987,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {VoidCallback? onChanged, int? maxLength}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {VoidCallback? onChanged, int? maxLength, List<TextInputFormatter>? inputFormatters}) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.bgDeep.withOpacity(0.5),
@@ -996,6 +997,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       child: TextField(
         controller: controller,
         maxLength: maxLength,
+        inputFormatters: inputFormatters,
         onChanged: onChanged != null ? (_) => onChanged() : null,
         style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
@@ -1118,6 +1120,7 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                     Builder(
                       builder: (_) {
                         _contactLoaded = true;
+                        currentPhotoUrl = person['photo_url'] as String?;
                         SupabaseConfig.client
                             .from('contact_info')
                             .select()
@@ -1127,7 +1130,6 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                               if (contact != null) {
                                 mobileController.text = contact['mobile_phone'] as String? ?? '';
                                 emailController.text = contact['email'] as String? ?? '';
-                                currentPhotoUrl = person['photo_url'] as String?;
                                 instagramController.text = contact['instagram'] as String? ?? '';
                                 twitterController.text = contact['twitter'] as String? ?? '';
                                 snapchatController.text = contact['snapchat'] as String? ?? '';
@@ -1624,7 +1626,19 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
                   SizedBox(height: 12),
                   _buildLabel('رمز PIN'),
                   SizedBox(height: 4),
-                  _buildTextField(pinController, 'رمز الدخول (4 أرقام)', maxLength: 4),
+                  _buildTextField(pinController, 'رمز الدخول (4 أرقام)', maxLength: 4, inputFormatters: [
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      final converted = newValue.text
+                          .replaceAll('٠', '0').replaceAll('١', '1')
+                          .replaceAll('٢', '2').replaceAll('٣', '3')
+                          .replaceAll('٤', '4').replaceAll('٥', '5')
+                          .replaceAll('٦', '6').replaceAll('٧', '7')
+                          .replaceAll('٨', '8').replaceAll('٩', '9');
+                      return newValue.copyWith(text: converted);
+                    }),
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ]),
                   SizedBox(height: 20),
                   Container(height: 1, color: Colors.white.withOpacity(0.06)),
                   SizedBox(height: 16),

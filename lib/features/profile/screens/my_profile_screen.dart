@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -2831,6 +2832,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       keyboardType: TextInputType.number,
       obscureText: true,
       maxLength: 4,
+      inputFormatters: [
+        TextInputFormatter.withFunction((oldValue, newValue) {
+          final converted = newValue.text
+              .replaceAll('٠', '0').replaceAll('١', '1')
+              .replaceAll('٢', '2').replaceAll('٣', '3')
+              .replaceAll('٤', '4').replaceAll('٥', '5')
+              .replaceAll('٦', '6').replaceAll('٧', '7')
+              .replaceAll('٨', '8').replaceAll('٩', '9');
+          return newValue.copyWith(text: converted);
+        }),
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(4),
+      ],
       style: TextStyle(color: AppColors.textPrimary, fontSize: 20, letterSpacing: 8),
       decoration: InputDecoration(
         labelText: label,
