@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/config/supabase_config.dart';
 
@@ -151,6 +152,7 @@ class PersonService {
         } catch (e) {
           // people.pin_code محدّث بالفعل — نسجّل الخطأ بدون إيقاف العملية
           // عند أول تسجيل دخول، auth_service.login() سينشئ الحساب بالـ PIN الجديد
+          debugPrint('⚠️ فشل مزامنة PIN مع auth.users: $e');
         }
       }
     }
