@@ -50,3 +50,7 @@ web/Untitled
 android/key.properties
 android/app/upload-keystore.jks
 android/play-store-credentials.json
+key.properties
+
+# Fastlane auto-generated
+fastlane/report.xml
