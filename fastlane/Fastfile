@@ -1,0 +1,19 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload AAB to Google Play Production"
+  lane :deploy do
+    upload_to_play_store(
+      track: "production",
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      json_key: "android/play-store-credentials.json",
+      package_name: "com.alquwaiz.familytree",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      rollout: "1.0"
+    )
+  end
+end

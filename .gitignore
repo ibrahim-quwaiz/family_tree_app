@@ -45,3 +45,8 @@ app.*.map.json
 /android/app/release
 migrate_photos.dart
 web/Untitled
+
+# Sensitive credentials
+android/key.properties
+android/app/upload-keystore.jks
+android/play-store-credentials.json
