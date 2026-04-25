@@ -34,10 +34,13 @@ https://ibrahim-quwaiz.github.io/family_tree_app/
 
 ### Google Play
 - **Package Name:** com.alquwaiz.familytree
-- **الحالة:** اختبار مغلق — يحتاج 12 مختبر (9 مكتملون)
-- **الإصدار:** 2.0.0+10
+- **الحالة:** قيد المراجعة للإنتاج (2.0.2+12)
+- **الإصدار:** 2.0.2+12
+- **الدول:** المملكة العربية السعودية
 - **Keystore:** android/app/upload-keystore.jks (alias: upload)
 - **Key Properties:** android/key.properties (محمي من Git)
+- **Fastlane:** مضبوط — الرفع بأمر `fastlane deploy`
+- **Service Account:** android/play-store-credentials.json (محمي من Git)
 
 ### Apple App Store
 - **Bundle ID (iOS):** yit.familytree.com
@@ -64,8 +67,11 @@ flutter run -d chrome
 flutter run -d 00008120-000449023660C01E   # iPhone
 
 # إصدار
-flutter build appbundle --release   # Google Play (يفضل: JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" قبل الأمر)
+JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" flutter build appbundle --release   # Google Play
 flutter build ipa --release        # App Store
+
+# نشر على Google Play (تلقائي)
+fastlane deploy
 ```
 
 ## هيكل المشروع
@@ -176,6 +182,10 @@ gold: #C8A45C / bgDeep: #0A1628 / bgCard: #111E36
 - `v2.0-before-theme` — قبل إضافة الثيم
 
 ## المهام المنجزة مؤخراً
+- [x] إعداد Fastlane للنشر التلقائي على Google Play من الترمنل
+- [x] تصحيح applicationId إلى com.alquwaiz.familytree في build.gradle.kts
+- [x] إعداد release signing config باستخدام upload-keystore
+- [x] رفع الإصدار 2.0.2+12 على Google Play (قيد المراجعة)
 - [x] إضافة تعديل وحذف الأبناء من صفحة حسابي
 - [x] إضافة تعديل وحذف الزوجات من صفحة حسابي
 - [x] توحيد `deleteMarriage()` و`deletePerson()` في `PersonService`
@@ -191,11 +201,10 @@ gold: #C8A45C / bgDeep: #0A1628 / bgCard: #111E36
 ## المهام المعلقة
 - [ ] توحيد بنية `showModalBottomSheet` (مؤجل لما قبل النشر)
 - [ ] Push Notifications (FCM + APNs)
-- [ ] Google Play: إكمال 12 مختبر + 14 يوم اختبار
 - [ ] App Store: انتظار مراجعة Apple
-- [ ] رفع نسخة جديدة للمتجر
 - [ ] تغيير Display Name لـ "عائلة القويز"
 - [ ] تنظيف `print` statements المتبقية
+- [ ] تحديث Kotlin إلى 2.1.0+ (تحذير من Flutter)
 
 ## ملاحظات مهمة
 - photo_url مُنقول من contact_info إلى people
